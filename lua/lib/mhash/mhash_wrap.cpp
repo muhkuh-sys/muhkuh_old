@@ -2009,6 +2009,7 @@ static swig_lua_const_info swig_constants[] = {
 { SWIG_LUA_INT,     (char *)"MHASH_SUBHASH", (long) MHASH_SUBHASH, 0, 0, 0},
 { SWIG_LUA_INT,     (char *)"MHASH_HILROM", (long) MHASH_HILROM, 0, 0, 0},
 { SWIG_LUA_INT,     (char *)"MHASH_HILROMI", (long) MHASH_HILROMI, 0, 0, 0},
+{ SWIG_LUA_INT,     (char *)"MHASH_CRC16", (long) MHASH_CRC16, 0, 0, 0},
 { SWIG_LUA_INT,     (char *)"MUTILS_OK", (long) MUTILS_OK, 0, 0, 0},
 { SWIG_LUA_INT,     (char *)"MUTILS_SYSTEM_ERROR", (long) MUTILS_SYSTEM_ERROR, 0, 0, 0},
 { SWIG_LUA_INT,     (char *)"MUTILS_UNSPECIFIED_ERROR", (long) MUTILS_UNSPECIFIED_ERROR, 0, 0, 0},

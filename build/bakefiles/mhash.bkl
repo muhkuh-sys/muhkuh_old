@@ -33,6 +33,7 @@
 			lua/lib/mhash/mhash_state.cpp
 			lua/lib/mhash/mhash_wrap.cpp
 			lua/lib/mhash/mhash-0.9.9-hilrom/lib/adler32.c
+			lua/lib/mhash/mhash-0.9.9-hilrom/lib/crc16.c
 			lua/lib/mhash/mhash-0.9.9-hilrom/lib/crc32.c
 			lua/lib/mhash/mhash-0.9.9-hilrom/lib/gosthash.c
 			lua/lib/mhash/mhash-0.9.9-hilrom/lib/haval.c
@@ -69,6 +70,7 @@
 			lua/lib/mhash/mhash-0.9.9-hilrom/lib/keygen.h
 			lua/lib/mhash/mhash-0.9.9-hilrom/lib/libdefs.h
 			lua/lib/mhash/mhash-0.9.9-hilrom/lib/mhash_adler32.h
+			lua/lib/mhash/mhash-0.9.9-hilrom/lib/mhash_crc16.h
 			lua/lib/mhash/mhash-0.9.9-hilrom/lib/mhash_crc32.h
 			lua/lib/mhash/mhash-0.9.9-hilrom/lib/mhash_gost.h
 			lua/lib/mhash/mhash-0.9.9-hilrom/lib/mhash_haval.h
