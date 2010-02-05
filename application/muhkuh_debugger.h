@@ -113,11 +113,11 @@ private:
 	void dbg_fillStackWindow(void);
 	void dbg_fillWatchWindow(void);
 
-	static const char *acSyntaxhl0;
-	static const char *acSyntaxhl1;
-	static const char *acSyntaxhl2;
-	static const char *acSyntaxhl3;
-	static const char *acSyntaxhl4;
+	static const wxChar *acSyntaxhl0;
+	static const wxChar *acSyntaxhl1;
+	static const wxChar *acSyntaxhl2;
+	static const wxChar *acSyntaxhl3;
+	static const wxChar *acSyntaxhl4;
 
 
 	// debugger gui elements

@@ -155,7 +155,7 @@ muhkuh_mainFrame::muhkuh_mainFrame(void)
 	if( m_locale.Init(iLanguage, wxLOCALE_CONV_ENCODING)==false )
 	{
 		// NOTE: translate this so the default system language may be used at least.
-		wxLogError(_("The language '%s' is not supported by the system."), wxLocale::GetLanguageName(iLanguage).fn_str());
+		wxLogError(_("The language '%s' is not supported by the system."), wxLocale::GetLanguageName(iLanguage).c_str());
 	}
 	else
 	{
@@ -450,7 +450,7 @@ wxString muhkuh_mainFrame::loadHtmlString(wxString strFileUrl)
 	}
 	else
 	{
-		strData.Printf(_("<html><body><h1>Error!</h1>Failed to load file '%s'!</body></html>"), strFileUrl.fn_str());
+		strData.Printf(_("<html><body><h1>Error!</h1>Failed to load file '%s'!</body></html>"), strFileUrl.c_str());
 	}
 	delete ptGrowBuffer;
 
@@ -868,7 +868,7 @@ void muhkuh_mainFrame::OnIdle(wxIdleEvent& event)
 			reloadDetailsPage(NULL);
 
 			// add all help books
-			m_ptHelp->AddBook(wxFileName("muhkuh.htb"), true);
+			m_ptHelp->AddBook(wxFileName(wxT("muhkuh.htb")), true);
 
 			if( m_fShowStartupTips==true && m_tipProvider!=NULL )
 			{
@@ -903,7 +903,7 @@ void muhkuh_mainFrame::OnIdle(wxIdleEvent& event)
 		break;
 
 	case muhkuh_mainFrame_state_testing:
-		strStatus.Printf(_("Test '%s' in progress..."), m_strRunningTestName.fn_str());
+		strStatus.Printf(_("Test '%s' in progress..."), m_strRunningTestName.c_str());
 		break;
 	}
 
@@ -1181,7 +1181,7 @@ bool muhkuh_mainFrame::initLuaState(void)
 							// set the package path
 							wxLogMessage(wxT("Lua path:") + m_strLuaIncludePath);
 
-							m_ptLuaState->lua_GetGlobal(wxT("package"));
+							m_ptLuaState->lua_GetGlobal("package");
 							if( m_ptLuaState->lua_IsNoneOrNil(-1)==true )
 							{
 								wxLogError(_("Failed to get the global 'package'"));
@@ -1191,7 +1191,7 @@ bool muhkuh_mainFrame::initLuaState(void)
 
 							// set the lua version
 							m_ptLuaState->lua_PushString(m_strVersion.ToAscii());
-							m_ptLuaState->lua_SetGlobal(wxT("__MUHKUH_VERSION"));
+							m_ptLuaState->lua_SetGlobal("__MUHKUH_VERSION");
 						}
 					}
 				}
@@ -1326,14 +1326,14 @@ void muhkuh_mainFrame::executeTest(muhkuh_wrap_xml *ptTestData, unsigned int uiI
 #ifdef __ENABLE_DEBUGGER__
 			strServerCmd.Printf(wxT("./serverkuh -c Muhkuh.cfg -i %d -dlocalhost:%d %s"), uiIndex, m_usDebugServerPort, strXmlUrl.fn_str());
 #else
-			strServerCmd.Printf(wxT("./serverkuh -c Muhkuh.cfg -i %d %s"), uiIndex, strXmlUrl.fn_str());
+			strServerCmd.Printf(wxT("./serverkuh -c Muhkuh.cfg -i %d %s"), uiIndex, strXmlUrl.c_str());
 #endif
 			wxLogMessage(wxT("starting server: ") + strServerCmd);
 
 			m_lServerPid = wxExecute(strServerCmd, wxEXEC_ASYNC|wxEXEC_MAKE_GROUP_LEADER, m_ptServerProcess);
 			if( m_lServerPid==0 )
 			{
-				strMsg.Printf(_("Failed to start the server with command: %s"), strServerCmd.fn_str());
+				strMsg.Printf(_("Failed to start the server with command: %s"), strServerCmd.c_str());
 				wxMessageBox(strMsg, _("Server startup error"), wxICON_ERROR, this);
 			}
 		}
@@ -1346,7 +1346,7 @@ void muhkuh_mainFrame::finishTest(void)
 	int iPanelIdx;
 
 
-	wxLogMessage(_("Test '%s' finished, cleaning up..."), m_strRunningTestName.fn_str());
+	wxLogMessage(_("Test '%s' finished, cleaning up..."), m_strRunningTestName.c_str());
 
 	if( m_debuggerPanel!=NULL )
 	{
@@ -1623,7 +1623,7 @@ void muhkuh_mainFrame::OnTestTreeContextMenu(wxTreeEvent &event)
 	pt = event.GetPoint();
 	if( itemId.IsOk() )
 	{
-		strTitle.Printf(_("Menu for %s"), m_treeCtrl->GetItemText(itemId).fn_str());
+		strTitle.Printf(_("Menu for %s"), m_treeCtrl->GetItemText(itemId).c_str());
 		ptMenu = new wxMenu(strTitle);
 		ptMenu->Append(muhkuh_mainFrame_TestTree_Execute,	_("&Execute..."));
 		ptMenu->Append(muhkuh_mainFrame_TestTree_ShowHelp,	_("&Show Help..."));
@@ -1760,7 +1760,7 @@ void muhkuh_mainFrame::addAllTests(int iActiveRepositoryIdx)
 	while( sizCnt<sizMax && fScannerIsRunning==true )
 	{
 		// check for cancel button
-		strMessage.Printf(_("scanning '%s'..."), m_ptRepositoryManager->getTestlistPrintUrl(iActiveRepositoryIdx, sizCnt).fn_str());
+		strMessage.Printf(_("scanning '%s'..."), m_ptRepositoryManager->getTestlistPrintUrl(iActiveRepositoryIdx, sizCnt).c_str());
 		fScannerIsRunning = m_scannerProgress->Update(sizCnt, strMessage, NULL);
 
 		fResult = scanFileXml(iActiveRepositoryIdx, sizCnt);
@@ -1853,7 +1853,7 @@ bool muhkuh_mainFrame::addTestTree(testTreeItemData *ptTestTreeItem)
 	if( fResult==false )
 	{
 		// path not ok
-		strMsg.Printf(_("The testname '%s' is no valid path to a test."), strTestPath.fn_str());
+		strMsg.Printf(_("The testname '%s' is no valid path to a test."), strTestPath.c_str());
 		wxMessageBox(strMsg, _("Failed to add test"), wxICON_ERROR, this);
 	}
 	else
@@ -1892,7 +1892,7 @@ bool muhkuh_mainFrame::addTestTree(testTreeItemData *ptTestTreeItem)
 						ptOldTreeItem = (testTreeItemData*)m_treeCtrl->GetItemData(searchId);
 						if( ptOldTreeItem!=NULL )
 						{
-							strMsg.Printf(_("The path '%s' conflicts with a test in this path!"), strTestPath.fn_str());
+							strMsg.Printf(_("The path '%s' conflicts with a test in this path!"), strTestPath.c_str());
 							wxMessageBox(strMsg, _("Failed to add test"), wxICON_ERROR, this);
 							fResult = false;
 						}
@@ -1984,7 +1984,7 @@ bool muhkuh_mainFrame::addTestTree(testTreeItemData *ptTestTreeItem)
 			// check for error (element already exists)
 			if( iCmp==0 )
 			{
-				strMsg.Printf(_("The test '%s' already exists, skipping new instance!"), strTestPath.fn_str());
+				strMsg.Printf(_("The test '%s' already exists, skipping new instance!"), strTestPath.c_str());
 				wxMessageBox(strMsg, _("Failed to add test"), wxICON_ERROR, this);
 				fResult = false;
 			}
@@ -2016,11 +2016,11 @@ bool muhkuh_mainFrame::scanFileXml(size_t sizRepositoryIdx, size_t sizTestIdx)
 	strXmlUrl = m_ptRepositoryManager->getTestlistXmlUrl(sizRepositoryIdx, sizTestIdx);
 
 	// test if file exists
-	wxLogVerbose(_("Reading testdescription '%s'"), strXmlUrl.fn_str());
+	wxLogVerbose(_("Reading testdescription '%s'"), strXmlUrl.c_str());
 	ptFsFile = fileSystem.OpenFile(strXmlUrl);
 	if( ptFsFile==NULL )
 	{
-		wxLogError(_("could not read xml file '%s'"), strXmlUrl.fn_str());
+		wxLogError(_("could not read xml file '%s'"), strXmlUrl.c_str());
 	}
 	else
 	{
@@ -2032,7 +2032,7 @@ bool muhkuh_mainFrame::scanFileXml(size_t sizRepositoryIdx, size_t sizTestIdx)
 		{
 			if( ptWrapXml->initialize(ptInputStream, sizRepositoryIdx, sizTestIdx)==false )
 			{
-				wxLogError(_("Failed to read the xml file for testdescription '%s'"), strXmlUrl.fn_str());
+				wxLogError(_("Failed to read the xml file for testdescription '%s'"), strXmlUrl.c_str());
 			}
 			else
 			{
@@ -2190,7 +2190,7 @@ void muhkuh_mainFrame::OnMtdLinkClicked(wxHtmlLinkEvent &event)
 		if( tUri.HasServer()==false && tUri.HasPath()==false )
 		{
 			// no server and no path -> no good mtd link
-			wxLogError(_("mtd link has no valid path: '%s'"), tUri.Unescape(strHref).fn_str());
+			wxLogError(_("mtd link has no valid path: '%s'"), tUri.Unescape(strHref).c_str());
 		}
 		else
 		{
@@ -2217,7 +2217,7 @@ void muhkuh_mainFrame::OnMtdLinkClicked(wxHtmlLinkEvent &event)
 			if( fResult==false )
 			{
 				// path not ok
-				wxLogError(wxT("The testname '%s' is no valid path to a test."), tUri.Unescape(strPath).fn_str());
+				wxLogError(wxT("The testname '%s' is no valid path to a test."), tUri.Unescape(strPath).c_str());
 			}
 			else
 			{
@@ -2266,7 +2266,7 @@ void muhkuh_mainFrame::OnMtdLinkClicked(wxHtmlLinkEvent &event)
 				if( iCmp!=0 || searchId.IsOk()!=true )
 				{
 					// no
-					wxLogError(wxT("The test '%s' could not be found."), tUri.Unescape(strPath).fn_str());
+					wxLogError(wxT("The test '%s' could not be found."), tUri.Unescape(strPath).c_str());
 				}
 				else
 				{
@@ -2288,7 +2288,7 @@ void muhkuh_mainFrame::OnMtdLinkClicked(wxHtmlLinkEvent &event)
 									fResult = ptWrapXml->testDescription_setTest(uiCnt);
 									if( fResult!=true )
 									{
-										wxLogError(_("failed to query subtest '%s' in test '%s'"), strFragment.fn_str(), strPath.fn_str());
+										wxLogError(_("failed to query subtest '%s' in test '%s'"), strFragment.c_str(), strPath.c_str());
 										break;
 									}
 									else
@@ -2305,7 +2305,7 @@ void muhkuh_mainFrame::OnMtdLinkClicked(wxHtmlLinkEvent &event)
 								// found test
 								if( iCmp!=0 )
 								{
-									wxLogError(_("test '%s' has no subtest '%s'"), strPath.fn_str(), strFragment.fn_str());
+									wxLogError(_("test '%s' has no subtest '%s'"), strPath.c_str(), strFragment.c_str());
 								}
 							}
 							else
@@ -2377,12 +2377,12 @@ wxString muhkuh_mainFrame::luaLoad(wxString strFileName)
 	else
 	{
 		strFileUrl = m_ptRepositoryManager->getTestlistBaseUrl(m_sizRunningTest_RepositoryIdx, m_sizRunningTest_TestIdx) + wxFileName::GetPathSeparator() + strFileName;
-		wxLogMessage(_("lua load: searching '%s'"), strFileUrl.fn_str());
+		wxLogMessage(_("lua load: searching '%s'"), strFileUrl.c_str());
 		urlError = filelistUrl.SetURL(strFileUrl);
 		if( urlError!=wxURL_NOERR )
 		{
 			// this was no valid url
-			strMsg.Printf(_("lua load: invalid URL '%s': "), strFileUrl.fn_str());
+			strMsg.Printf(_("lua load: invalid URL '%s': "), strFileUrl.c_str());
 			// try to show some details
 			switch( urlError )
 			{
@@ -2464,12 +2464,12 @@ void muhkuh_mainFrame::luaInclude(wxString strFileName)
 		else
 		{
 			strFileUrl = m_ptRepositoryManager->getTestlistBaseUrl(m_sizRunningTest_RepositoryIdx, m_sizRunningTest_TestIdx) + wxFileName::GetPathSeparator() + strFileName;
-			wxLogMessage(_("lua include: searching '%s'"), strFileUrl.fn_str());
+			wxLogMessage(_("lua include: searching '%s'"), strFileUrl.c_str());
 			urlError = filelistUrl.SetURL(strFileUrl);
 			if( urlError!=wxURL_NOERR )
 			{
 				// this was no valid url
-				strMsg.Printf(_("lua include: invalid URL '%s': "), strFileUrl.fn_str());
+				strMsg.Printf(_("lua include: invalid URL '%s': "), strFileUrl.c_str());
 				// try to show some details
 				switch( urlError )
 				{

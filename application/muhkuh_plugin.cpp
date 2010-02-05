@@ -119,7 +119,7 @@ muhkuh_plugin::~muhkuh_plugin(void)
 
 void muhkuh_plugin::setMe(void)
 {
-	m_strMe.Printf("muhkuh_plugin(%p) :", this);
+	m_strMe.Printf(wxT("muhkuh_plugin(%p) :"), this);
 }
 
 
@@ -129,7 +129,7 @@ void muhkuh_plugin::setInitError(wxString strMessage, wxString strPath)
 
 
 	// build errormessage
-	m_strInitError.Printf(_("The plugin '%s' failed to load: %s"), strPath.fn_str(), strMessage.fn_str());
+	m_strInitError.Printf(_("The plugin '%s' failed to load: %s"), strPath.c_str(), strMessage.c_str());
 	// show message in logfile
 	wxLogError(m_strMe + m_strInitError);
 
@@ -280,7 +280,7 @@ bool muhkuh_plugin::Load(wxString strPluginCfgPath)
 	const muhkuh_plugin_desc *ptDesc;
 
 
-	wxLogMessage(m_strMe + _("loading plugin '%s'"), strPluginCfgPath.fn_str());
+	wxLogMessage(m_strMe + _("loading plugin '%s'"), strPluginCfgPath.c_str());
 
 	// do not open a plugin twice
 	if( m_tPluginIf.tHandle!=NULL )
@@ -359,7 +359,7 @@ bool muhkuh_plugin::Load(wxString strPluginCfgPath)
 				if( fResult!=true )
 				{
 					// close the plugin
-					wxLogMessage(m_strMe + _("closing plugin '%s'"), strPluginCfgPath.fn_str());
+					wxLogMessage(m_strMe + _("closing plugin '%s'"), strPluginCfgPath.c_str());
 					close();
 				}
 			}
@@ -555,7 +555,7 @@ bool muhkuh_plugin::open(wxString strPluginPath)
 		fDllLoaded = dll.Load(strFullPath, wxDL_DEFAULT);
 		if( fDllLoaded==false )
 		{
-			strMsg.Printf(_("failed to load the shared object from '%s'"), strFullPath.fn_str());
+			strMsg.Printf(_("failed to load the shared object from '%s'"), strFullPath.c_str());
 			setInitError(strMsg, strPluginPath);
 		}
 		else
@@ -569,7 +569,7 @@ bool muhkuh_plugin::open(wxString strPluginPath)
 				pvPtr = dll.GetSymbol(ptCnt->pcSymbolName);
 				if( pvPtr==NULL )
 				{
-					strMsg.Printf(_("failed to get symbol '%s' from shared object '%s'"), ptCnt->pcSymbolName, strFullPath.fn_str());
+					strMsg.Printf(_("failed to get symbol '%s' from shared object '%s'"), ptCnt->pcSymbolName, strFullPath.c_str());
 					setInitError(strMsg, strPluginPath);
 					break;
 				}

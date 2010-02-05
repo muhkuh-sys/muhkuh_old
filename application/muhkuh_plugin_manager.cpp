@@ -96,7 +96,7 @@ muhkuh_plugin_manager::~muhkuh_plugin_manager(void)
 
 void muhkuh_plugin_manager::setMe(void)
 {
-	m_strMe.Printf("muhkuh_plugin_manager(%p) :", this);
+	m_strMe.Printf(wxT("muhkuh_plugin_manager(%p) :"), this);
 }
 
 
@@ -114,7 +114,7 @@ long muhkuh_plugin_manager::addPlugin(wxString strPluginCfgName)
 	// check if the plugin was loaded
 	if( ptPlugin==NULL )
 	{
-		wxLogError(m_strMe + _("failed to create plugin '%s'"), strPluginCfgName.fn_str());
+		wxLogError(m_strMe + _("failed to create plugin '%s'"), strPluginCfgName.c_str());
 	}
 	else
 	{
@@ -411,7 +411,7 @@ bool muhkuh_plugin_manager::initLuaBindings(wxLuaState *ptLuaState)
 				if( ptPlugin->IsOk()!=true )
 				{
 					// plugin is not ok, but still enabled!
-					wxLogError(m_strMe + _("State of plugin '%s' is not ok, init error is '%s'"), strPluginName.fn_str(), ptPlugin->GetInitError().fn_str());
+					wxLogError(m_strMe + _("State of plugin '%s' is not ok, init error is '%s'"), strPluginName.c_str(), ptPlugin->GetInitError().c_str());
 					// NOTE: errors in plugins are not fatal
 				}
 				else
@@ -420,7 +420,7 @@ bool muhkuh_plugin_manager::initLuaBindings(wxLuaState *ptLuaState)
 					iResult = ptPlugin->fn_init_lua(ptLuaState);
 					if( iResult!=0 )
 					{
-						wxLogError(m_strMe + _("Failed to init lua bindings of plugin '%s': %d"), strPluginName.fn_str(), iResult);
+						wxLogError(m_strMe + _("Failed to init lua bindings of plugin '%s': %d"), strPluginName.c_str(), iResult);
 						// NOTE: errors in plugins are not fatal
 					}
 				}
@@ -464,7 +464,7 @@ void muhkuh_plugin_manager::ScanPlugins(wxString strPattern, wxLuaState *ptLuaSt
 		if( fResult!=true )
 		{
 			// failed to compile regex
-			strMsg.Printf(_("Failed to compile regular expression: '%s'"), strPattern.fn_str());
+			strMsg.Printf(_("Failed to compile regular expression: '%s'"), strPattern.c_str());
 		}
 		else
 		{
@@ -486,7 +486,7 @@ void muhkuh_plugin_manager::ScanPlugins(wxString strPattern, wxLuaState *ptLuaSt
 					{
 						if( ptPlugin->IsOk()!=true )
 						{
-							strMsg.Printf(_("The state of plugin '%s' is not ok!"), strPluginName.fn_str());
+							strMsg.Printf(_("The state of plugin '%s' is not ok!"), strPluginName.c_str());
 							wxLogError(m_strMe + strMsg);
 						}
 						else
@@ -499,7 +499,7 @@ void muhkuh_plugin_manager::ScanPlugins(wxString strPattern, wxLuaState *ptLuaSt
 								iResult = ptPlugin->fn_detect_interfaces(m_ptMatchingPlugins);
 								if( iResult<0 )
 								{
-									strMsg.Printf(_("Failed to detect interfaces of plugin '%s': %d!"), strPluginName.fn_str(), iResult);
+									strMsg.Printf(_("Failed to detect interfaces of plugin '%s': %d!"), strPluginName.c_str(), iResult);
 
 									fResult = false;
 									break;

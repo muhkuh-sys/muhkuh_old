@@ -45,193 +45,193 @@ BEGIN_EVENT_TABLE(muhkuh_debugger, wxPanel)
 END_EVENT_TABLE()
 
 
-const char *muhkuh_debugger::acSyntaxhl0 =
+const wxChar *muhkuh_debugger::acSyntaxhl0 =
 {
-	"and "
-	"break "
-	"do "
-	"else "
-	"elseif "
-	"end "
-	"false "
-	"for "
-	"function "
-	"if "
-	"in "
-	"local "
-	"nil "
-	"not "
-	"or "
-	"repeat "
-	"return "
-	"then "
-	"true "
-	"until "
-	"while"
+	wxT("and ")
+	wxT("break ")
+	wxT("do ")
+	wxT("else ")
+	wxT("elseif ")
+	wxT("end ")
+	wxT("false ")
+	wxT("for ")
+	wxT("function ")
+	wxT("if ")
+	wxT("in ")
+	wxT("local ")
+	wxT("nil ")
+	wxT("not ")
+	wxT("or ")
+	wxT("repeat ")
+	wxT("return ")
+	wxT("then ")
+	wxT("true ")
+	wxT("until ")
+	wxT("while")
 };
 
 
-const char *muhkuh_debugger::acSyntaxhl1 =
+const wxChar *muhkuh_debugger::acSyntaxhl1 =
 {
-	"_VERSION "
-	"assert "
-	"collectgarbage "
-	"dofile "
-	"error "
-	"gcinfo "
-	"loadfile "
-	"loadstring "
-	"print "
-	"rawget "
-	"rawset "
-	"require "
-	"tonumber "
-	"tostring "
-	"type "
-	"unpack"
+	wxT("_VERSION ")
+	wxT("assert ")
+	wxT("collectgarbage ")
+	wxT("dofile ")
+	wxT("error ")
+	wxT("gcinfo ")
+	wxT("loadfile ")
+	wxT("loadstring ")
+	wxT("print ")
+	wxT("rawget ")
+	wxT("rawset ")
+	wxT("require ")
+	wxT("tonumber ")
+	wxT("tostring ")
+	wxT("type ")
+	wxT("unpack")
 };
 
 
-const char *muhkuh_debugger::acSyntaxhl2 =
+const wxChar *muhkuh_debugger::acSyntaxhl2 =
 {
-	"_G "
-	"getfenv "
-	"getmetatable "
-	"ipairs "
-	"loadlib "
-	"next "
-	"pairs "
-	"pcall "
-	"rawequal "
-	"setfenv "
-	"setmetatable "
-	"xpcall "
-	"string "
-	"table "
-	"math "
-	"coroutine "
-	"io "
-	"os "
-	"debug "
-	"load "
-	"module "
-	"select"
+	wxT("_G ")
+	wxT("getfenv ")
+	wxT("getmetatable ")
+	wxT("ipairs ")
+	wxT("loadlib ")
+	wxT("next ")
+	wxT("pairs ")
+	wxT("pcall ")
+	wxT("rawequal ")
+	wxT("setfenv ")
+	wxT("setmetatable ")
+	wxT("xpcall ")
+	wxT("string ")
+	wxT("table ")
+	wxT("math ")
+	wxT("coroutine ")
+	wxT("io ")
+	wxT("os ")
+	wxT("debug ")
+	wxT("load ")
+	wxT("module ")
+	wxT("select")
 };
 
 
-const char *muhkuh_debugger::acSyntaxhl3 =
+const wxChar *muhkuh_debugger::acSyntaxhl3 =
 {
-	"string.byte "
-	"string.char "
-	"string.dump "
-	"string.find "
-	"string.len "
-	"string.lower "
-	"string.rep "
-	"string.sub "
-	"string.upper "
-	"string.format "
-	"string.gfind "
-	"string.gsub "
-	"table.concat "
-	"table.foreach "
-	"table.foreachi "
-	"table.getn "
-	"table.sort "
-	"table.insert "
-	"table.remove "
-	"table.setn "
-	"math.abs "
-	"math.acos "
-	"math.asin "
-	"math.atan "
-	"math.atan2 "
-	"math.ceil "
-	"math.cos "
-	"math.deg "
-	"math.exp "
-	"math.floor "
-	"math.frexp "
-	"math.ldexp "
-	"math.log "
-	"math.log10 "
-	"math.max "
-	"math.min "
-	"math.mod "
-	"math.pi "
-	"math.pow "
-	"math.rad "
-	"math.random "
-	"math.randomseed "
-	"math.sin "
-	"math.sqrt "
-	"math.tan "
-	"string.gmatch "
-	"string.match "
-	"string.reverse "
-	"table.maxn "
-	"math.cosh "
-	"math.fmod "
-	"math.modf "
-	"math.sinh "
-	"math.tanh "
-	"math.huge"
+	wxT("string.byte ")
+	wxT("string.char ")
+	wxT("string.dump ")
+	wxT("string.find ")
+	wxT("string.len ")
+	wxT("string.lower ")
+	wxT("string.rep ")
+	wxT("string.sub ")
+	wxT("string.upper ")
+	wxT("string.format ")
+	wxT("string.gfind ")
+	wxT("string.gsub ")
+	wxT("table.concat ")
+	wxT("table.foreach ")
+	wxT("table.foreachi ")
+	wxT("table.getn ")
+	wxT("table.sort ")
+	wxT("table.insert ")
+	wxT("table.remove ")
+	wxT("table.setn ")
+	wxT("math.abs ")
+	wxT("math.acos ")
+	wxT("math.asin ")
+	wxT("math.atan ")
+	wxT("math.atan2 ")
+	wxT("math.ceil ")
+	wxT("math.cos ")
+	wxT("math.deg ")
+	wxT("math.exp ")
+	wxT("math.floor ")
+	wxT("math.frexp ")
+	wxT("math.ldexp ")
+	wxT("math.log ")
+	wxT("math.log10 ")
+	wxT("math.max ")
+	wxT("math.min ")
+	wxT("math.mod ")
+	wxT("math.pi ")
+	wxT("math.pow ")
+	wxT("math.rad ")
+	wxT("math.random ")
+	wxT("math.randomseed ")
+	wxT("math.sin ")
+	wxT("math.sqrt ")
+	wxT("math.tan ")
+	wxT("string.gmatch ")
+	wxT("string.match ")
+	wxT("string.reverse ")
+	wxT("table.maxn ")
+	wxT("math.cosh ")
+	wxT("math.fmod ")
+	wxT("math.modf ")
+	wxT("math.sinh ")
+	wxT("math.tanh ")
+	wxT("math.huge")
 };
 
 
-const char *muhkuh_debugger::acSyntaxhl4 =
+const wxChar *muhkuh_debugger::acSyntaxhl4 =
 {
-	"coroutine.create "
-	"coroutine.resume "
-	"coroutine.status "
-	"coroutine.wrap "
-	"coroutine.yield "
-	"io.close "
-	"io.flush "
-	"io.input "
-	"io.lines "
-	"io.open "
-	"io.output "
-	"io.read "
-	"io.tmpfile "
-	"io.type "
-	"io.write "
-	"io.stdin "
-	"io.stdout "
-	"io.stderr "
-	"os.clock "
-	"os.date "
-	"os.difftime "
-	"os.execute "
-	"os.exit "
-	"os.getenv "
-	"os.remove "
-	"os.rename "
-	"os.setlocale "
-	"os.time "
-	"os.tmpname "
-	"coroutine.running "
-	"package.cpath "
-	"package.loaded "
-	"package.loadlib "
-	"package.path "
-	"package.preload "
-	"package.seeall "
-	"io.popen "
-	"debug.debug "
-	"debug.getfenv "
-	"debug.gethook "
-	"debug.getinfo "
-	"debug.getlocal "
-	"debug.getmetatable "
-	"debug.getregistry "
-	"debug.getupvalue "
-	"debug.setfenv "
-	"debug.sethook "
-	"debug.setlocal "
-	"debug.setmetatable "
-	"debug.setupvalue "
-	"debug.traceback"
+	wxT("coroutine.create ")
+	wxT("coroutine.resume ")
+	wxT("coroutine.status ")
+	wxT("coroutine.wrap ")
+	wxT("coroutine.yield ")
+	wxT("io.close ")
+	wxT("io.flush ")
+	wxT("io.input ")
+	wxT("io.lines ")
+	wxT("io.open ")
+	wxT("io.output ")
+	wxT("io.read ")
+	wxT("io.tmpfile ")
+	wxT("io.type ")
+	wxT("io.write ")
+	wxT("io.stdin ")
+	wxT("io.stdout ")
+	wxT("io.stderr ")
+	wxT("os.clock ")
+	wxT("os.date ")
+	wxT("os.difftime ")
+	wxT("os.execute ")
+	wxT("os.exit ")
+	wxT("os.getenv ")
+	wxT("os.remove ")
+	wxT("os.rename ")
+	wxT("os.setlocale ")
+	wxT("os.time ")
+	wxT("os.tmpname ")
+	wxT("coroutine.running ")
+	wxT("package.cpath ")
+	wxT("package.loaded ")
+	wxT("package.loadlib ")
+	wxT("package.path ")
+	wxT("package.preload ")
+	wxT("package.seeall ")
+	wxT("io.popen ")
+	wxT("debug.debug ")
+	wxT("debug.getfenv ")
+	wxT("debug.gethook ")
+	wxT("debug.getinfo ")
+	wxT("debug.getlocal ")
+	wxT("debug.getmetatable ")
+	wxT("debug.getregistry ")
+	wxT("debug.getupvalue ")
+	wxT("debug.setfenv ")
+	wxT("debug.sethook ")
+	wxT("debug.setlocal ")
+	wxT("debug.setmetatable ")
+	wxT("debug.setupvalue ")
+	wxT("debug.traceback")
 };
 
 
@@ -360,7 +360,7 @@ void muhkuh_debugger::OnNotebookPageClose(wxAuiNotebookEvent &event)
 		if( it->second.m_ptEditor==ptWin )
 		{
 			m_docHash.erase(it);
-			wxLogMessage("delete editor %p", ptWin);
+			wxLogMessage(wxT("delete editor %p"), ptWin);
 			break;
 		}
 		++it;
@@ -519,7 +519,7 @@ wxStyledTextCtrl *muhkuh_debugger::create_debugger_editor(wxString strCaption)
 	// ptEditor->SetXCaretPolicy(wxSTC_CARET_SLOP, 10);
 	// ptEditor->SetYCaretPolicy(wxSTC_CARET_SLOP, 3);
 
-	ptEditor->SetMarginWidth(0, ptEditor->TextWidth(32, "99999_"));	// line # margin
+	ptEditor->SetMarginWidth(0, ptEditor->TextWidth(32, wxT("99999_")));	// line # margin
 
 	ptEditor->SetMarginWidth(1, 16);				// marker margin
 	ptEditor->SetMarginType(1, wxSTC_MARGIN_SYMBOL);
@@ -535,9 +535,9 @@ wxStyledTextCtrl *muhkuh_debugger::create_debugger_editor(wxString strCaption)
 
 	ptEditor->SetFoldFlags(wxSTC_FOLDFLAG_LINEBEFORE_CONTRACTED|wxSTC_FOLDFLAG_LINEAFTER_CONTRACTED);
 
-	ptEditor->SetProperty("fold", "1");
-	ptEditor->SetProperty("fold.compact", "1");
-	ptEditor->SetProperty("fold.comment", "1");
+	ptEditor->SetProperty(wxT("fold"), wxT("1"));
+	ptEditor->SetProperty(wxT("fold.compact"), wxT("1"));
+	ptEditor->SetProperty(wxT("fold.comment"), wxT("1"));
 
 	ptEditor->MarkerDefine(wxSTC_MARKNUM_FOLDEROPEN,	wxSTC_MARK_BOXMINUS,		0x00ffffff, 0x00808080);
 	ptEditor->MarkerDefine(wxSTC_MARKNUM_FOLDER,		wxSTC_MARK_BOXPLUS,		0x00ffffff, 0x00808080);
@@ -650,7 +650,7 @@ bool muhkuh_debugger::editor_get_source_document(wxString strSource, muhkuh_debu
 						}
 						else
 						{
-							ptDoc->m_strSourceCode = "Read error, failed to read file!!!";
+							ptDoc->m_strSourceCode = wxT("Read error, failed to read file!!!");
 							fResult = false;
 						}
 						delete[] pucData;
@@ -658,13 +658,13 @@ bool muhkuh_debugger::editor_get_source_document(wxString strSource, muhkuh_debu
 				}
 				else
 				{
-					ptDoc->m_strSourceCode = "Failed to open file!!!";
+					ptDoc->m_strSourceCode = wxT("Failed to open file!!!");
 					fResult = false;
 				}
 			}
 			else
 			{
-				ptDoc->m_strSourceCode = "Whaa, no source code found!!!";
+				ptDoc->m_strSourceCode = wxT("Whaa, no source code found!!!");
 				fResult = false;
 			}
 		}
@@ -711,7 +711,7 @@ wxStyledTextCtrl *muhkuh_debugger::editor_get_document(wxString strSource)
 				ptEditor->AppendText(tDoc.m_strSourceCode);
 				tDoc.m_ptEditor = ptEditor;
 
-				wxLogMessage("created new editor %p with caption %s", ptEditor, tDoc.m_strSourceFileName.fn_str());
+				wxLogMessage(wxT("created new editor %p with caption %s"), ptEditor, tDoc.m_strSourceFileName.c_str());
 			}
 		}
 
@@ -908,7 +908,7 @@ void muhkuh_debugger::dbg_packet_InterpreterHalted(void)
 				dbg_read_int(&iLastLineDefined)==true
 			)
 			{
-				wxLogMessage(_("Debug: %s:%s:%s:%s:%d:%d:%d:%d"), strName.fn_str(), strNameWhat.fn_str(), strWhat.fn_str(), strSource.fn_str(), iCurrentLine, iNUps, iLineDefined, iLastLineDefined);
+				wxLogMessage(_("Debug: %s:%s:%s:%s:%d:%d:%d:%d"), strName.c_str(), strNameWhat.c_str(), strWhat.c_str(), strSource.c_str(), iCurrentLine, iNUps, iLineDefined, iLastLineDefined);
 
 				// clear all "current line" markers
 				it = m_docHash.begin();
@@ -1009,7 +1009,7 @@ void muhkuh_debugger::dbg_fillStackWindow(void)
 					dbg_read_int(&iLastLineDefined)==true
 				)
 				{
-					wxLogMessage(_("Debug: Fill Stack window: %s:%s:%s:%s:%d:%d:%d:%d"), strName.fn_str(), strNameWhat.fn_str(), strWhat.fn_str(), strSource.fn_str(), iCurrentLine, iNUps, iLineDefined, iLastLineDefined);
+					wxLogMessage(_("Debug: Fill Stack window: %s:%s:%s:%s:%d:%d:%d:%d"), strName.c_str(), strNameWhat.c_str(), strWhat.c_str(), strSource.c_str(), iCurrentLine, iNUps, iLineDefined, iLastLineDefined);
 
 					if( strWhat.Cmp(wxT("Lua"))==0 || strWhat.Cmp(wxT("main"))==0 )
 					{
@@ -1039,7 +1039,7 @@ void muhkuh_debugger::dbg_fillStackWindow(void)
 						tFunctionItem.SetId(lIdx);
 						m_ptDebugStackWindow->SetItem(tFunctionItem);
 
-						strItem.Printf("%d", iCurrentLine);
+						strItem.Printf(wxT("%d"), iCurrentLine);
 						tLineItem.SetText(strItem);
 						tLineItem.SetId(lIdx);
 						m_ptDebugStackWindow->SetItem(tLineItem);
