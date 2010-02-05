@@ -53,11 +53,11 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
 	{ wxCMD_LINE_NONE }
 };
 
-static const char cmdLineLogo[] = 
+static const wxChar cmdLineLogo[] = wxT(
 	"regkuh is a helper tool for automatic installers. "
 	"It registers repositories and plugins in a configuration file and sets options like autostart, lua include paths, etc."
 	"\n"
-;
+);
 
 int main(int argc, char *argv[])
 {
@@ -311,7 +311,7 @@ int muhkuh_regApp::execute_operation(wxCmdLineParser *ptPar)
 			else
 			{
 				// open the config file
-				wxLogMessage(wxT("reading config file '%s'"), m_strCfgConfigFile.fn_str());
+				wxLogMessage(wxT("reading config file '%s'"), m_strCfgConfigFile.c_str());
 				iRet = open_config_file();
 				if( iRet==EXIT_SUCCESS )
 				{
@@ -333,7 +333,7 @@ int muhkuh_regApp::execute_operation(wxCmdLineParser *ptPar)
 					}
 					if( iRet==EXIT_SUCCESS )
 					{
-						wxLogMessage(wxT("writing config file '%s'"), m_strCfgConfigFile.fn_str());
+						wxLogMessage(wxT("writing config file '%s'"), m_strCfgConfigFile.c_str());
 						iRet = close_config_file();
 					}
 				}
@@ -431,7 +431,7 @@ int muhkuh_regApp::process_parameter(wxString &strParam)
 				wxLogMessage(wxT("found %d elements:"), sizMax);
 				while(sizCnt<sizMax)
 				{
-					wxLogMessage(wxT(" %02d: %s"), sizCnt, aParam[sizCnt].fn_str());
+					wxLogMessage(wxT(" %02d: %s"), sizCnt, aParam[sizCnt].c_str());
 					++sizCnt;
 				}
 			}
@@ -509,7 +509,7 @@ int muhkuh_regApp::custom_title(wxArrayString &aParam)
 
 		if( iRes==EXIT_SUCCESS )
 		{
-			wxLogMessage(_("Set custom title to '%s'"), strTitle.fn_str());
+			wxLogMessage(_("Set custom title to '%s'"), strTitle.c_str());
 			ptConfig->SetPath(wxT("/MainFrame"));
 			ptConfig->Write(wxT("customtitle"), strTitle);
 		}
@@ -558,7 +558,7 @@ int muhkuh_regApp::custom_icon(wxArrayString &aParam)
 
 		if( iRes==EXIT_SUCCESS )
 		{
-			wxLogMessage(_("Set custom icon to '%s'"), strIcon.fn_str());
+			wxLogMessage(_("Set custom icon to '%s'"), strIcon.c_str());
 			ptConfig->SetPath(wxT("/MainFrame"));
 			ptConfig->Write(wxT("customicon"), strIcon);
 		}
@@ -599,12 +599,12 @@ int muhkuh_regApp::register_plugin(wxArrayString &aParam)
 		if( sizParamCount==3 )
 		{
 			strEnable = aParam[1];
-			if( strEnable.Cmp("1")==0 )
+			if( strEnable.Cmp(wxT("1"))==0 )
 			{
 				// make this repository active
 				fEnable = true;
 			}
-			else if( strEnable.Cmp("0")==0 )
+			else if( strEnable.Cmp(wxT("0"))==0 )
 			{
 				fEnable = false;
 			}
@@ -622,7 +622,7 @@ int muhkuh_regApp::register_plugin(wxArrayString &aParam)
 
 		if( iRes==EXIT_SUCCESS )
 		{
-			wxLogMessage(_("Add plugin '%s'..."), strPlugin.fn_str());
+			wxLogMessage(_("Add plugin '%s'..."), strPlugin.c_str());
 			lIdx = m_ptPluginManager->addPlugin(strPlugin);
 			fIsOk = m_ptPluginManager->IsOk(lIdx);
 			if( fIsOk==true )
@@ -631,7 +631,7 @@ int muhkuh_regApp::register_plugin(wxArrayString &aParam)
 			}
 			else
 			{
-				wxLogMessage(_("Plugin is not ok, init error: '%s'"), m_ptPluginManager->GetInitError(lIdx).fn_str());
+				wxLogMessage(_("Plugin is not ok, init error: '%s'"), m_ptPluginManager->GetInitError(lIdx).c_str());
 			}
 
 			if( fEnable==true )
@@ -745,12 +745,12 @@ int muhkuh_regApp::register_repository(wxArrayString &aParam)
 
 		if( tRepositoryTyp!=muhkuh_repository::REPOSITORY_TYP_UNDEFINED )
 		{
-			if( strActive.Cmp("1")==0 )
+			if( strActive.Cmp(wxT("1"))==0 )
 			{
 				// make this repository active
 				fMakeActive = true;
 			}
-			else if( strActive.Cmp("0")==0 )
+			else if( strActive.Cmp(wxT("0"))==0 )
 			{
 				fMakeActive = false;
 			}
@@ -777,7 +777,7 @@ int muhkuh_regApp::register_repository(wxArrayString &aParam)
 					break;
 				}
 
-				wxLogMessage(wxT("Add new repository: %s"), ptRepository->GetStringRepresentation().fn_str());
+				wxLogMessage(wxT("Add new repository: %s"), ptRepository->GetStringRepresentation().c_str());
 				lRepIdx = m_ptRepositoryManager->addRepository(ptRepository);
 
 				if( fMakeActive==true )
@@ -839,12 +839,12 @@ int muhkuh_regApp::autostart(wxArrayString &aParam)
 			fAutoStart = true;
 			strAutostart = aParam[1];
 			strAutoexit = aParam[2];
-			if( strAutoexit.Cmp("1")==0 )
+			if( strAutoexit.Cmp(wxT("1"))==0 )
 			{
 				// make this repository active
 				fAutoExit = true;
 			}
-			else if( strAutoexit.Cmp("0")==0 )
+			else if( strAutoexit.Cmp(wxT("0"))==0 )
 			{
 				fAutoExit = false;
 			}
