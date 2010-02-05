@@ -204,7 +204,7 @@ romloader *romloader_uart_create(void *pvHandle)
 		// is the device really free?
 		if( astrBusyDevices.Index(strInterface, true, false)!=wxNOT_FOUND )
 		{
-			wxLogMessage(wxT("Interface %s is already in use!"), strInterface.fn_str());
+			wxLogMessage(wxT("Interface %s is already in use!"), strInterface.c_str());
 		}
 		else
 		{
@@ -1000,7 +1000,7 @@ int romloader_uart::write_data(wxString &strData, unsigned long ulLoadAdr, lua_S
 			}
 
 			// send data chunk
-			ulSent = m_ptUartDev->SendRaw((const unsigned char*)strData.Mid(sizDataCnt, sizChunkSize).To8BitData(), sizChunkSize, 1000);
+			ulSent = m_ptUartDev->SendRaw((const unsigned char*)strData.Mid(sizDataCnt, sizChunkSize).c_str(), sizChunkSize, 1000);
 			if( ulSent!=sizChunkSize )
 			{
 				strErrorMsg.Printf(wxT("failed to send %d bytes: %d"), sizChunkSize, ulSent);

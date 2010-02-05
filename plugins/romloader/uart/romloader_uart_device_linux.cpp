@@ -83,7 +83,7 @@ bool romloader_uart_device_linux::Open(void)
 	if( m_hPort==-1 )
 	{
 		// no -> exit with error
-		wxLogError(_("failed to open the com port %s: %s"), m_strPortName.fn_str(), strerror(errno));
+		wxLogError(_("failed to open the com port %s: %s"), m_strPortName.c_str(), strerror(errno));
 	}
 	else
 	{
@@ -369,7 +369,7 @@ void romloader_uart_device_linux::ScanForPorts(wxArrayString *ptArray)
 		for(iCnt=0; iCnt<4; ++iCnt)
 		{
 			// construct the name
-			strName.Printf("/dev/ttyS%d", iCnt);
+			strName.Printf(wxT("/dev/ttyS%d"), iCnt);
 			ptArray->Add(strName);
 		}
 	}
