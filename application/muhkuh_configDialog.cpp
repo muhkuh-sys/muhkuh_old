@@ -997,7 +997,7 @@ void muhkuh_configDialog::plugin_add(void)
 	if( pluginDialog->ShowModal()==wxID_OK )
 	{
 		strPluginName = pluginDialog->GetPath();
-		wxLogMessage(_("open plugin '%s'"), strPluginName.fn_str());
+		wxLogMessage(_("open plugin '%s'"), strPluginName.c_str());
 		lIdx = m_ptPluginManager->addPlugin(strPluginName);
 		if( lIdx>=0 )
 		{

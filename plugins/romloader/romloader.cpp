@@ -264,7 +264,7 @@ wxString romloader::read_image(double dNetxAddress, double dSize, lua_State *L, 
 			else
 			{
 				// convert the binary data to wxString
-				strData = wxString::FromAscii(pcBuffer, ulSize);
+				strData = wxString::From8BitData(pcBuffer, ulSize);
 				delete[] pcBuffer;
 			}
 		}
