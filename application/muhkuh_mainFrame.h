@@ -30,6 +30,7 @@
 #include <wx/image.h>
 #include <wx/intl.h>
 #include <wx/listctrl.h>
+#include <wx/process.h>
 #include <wx/progdlg.h>
 #include <wx/splitter.h>
 #include <wx/tipdlg.h>
@@ -39,26 +40,21 @@
 #define __MUHKUH_MAINFRAME_H__
 
 #include "muhkuh_id.h"
-#include "muhkuh_debugger.h"
-#include "muhkuh_plugin_manager.h"
 #include "muhkuh_repository_manager.h"
 #include "muhkuh_testTreeItemData.h"
 #include "muhkuh_wrap_xml.h"
 
 
-//-------------------------------------
-// the wxLua entries
 
-#include <wxlua/include/wxlua.h>
-#include <wxluasocket/include/wxldserv.h>
-#include <wxluasocket/include/wxldtarg.h>
-#include "plugins/_luaif/muhkuh_wxlua_bindings.h"
-#include "plugins/_luaif/bit_wxlua_bindings.h"
-
-extern "C"
+class muhkuh_server_process : public wxProcess
 {
-	#include <lualib.h>
-}
+public:
+	muhkuh_server_process(wxEvtHandler *parent, int id)
+	: wxProcess(parent, id)
+	{
+	}
+};
+
 
 //-------------------------------------
 // Define the main frame
@@ -98,10 +94,6 @@ public:
 
 	void OnMtdLinkClicked(wxHtmlLinkEvent &event);
 
-	// process the lua events
-	void OnLuaPrint(wxLuaEvent &event);
-	void OnLuaError(wxLuaEvent &event);
-
 	void OnNotebookPageClose(wxAuiNotebookEvent &event);
 	void OnPaneClose(wxAuiManagerEvent &event);
 
@@ -109,13 +101,6 @@ public:
 
 	void OnMove(wxMoveEvent &event);
 	void OnSize(wxSizeEvent &event);
-
-	// the lua functions
-	wxString luaLoad(wxString strFileName);
-	void luaInclude(wxString strFileName);
-	void luaScanPlugins(wxString strPattern);
-	muhkuh_plugin_instance *luaGetNextPlugin(void);
-	muhkuh_wrap_xml *luaGetSelectedTest(void);
 
 	static wxString htmlTag_lua(const wxString &strLuaCode);
 	wxString local_htmlTag_lua(const wxString &strLuaCode);
@@ -149,9 +134,6 @@ private:
 	void read_config(void);
 	void write_config(void);
 
-	bool initLuaState(void);
-	void clearLuaState(void);
-
 	void executeTest(muhkuh_wrap_xml *ptTestData, unsigned int uiIndex);
 	void finishTest(void);
 
@@ -169,8 +151,6 @@ private:
 	wxString loadHtmlString(wxString strFileUrl);
 	void reloadWelcomePage(void);
 	void reloadDetailsPage(muhkuh_wrap_xml *ptWrapXml);
-
-	bool check_plugins(void);
 
 	// main frame controls
 	wxAuiManager m_auiMgr;
@@ -199,14 +179,8 @@ private:
 	// state of the init process
 	MAINFRAME_INIT_STATE_E m_eInitState;
 
-	// the lua state
-	wxLuaState *m_ptLuaState;
-	// the debugger panel
-	muhkuh_debugger *m_debuggerPanel;
 	// the process id of the server task
 	long m_lServerPid;
-	// the debug server port
-	unsigned short m_usDebugServerPort;
 	// the server process notification
 	muhkuh_server_process *m_ptServerProcess;
 
@@ -223,9 +197,6 @@ private:
 
 	// number of loaded test descriptions
 	size_t m_sizTestCnt;
-
-	// the plugin manager
-	muhkuh_plugin_manager *m_ptPluginManager;
 
 	// the repository manager
 	muhkuh_repository_manager *m_ptRepositoryManager;
@@ -256,11 +227,6 @@ private:
 	wxString m_strWelcomePageFile;
 	// the details page file
 	wxString m_strDetailsPageFile;
-
-	bool m_fAutoStart;
-	bool m_fAutoExit;
-	wxString m_strAutoStartTest;
-	bool m_fRunningTestIsAutostart;
 
 	// the application title
 	wxString m_strApplicationTitle;

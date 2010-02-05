@@ -6,7 +6,6 @@
 
 #include <wx/html/htmlcell.h>
 
-#include "muhkuh_lua_interface.h"
 #include "muhkuh_mainFrame.h"
 
 
