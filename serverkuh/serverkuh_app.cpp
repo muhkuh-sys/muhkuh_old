@@ -67,10 +67,10 @@ const wxCmdLineEntryDesc cmdLineDesc[] =
 	{ wxCMD_LINE_NONE }
 };
 
-const char cmdLineLogo[] = 
+const wxChar cmdLineLogo[] = wxT(
 	"serverkuh is .... "
 	"\n"
-;
+);
 
 
 void serverkuh_app::showHelp(wxCmdLineParser *ptParser)
@@ -78,25 +78,26 @@ void serverkuh_app::showHelp(wxCmdLineParser *ptParser)
 	// show general usage
 	ptParser->Usage();
 
-	wxLogMessage(	"\n"
+	wxLogMessage(wxT(
+		"\n"
 		"Examples:\n"
 		"  regkuh -rp plugins/romloader_uart.xml\n"
 		"        register the romloader_uart plugin in the plugins folder.\n"
 		"\n"
 		"Muhkuh home page: www.sf.net/projects/muhkuh\n"
-	);
+	));
 }
 
 
 void serverkuh_app::showVersion(void)
 {
-  wxLogMessage(
+  wxLogMessage(wxT(
 	SERVERKUH_APPLICATION_NAME " " SERVERKUH_VERSION_STRING "\n"
 	"Copyright (c) 2008, the Muhkuh team.\n"
 	"There is NO warranty.  You may redistribute this software\n"
 	"under the terms of the GNU General Public License.\n"
 	"For more information about these matters, see the files named COPYING.\n"
-  );
+  ));
 }
 
 bool serverkuh_app::OnInit()
@@ -105,7 +106,9 @@ bool serverkuh_app::OnInit()
 	serverkuh_mainFrame *mainframe;
 	wxCmdLineParser tParser;
 	bool fOk;
-  int argcServerkuh;
+	int argcServerkuh;
+	wxString strArg;
+
 
 	mainframe = NULL;
 
@@ -133,11 +136,19 @@ bool serverkuh_app::OnInit()
 	SetVendorName(wxT(SERVERKUH_APPLICATION_NAME " team"));
 	SetAppName(wxT(SERVERKUH_APPLICATION_NAME));
 
-  // if the command line contains a "--", we want to pass
-  // everything before it Serverkuh command line parser,
-  // and everything behind it to the Lua script
-  argcServerkuh = 0;
-  while(argcServerkuh < argc && strcmp("--", argv[argcServerkuh])!=0) argcServerkuh++;
+	// if the command line contains a "--", we want to pass
+	// everything before it Serverkuh command line parser,
+	// and everything behind it to the Lua script
+	argcServerkuh = 0;
+	while(argcServerkuh<argc)
+	{
+		strArg = argv[argcServerkuh];
+		if( strArg.Cmp(wxT("--"))==0 )
+		{
+			break;
+		}
+		++argcServerkuh;
+	}
 
 	tParser.SetCmdLine(argcServerkuh, argv);
 	tParser.SetSwitchChars(wxT("-"));
@@ -156,24 +167,26 @@ bool serverkuh_app::OnInit()
 	{
 		showHelp(&tParser);
 		fOk = false;
-  }
-  else if( tParser.Found(wxT("version"))==true )
+	}
+	else if( tParser.Found(wxT("version"))==true )
 	{
 		showVersion();
 		fOk = false;
 	}
-  else if (tParser.GetParamCount()==0) {
+	else if( tParser.GetParamCount()==0 )
+	{
 		showHelp(&tParser);
-  }
+	}
 	else
 	{
 		// create the muhkuh main frame
 		mainframe = new serverkuh_mainFrame(&tParser);
 
-    // set the parameters for Lua scripts
-    if (argcServerkuh+1 < argc) {
-      mainframe->setLuaArgs(argv + argcServerkuh + 1, argc - (argcServerkuh + 1));
-    }
+		// set the parameters for Lua scripts
+		if( (argcServerkuh+1)<argc)
+		{
+			mainframe->setLuaArgs(argv+argcServerkuh+1, argc-(argcServerkuh+1));
+		}
 
 		// show the frame
 		mainframe->Show(true);

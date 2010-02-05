@@ -120,7 +120,7 @@ serverkuh_mainFrame::serverkuh_mainFrame(wxCmdLineParser *ptParser)
 	if( m_locale.Init(iLanguage, wxLOCALE_CONV_ENCODING)==false )
 	{
 		// NOTE: translate this so the default system language may be used at least.
-		wxLogError(_("The language '%s' is not supported by the system."), wxLocale::GetLanguageName(iLanguage).fn_str());
+		wxLogError(_("The language '%s' is not supported by the system."), wxLocale::GetLanguageName(iLanguage).c_str());
 	}
 	else
 	{
@@ -444,11 +444,11 @@ bool serverkuh_mainFrame::scanFileXml(wxString &strXmlUrl)
 	fResult = false;
 
 	// test if file exists
-	wxLogVerbose(_("Reading testdescription '%s'"), strXmlUrl.fn_str());
+	wxLogVerbose(_("Reading testdescription '%s'"), strXmlUrl.c_str());
 	ptFsFile = fileSystem.OpenFile(strXmlUrl);
 	if( ptFsFile==NULL )
 	{
-		wxLogError(_("could not read xml file '%s'"), strXmlUrl.fn_str());
+		wxLogError(_("could not read xml file '%s'"), strXmlUrl.c_str());
 	}
 	else
 	{
@@ -460,7 +460,7 @@ bool serverkuh_mainFrame::scanFileXml(wxString &strXmlUrl)
 		{
 			if( ptWrapXml->initialize(ptInputStream, 0, 0)==false )
 			{
-				wxLogError(_("Failed to read the xml file for testdescription '%s'"), strXmlUrl.fn_str());
+				wxLogError(_("Failed to read the xml file for testdescription '%s'"), strXmlUrl.c_str());
 			}
 			else
 			{
@@ -529,12 +529,12 @@ bool serverkuh_mainFrame::dbg_enable(void)
 }
 
 
-
-void serverkuh_mainFrame::setLuaArgs(char **argv, int argc)
+void serverkuh_mainFrame::setLuaArgs(wxChar **argv, int argc)
 {
-  m_argvLua = argv;
-  m_argcLua = argc;
+	m_argvLua = argv;
+	m_argcLua = argc;
 }
+
 
 bool serverkuh_mainFrame::initLuaState(void)
 {
@@ -612,7 +612,7 @@ bool serverkuh_mainFrame::initLuaState(void)
 							// set the package path
 							wxLogMessage(wxT("Lua path:") + m_strLuaIncludePath);
 
-							m_ptLuaState->lua_GetGlobal(wxT("package"));
+							m_ptLuaState->lua_GetGlobal("package");
 							if( m_ptLuaState->lua_IsNoneOrNil(-1)==true )
 							{
 								wxLogError(_("Failed to get the global 'package'"));
@@ -622,7 +622,7 @@ bool serverkuh_mainFrame::initLuaState(void)
 
 							// set the lua version
 							m_ptLuaState->lua_PushString(m_strVersion.ToAscii());
-							m_ptLuaState->lua_SetGlobal(wxT("__MUHKUH_VERSION"));
+							m_ptLuaState->lua_SetGlobal("__MUHKUH_VERSION");
 
 							// only create debug hooks and connection if debug server is set
 							if( m_strDebugServerName.IsEmpty()==false )
@@ -745,6 +745,8 @@ void serverkuh_mainFrame::executeTest(void)
 	wxString strDebug;
 	int iGetTop;
 	int iLineNr;
+	int iCnt;
+	wxString strArg;
 
 
 	// check all plugins for state ok before executing the test
@@ -757,23 +759,25 @@ void serverkuh_mainFrame::executeTest(void)
 		{
 			// set some global vars
 
-      // store command line args behind "--" in global Lua table "arg"
-      m_ptLuaState->lua_CreateTable(m_argcLua, 0);
-      for (int i=0; i<m_argcLua; i++) {
-        m_ptLuaState->lua_PushString(m_argvLua[i]);
-        m_ptLuaState->lua_RawSeti(-2, i+1);
-      }
-      m_ptLuaState->lua_SetGlobal(wxT("arg"));
+			// store command line args behind "--" in global Lua table "arg"
+			m_ptLuaState->lua_CreateTable(m_argcLua, 0);
+			for(iCnt=0; iCnt<m_argcLua; ++iCnt)
+			{
+				strArg = m_argvLua[iCnt];
+				m_ptLuaState->lua_PushString(strArg.c_str());
+				m_ptLuaState->lua_RawSeti(-2, iCnt+1);
+			}
+			m_ptLuaState->lua_SetGlobal("arg");
 
 			// set the xml document
 			m_ptLuaState->wxluaT_PushUserDataType(m_ptWrapXml->getXmlDocument(), wxluatype_wxXmlDocument, false);
-			m_ptLuaState->lua_SetGlobal(wxT("__MUHKUH_TEST_XML"));
+			m_ptLuaState->lua_SetGlobal("__MUHKUH_TEST_XML");
 			// set the selected test index
 			m_ptLuaState->lua_PushNumber(m_lTestIndex);
-			m_ptLuaState->lua_SetGlobal(wxT("__MUHKUH_TEST_INDEX"));
+			m_ptLuaState->lua_SetGlobal("__MUHKUH_TEST_INDEX");
 			// set the test panel
 			m_ptLuaState->wxluaT_PushUserDataType(m_testPanel, wxluatype_wxPanel, false);
-			m_ptLuaState->lua_SetGlobal(wxT("__MUHKUH_PANEL"));
+			m_ptLuaState->lua_SetGlobal("__MUHKUH_PANEL");
 
 			// set the log marker
 			luaSetLogMarker();
@@ -794,7 +798,7 @@ void serverkuh_mainFrame::executeTest(void)
 
 void serverkuh_mainFrame::finishTest(void)
 {
-	wxLogMessage(_("Test '%s' finished, cleaning up..."), m_strTestName.fn_str());
+	wxLogMessage(_("Test '%s' finished, cleaning up..."), m_strTestName.c_str());
 }
 
 
@@ -833,7 +837,7 @@ void serverkuh_mainFrame::OnIdle(wxIdleEvent &event)
 		}
 	}
 
-	strStatus.Printf(_("Test '%s' in progress..."), m_strTestName.fn_str());
+	strStatus.Printf(_("Test '%s' in progress..."), m_strTestName.c_str());
 
 	// get the Lua Memory in kilobytes
 	if( m_ptLuaState!=NULL && m_ptLuaState->Ok()==true )
@@ -1051,10 +1055,10 @@ void serverkuh_mainFrame::dbg_get_stack(int iLevel)
 				dbg_write_u08(ucStatus);
 
 				// write all debug info
-				dbg_write_achar(tDbg.name);
-				dbg_write_achar(tDbg.namewhat);
-				dbg_write_achar(tDbg.what);
-				dbg_write_achar(tDbg.source);
+				dbg_write_str(wxString::FromAscii(tDbg.name));
+				dbg_write_str(wxString::FromAscii(tDbg.namewhat));
+				dbg_write_str(wxString::FromAscii(tDbg.what));
+				dbg_write_str(wxString::FromAscii(tDbg.source));
 				dbg_write_int(tDbg.currentline);
 				dbg_write_int(tDbg.nups);
 				dbg_write_int(tDbg.linedefined);
@@ -1090,19 +1094,19 @@ void serverkuh_mainFrame::dbg_get_locals(int iLevel)
 			iIndex = 1;
 			do
 			{
-				strValue = m_ptLuaState->lua_GetLocal(&tDbg, iIndex);
-				dbg_write_achar(strValue);
+				strValue = wxString::FromAscii(m_ptLuaState->lua_GetLocal(&tDbg, iIndex));
+				dbg_write_str(strValue);
 
 				if( strValue.IsEmpty()==false )
 				{
 					// get the value from the stack
 					iLuaType = m_ptLuaState->lua_Type(-1);
 					strValue = m_ptLuaState->lua_TypeName(iLuaType);
-					dbg_write_achar(strValue);
+					dbg_write_str(strValue);
 
 					// get the typ
 					strValue = dbg_getStackValue(-1);
-					dbg_write_achar(strValue);
+					dbg_write_str(strValue);
 
 					// remove the value from the stack
 					m_ptLuaState->lua_Pop(1);
@@ -1117,7 +1121,7 @@ void serverkuh_mainFrame::dbg_get_locals(int iLevel)
 		}
 		else
 		{
-			dbg_write_achar(wxEmptyString);
+			dbg_write_str(wxEmptyString);
 		}
 	}
 }
@@ -1158,12 +1162,12 @@ wxString serverkuh_mainFrame::dbg_getStackValue(int iIndex)
 
 	case LUA_TLIGHTUSERDATA:
 		pvVal = m_ptLuaState->lua_ToUserdata(iIndex);
-		strValue.Printf("%p", pvVal);
+		strValue.Printf(wxT("%p"), pvVal);
 		break;
 
 	case LUA_TNUMBER:
 		dVal = m_ptLuaState->lua_ToNumber(iIndex);
-		strValue.Printf("%f", dVal);
+		strValue.Printf(wxT("%f"), dVal);
 		break;
 
 	case LUA_TSTRING:
@@ -1178,21 +1182,21 @@ wxString serverkuh_mainFrame::dbg_getStackValue(int iIndex)
 		break;
 
 	case LUA_TFUNCTION:
-		strValue = "some function...";
+		strValue = wxT("some function...");
 		break;
 
 	case LUA_TUSERDATA:
 		pvVal = m_ptLuaState->lua_ToUserdata(iIndex);
-		strValue.Printf("%p", pvVal);
+		strValue.Printf(wxT("%p"), pvVal);
 		break;
 
 	case LUA_TTHREAD:
 		pvVal = m_ptLuaState->lua_ToPointer(iIndex);
-		strValue.Printf("%p", pvVal);
+		strValue.Printf(wxT("%p"), pvVal);
 		break;
 
 	default:
-		strValue.Printf("unknown type: %d", iTyp);
+		strValue.Printf(wxT("unknown type: %d"), iTyp);
 		break;
 	}
 
@@ -1315,23 +1319,16 @@ void serverkuh_mainFrame::dbg_write_int(int iData)
 }
 
 
-void serverkuh_mainFrame::dbg_write_achar(const char *pcData)
+void serverkuh_mainFrame::dbg_write_str(wxString strData)
 {
-	size_t sizStrLen;
+	size_t sizData;
 
 
-	if( pcData==NULL )
+	sizData = strData.Len();
+	m_ptDebugClientSocket->Write(&sizData, sizeof(size_t));
+	if( sizData!=0 )
 	{
-		sizStrLen = 0;
-	}
-	else
-	{
-		sizStrLen = strlen(pcData);
-	}
-	m_ptDebugClientSocket->Write(&sizStrLen, sizeof(size_t));
-	if( sizStrLen!=0 )
-	{
-		m_ptDebugClientSocket->Write(pcData, sizStrLen);
+		m_ptDebugClientSocket->Write(strData.c_str(), sizData);
 	}
 }
 
@@ -1378,15 +1375,15 @@ void serverkuh_mainFrame::OnDebugSocket(wxSocketEvent &event)
 	switch( tEventTyp )
 	{
 	case wxSOCKET_INPUT:
-		wxLogMessage("wxSOCKET_INPUT");
+		wxLogMessage(wxT("wxSOCKET_INPUT"));
 		break;
 
 	case wxSOCKET_LOST:
-		wxLogMessage("wxSOCKET_LOST");
+		wxLogMessage(wxT("wxSOCKET_LOST"));
 		break;
 
 	case wxSOCKET_CONNECTION:
-		wxLogMessage("wxSOCKET_CONNECTION");
+		wxLogMessage(wxT("wxSOCKET_CONNECTION"));
 	}
 }
 
@@ -1424,12 +1421,12 @@ wxString serverkuh_mainFrame::luaLoad(wxString strFileName)
 	{
 //		strFileUrl = m_strTestBaseUrl + wxFileName::GetPathSeparator() + strFileName;
 		strFileUrl = m_strTestBaseUrl + strFileName;
-		wxLogMessage(_("lua load: searching '%s'"), strFileUrl.fn_str());
+		wxLogMessage(_("lua load: searching '%s'"), strFileUrl.c_str());
 		urlError = filelistUrl.SetURL(strFileUrl);
 		if( urlError!=wxURL_NOERR )
 		{
 			// this was no valid url
-			strMsg.Printf(_("lua load: invalid URL '%s': "), strFileUrl.fn_str());
+			strMsg.Printf(_("lua load: invalid URL '%s': "), strFileUrl.c_str());
 			// try to show some details
 			switch( urlError )
 			{
@@ -1512,12 +1509,12 @@ void serverkuh_mainFrame::luaInclude(wxString strFileName)
 		{
 //			strFileUrl = m_strTestBaseUrl + wxFileName::GetPathSeparator() + strFileName;
 			strFileUrl = m_strTestBaseUrl + strFileName;
-			wxLogMessage(_("lua include: searching '%s'"), strFileUrl.fn_str());
+			wxLogMessage(_("lua include: searching '%s'"), strFileUrl.c_str());
 			urlError = filelistUrl.SetURL(strFileUrl);
 			if( urlError!=wxURL_NOERR )
 			{
 				// this was no valid url
-				strMsg.Printf(_("lua include: invalid URL '%s': "), strFileUrl.fn_str());
+				strMsg.Printf(_("lua include: invalid URL '%s': "), strFileUrl.c_str());
 				// try to show some details
 				switch( urlError )
 				{
