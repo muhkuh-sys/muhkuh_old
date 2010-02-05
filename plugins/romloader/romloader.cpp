@@ -264,7 +264,7 @@ wxString romloader::read_image(double dNetxAddress, double dSize, lua_State *L, 
 			else
 			{
 				// convert the binary data to wxString
-				strData = wxString::From8BitData(pcBuffer, ulSize);
+				strData = wxString::FromAscii(pcBuffer, ulSize);
 				delete[] pcBuffer;
 			}
 		}
@@ -533,7 +533,7 @@ bool romloader::detect_chiptyp(void)
 		strChiptyp = get_chiptyp_name(m_tChiptyp);
 		strRomcode = get_romcode_name(m_tRomcode);
 
-		strMsg.Printf(_("found chip %s with romcode %s"), strChiptyp.fn_str(), strRomcode.fn_str());
+		strMsg.Printf(_("found chip %s with romcode %s"), strChiptyp.c_str(), strRomcode.c_str());
 		wxLogMessage(wxT("romloader(%p): ") + strMsg, this);
 	}
 
@@ -641,7 +641,7 @@ bool romloader::callback_common(lua_State *L, void *pvCallbackUserData, int iOld
 				break;
 			}
 			wxLogError(wxT("callback function failed: ") + strMsg);
-			strMsg = wxlua_getstringtype(L, -1);
+			strMsg = wxString::From8BitData(wxlua_getstringtype(L, -1));
 			wxLogError(strMsg);
 			wxLogError(wxT("cancel operation"));
 			fStillRunning = false;
