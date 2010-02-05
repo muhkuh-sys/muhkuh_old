@@ -83,7 +83,7 @@ public:
 	typedef struct
 	{
 		libusb_error eErrNo;
-		const char *pcErrMsg;
+		const wxChar *pcErrMsg;
 	} LIBUSB_STRERROR_T;
 	static wxString libusb_strerror(int iError);
 	static bool isDeviceNetx(libusb_device *ptDev);
