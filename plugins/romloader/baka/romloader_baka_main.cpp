@@ -207,7 +207,7 @@ int fn_detect_interfaces(std::vector<muhkuh_plugin_instance*> *pvInterfaceList)
 	// detect all interfaces
 	for(uiInterfaceCnt=0; uiInterfaceCnt<uiInstances; ++uiInterfaceCnt)
 	{
-		strName.Printf("baka_%d", uiInterfaceCnt);
+		strName.Printf(wxT("baka_%d"), uiInterfaceCnt);
 		pvHandle = (void*)uiInterfaceCnt;
 		fIsUsed = atInstanceCfg[uiInterfaceCnt].fIsUsed;
 		ptInst = new muhkuh_plugin_instance(strName, strTyp, fIsUsed, strLuaCreateFn, pvHandle);
@@ -289,7 +289,7 @@ romloader *romloader_baka_create(void *pvHandle)
 		{
 			/* create the new instance */
 			strTyp = plugin_desc.strPluginId;
-			strName.Printf("baka_%d", uiIdx);
+			strName.Printf(wxT("baka_%d"), uiIdx);
 			ptInstance = new romloader(strName, strTyp, &tFunctionInterface, pvHandle, romloader_baka_close_instance, m_ptLuaState);
 			atInstanceCfg[uiIdx].fIsUsed = true;
 		}
