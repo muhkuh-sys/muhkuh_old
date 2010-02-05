@@ -5,6 +5,7 @@ project("muhkuh")
 include(${wxWidgets_USE_FILE})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${LUA_INCLUDE_DIR})
 
 
 set(muhkuh_SOURCES
@@ -45,5 +46,5 @@ set(muhkuh_HEADERS
 
 # Build the executable.
 add_executable(muhkuh ${muhkuh_SOURCES})
-target_link_libraries(muhkuh ${wxWidgets_LIBRARIES})
+target_link_libraries(muhkuh ${wxWidgets_LIBRARIES} lua)
 set_target_properties(muhkuh PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)

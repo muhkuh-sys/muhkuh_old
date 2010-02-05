@@ -24,11 +24,12 @@
 
 
 #include "growbuffer.h"
-#include "muhkuh_version.h"
 #include "muhkuh_aboutDialog.h"
-#include "muhkuh_mainFrame.h"
+#include "muhkuh_app.h"
 #include "muhkuh_configDialog.h"
 #include "muhkuh_icons.h"
+#include "muhkuh_mainFrame.h"
+#include "muhkuh_version.h"
 #include "readFsFile.h"
 
 //-------------------------------------
@@ -89,6 +90,7 @@ muhkuh_mainFrame::muhkuh_mainFrame(void)
  , m_tipProvider(NULL)
  , m_welcomeHtml(NULL)
  , m_testDetailsHtml(NULL)
+ , m_ptLua_State(NULL)
 {
 	wxLog *pOldLogTarget;
 	wxFileName cfgName;
@@ -200,12 +202,21 @@ muhkuh_mainFrame::muhkuh_mainFrame(void)
 	m_eInitState  = MAINFRAME_INIT_STATE_CONFIGURED;
 
 	InitDialog();
+
+	/* open a new lua state */
+	m_ptLua_State = lua_open();
 }
 
 
 muhkuh_mainFrame::~muhkuh_mainFrame(void)
 {
 	write_config();
+
+	// delete the lua state
+	if( m_ptLua_State!=NULL )
+	{
+		lua_close(m_ptLua_State);
+	}
 
 	// delete the help controller
 	if( m_ptHelp!=NULL )
@@ -1965,29 +1976,127 @@ void muhkuh_mainFrame::OnSize(wxSizeEvent &event)
 
 wxString muhkuh_mainFrame::htmlTag_lua(const wxString &strLuaCode)
 {
-#if 0
-	wxString strHtmlData;
+	muhkuh_mainFrame *ptMainframe;
+	wxString strText;
 
 
-	if( g_ptMainFrame==NULL )
+	ptMainframe = ::wxGetApp().ptMainframe;
+	if( ptMainframe!=NULL )
 	{
-		strHtmlData = wxT("LUA ERROR");
+		strText = ptMainframe->local_htmlTag_lua(strLuaCode);
 	}
 	else
 	{
-		strHtmlData = g_ptMainFrame->local_htmlTag_lua(strLuaCode);
+		strText = _("Lua Scripting not supported!");
 	}
 
-	return strHtmlData;
-#else
-	return wxT("bah!!");
-#endif
+	return strText;
+}
+
+
+
+const muhkuh_mainFrame::LUA_ERROR_TO_STR_T muhkuh_mainFrame::atLuaErrorToString[] =
+{
+	{ 0,			wxT("") },
+	{ LUA_YIELD,		wxT("Thread is suspended") },
+	{ LUA_ERRRUN,		wxT("Error while running chunk") },
+	{ LUA_ERRSYNTAX,	wxT("Syntax error during pre-compilation") },
+	{ LUA_ERRMEM,		wxT("Memory allocation error") },
+	{ LUA_ERRERR,		wxT("Generic error or an error occurred while running the error handler") },
+	{ LUA_ERRFILE,		wxT("Error occurred while opening file") }
+};
+
+wxString muhkuh_mainFrame::lua_error_to_string(int iLuaError)
+{
+	wxString strMessage;
+
+
+	if( iLuaError<(sizeof(atLuaErrorToString)/sizeof(atLuaErrorToString[0])) )
+	{
+		strMessage = atLuaErrorToString[iLuaError].pcMessage;
+	}
+	else
+	{
+		strMessage = wxT("Unknown lua error value");
+	}
+
+	return strMessage;
+}
+
+
+bool muhkuh_mainFrame::lua_get_errorinfo(lua_State *L, int iStatus, int iTop, wxString *pstrErrorMsg, int *piLineNum)
+{
+	int iNewTop;
+	wxString strErrorMsg;
+
+
+	if( iStatus!=0 )
+	{
+		iNewTop = lua_gettop(L);
+
+		strErrorMsg = lua_error_to_string(iStatus);
+
+		switch(iStatus)
+		{
+		case LUA_ERRMEM:
+		case LUA_ERRERR:
+			if( iNewTop>iTop )
+			{
+				strErrorMsg += wxT("\n");
+			}
+			break;
+
+		case LUA_ERRRUN:
+		case LUA_ERRFILE:
+		case LUA_ERRSYNTAX:
+		default:
+			if( iNewTop>iTop )
+			{
+				strErrorMsg += wxT("\n") + wxString::FromAscii(lua_tostring(L, -1));
+			}
+			break;
+		}
+	}
+
+	strErrorMsg += wxT("\n");
+
+	// Why can't I fill a lua_Debug here? Try to get the line number
+	// by parsing the error message that looks like this, 3 is linenumber
+	// [string "a = 1("]:3: unexpected symbol near `<eof>'
+	wxString strLine = strErrorMsg;
+	long lLineNum = -1;
+	while( strLine.IsEmpty()==false )
+	{
+		// search through the str to find ']:LONG:' pattern
+		strLine = strLine.AfterFirst(wxT(']'));
+		if ((strLine.Length() > 0) && (strLine.GetChar(0) == wxT(':')))
+		{
+			strLine = strLine.AfterFirst(wxT(':'));
+			if (strLine.IsEmpty() || strLine.BeforeFirst(wxT(':')).ToLong(&lLineNum))
+			{
+				break;
+			}
+		}
+	}
+
+	/* pops the message if any */
+	lua_settop(L, iTop);
+
+	if(pstrErrorMsg!=NULL)
+	{
+		*pstrErrorMsg = strErrorMsg;
+	}
+	if(piLineNum!=NULL)
+	{
+		*piLineNum = (int)lLineNum;
+	}
+
+	return true;
 }
 
 
 wxString muhkuh_mainFrame::local_htmlTag_lua(const wxString &strLuaCode)
 {
-#if 0
 	int iTopPre;
 	int iTopPost;
 	int iResult;
@@ -1998,44 +2107,44 @@ wxString muhkuh_mainFrame::local_htmlTag_lua(const wxString &strLuaCode)
 	wxString strErrorMsg;
 
 
-	if( m_ptLuaState!=NULL && m_ptLuaState->Ok()==true )
+	if( m_ptLua_State!=NULL )
 	{
-		iTopPre = m_ptLuaState->lua_GetTop();
-		iResult = m_ptLuaState->luaL_LoadBuffer(strLuaCode.fn_str(), strLuaCode.Len(), "html lua tag");
+		iTopPre = lua_gettop(m_ptLua_State);
+		iResult = luaL_loadbuffer(m_ptLua_State, strLuaCode.fn_str(), strLuaCode.Len(), "html lua tag");
 		if( iResult!=0 )
 		{
-			m_ptLuaState->SendLuaErrorEvent(iResult, iTopPre);
+			strHtmlCode = _("failed to load lua script!");
 		}
 		else
 		{
-			iResult = m_ptLuaState->LuaPCall(0, 1);
-		}
-
-		if( iResult!=0 )
-		{
-			wxlua_errorinfo(m_ptLuaState->GetLuaState(), iResult, iTopPre, &strErrorMsg, &iLineNr);
-			strMsg.Printf(_("html lua tag: error %d in line %d: ") + strErrorMsg, iResult, iLineNr);
-			wxLogError(strMsg);
-			strHtmlCode = strMsg;
-		}
-		else
-		{
-			iTopPost = m_ptLuaState->lua_GetTop();
-			if( iTopPre<iTopPost )
+			iResult = lua_pcall(m_ptLua_State, 0, 1, 0);
+			
+			if( iResult!=0 )
 			{
-				// check return type
-				iResultType = m_ptLuaState->wxluaT_Type(0);
-				if( (iResultType==WXLUA_TBOOLEAN) || (iResultType==WXLUA_TNUMBER) || (iResultType==WXLUA_TSTRING) || (iResultType==WXLUA_TINTEGER) )
+				lua_get_errorinfo(m_ptLua_State, iResult, iTopPre, &strErrorMsg, &iLineNr);
+				strMsg.Printf(_("html lua tag: error %d in line %d: ") + strErrorMsg, iResult, iLineNr);
+				wxLogError(strMsg);
+				strHtmlCode = strMsg;
+			}
+			else
+			{
+				iTopPost = lua_gettop(m_ptLua_State);
+				if( iTopPre<iTopPost )
 				{
-					strHtmlCode = m_ptLuaState->GetwxStringType(0);
-				}
-				else
-				{
-					strHtmlCode = _("html lua tag: invalid return type");
+					// check return type
+					iResultType = lua_type(m_ptLua_State, 0);
+					if( iResultType==LUA_TSTRING )
+					{
+						strHtmlCode = wxString::FromAscii(lua_tostring(m_ptLua_State, 0));
+					}
+					else
+					{
+						strHtmlCode = _("html lua tag: invalid return type");
+					}
 				}
 			}
+			lua_settop(m_ptLua_State, iTopPre);
 		}
-		m_ptLuaState->lua_SetTop(iTopPre);
 	}
 	else
 	{
@@ -2043,9 +2152,6 @@ wxString muhkuh_mainFrame::local_htmlTag_lua(const wxString &strLuaCode)
 	}
 
 	return strHtmlCode;
-#else
-	return wxT("bah!");
-#endif
 }
 
 

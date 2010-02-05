@@ -25,6 +25,9 @@
 #include <wx/filename.h>
 
 
+#include "muhkuh_mainFrame.h"
+
+
 #ifndef __MUHKUH_APP_H__
 #define __MUHKUH_APP_H__
 
@@ -33,6 +36,8 @@ class muhkuh_app : public wxApp
 public:
 	bool OnInit(void);
 	int OnExit(void);
+
+	muhkuh_mainFrame *ptMainframe;
 };
 
 DECLARE_APP(muhkuh_app);

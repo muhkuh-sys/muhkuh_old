@@ -36,6 +36,13 @@
 #include <wx/tipdlg.h>
 
 
+extern "C" {
+#include "lua.h"
+#include "lauxlib.h"
+#include "lualib.h"
+}
+
+
 #ifndef __MUHKUH_MAINFRAME_H__
 #define __MUHKUH_MAINFRAME_H__
 
@@ -122,6 +129,12 @@ public:
 		MAINFRAME_INIT_STATE_CONFIGURED,
 		MAINFRAME_INIT_STATE_SCANNED
 	} MAINFRAME_INIT_STATE_E;
+
+	typedef struct
+	{
+		int iLuaError;
+		const wxChar *pcMessage;
+	} LUA_ERROR_TO_STR_T;
 
 private:
 	void init_lua(void);
@@ -238,6 +251,17 @@ private:
 	// frame size and position
 	wxPoint m_framePosition;
 	wxSize m_frameSize;
+
+
+
+	// lua stuff
+	static const LUA_ERROR_TO_STR_T atLuaErrorToString[];
+	wxString lua_error_to_string(int iLuaError);
+	bool lua_get_errorinfo(lua_State *L, int iStatus, int iTop, wxString *pstrErrorMsg, int *piLineNum);
+	lua_State *m_ptLua_State;
+
+
+
 
     DECLARE_EVENT_TABLE()
 };

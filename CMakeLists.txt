@@ -28,7 +28,7 @@ ELSE(USE_SYSTEM_LUA)
 	# Use the internal lua version.
 	SET(LUA51_FOUND TRUE)
 	SET(LUA_LIBRARIES lua)
-	SET(LUA_INCLUDE_DIR ${CMAKE_HOME_DIRECTORY}/lua/lib/lua-5.1.4/src/)
+	SET(LUA_INCLUDE_DIR ${CMAKE_HOME_DIRECTORY}/lib/lua-5.1.4/src/)
 ENDIF(USE_SYSTEM_LUA)
 
 FIND_PACKAGE(PythonLibs)
@@ -47,3 +47,4 @@ ADD_CUSTOM_TARGET(SWIG_PYTHON_RUNTIME DEPENDS ${SWIG_RUNTIME_OUTPUT_PATH}swigpyt
 
 
 add_subdirectory(application)
+add_subdirectory(lib)
