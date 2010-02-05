@@ -519,7 +519,7 @@ static int romloader_openocd_connect(command_context_t **pptCmdCtx)
 						}
 						if( iResult!=ERROR_OK )
 						{
-							wxLogError("config failed!");
+							wxLogError(wxT("config failed!"));
 						}
 					}
 				}
@@ -568,7 +568,7 @@ int fn_detect_interfaces(std::vector<muhkuh_plugin_instance*> *pvInterfaceList)
 		romloader_openocd_close_instance(cmd_ctx);
 
 		// construct the name
-		strName.Printf("romloader_openocd");
+		strName.Printf(wxT("romloader_openocd"));
 		ptInst = new muhkuh_plugin_instance(strName, strTyp, false, strLuaCreateFn, NULL);
 		++iInterfaces;
 
@@ -598,7 +598,7 @@ romloader *romloader_openocd_create(void *pvHandle)
 		// create the new instance
 		strTyp = plugin_desc.strPluginId;
 		// TODO: add some info
-		strName.Printf("romloader_openocd");
+		strName.Printf(wxT("romloader_openocd"));
 		ptInstance = new romloader(strName, strTyp, &tFunctionInterface, cmd_ctx, romloader_openocd_close_instance, m_ptLuaState);
 	}
 
@@ -645,7 +645,7 @@ static bool callback(lua_State *L, int iLuaCallbackTag, unsigned long ulProgress
 				break;
 			}
 			wxLogError(wxT("callback function failed: ") + strMsg);
-			strMsg = wxlua_getstringtype(L, -1);
+			strMsg = wxString::FromAscii(wxlua_getstringtype(L, -1));
 			wxLogError(strMsg);
 			wxLogError(wxT("cancel operation"));
 			fStillRunning = false;
@@ -979,7 +979,7 @@ int fn_call(void *pvHandle, unsigned long ulNetxAddress, unsigned long ulParamet
 	iOocdResult = command_run_line(cmd_ctx, strCmd.ToAscii());
 	if( iOocdResult!=ERROR_OK )
 	{
-		wxLogError("config failed!");
+		wxLogError(wxT("config failed!"));
 	}
 	else
 	{
@@ -988,7 +988,7 @@ int fn_call(void *pvHandle, unsigned long ulNetxAddress, unsigned long ulParamet
 		iOocdResult = command_run_line(cmd_ctx, strCmd.ToAscii());
 		if( iOocdResult!=ERROR_OK )
 		{
-			wxLogError("config failed!");
+			wxLogError(wxT("config failed!"));
 		}
 		else
 		{
