@@ -173,7 +173,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "number",
   },
   wxANIHandler = {
-    BaseClass = "wxCURHandler",
+    BaseClasses = {
+      [1] = "wxCURHandler",
+    },
     Condition = "(wxLUA_USE_wxImage && wxUSE_IMAGE) && (wxUSE_ICO_CUR)",
     IsNumber = false,
     Name = "wxANIHandler",
@@ -194,14 +196,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxAcceleratorTable = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxAcceleratorTable && wxUSE_ACCEL",
     IsNumber = false,
     Name = "wxAcceleratorTable",
     ValueType = "class",
   },
   wxActivateEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxActivateEvent",
     ValueType = "class",
@@ -212,14 +218,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxAnimation = {
-    BaseClass = "wxGDIObject",
+    BaseClasses = {
+      [1] = "wxGDIObject",
+    },
     Condition = "wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxAnimation && wxUSE_ANIMATIONCTRL",
     IsNumber = false,
     Name = "wxAnimation",
     ValueType = "class",
   },
   wxAnimationCtrl = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxAnimation && wxUSE_ANIMATIONCTRL",
     IsNumber = false,
     Name = "wxAnimationCtrl",
@@ -232,7 +242,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxApp = {
-    BaseClass = "wxEvtHandler",
+    BaseClasses = {
+      [1] = "wxEvtHandler",
+    },
     Condition = "wxLUA_USE_wxApp",
     IsNumber = false,
     Name = "wxApp",
@@ -244,7 +256,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxArchiveFSHandler = {
-    BaseClass = "wxFileSystemHandler",
+    BaseClasses = {
+      [1] = "wxFileSystemHandler",
+    },
     Condition = "(wxUSE_STREAMS) && (wxUSE_FILESYSTEM)",
     IsNumber = false,
     Name = "wxArchiveFSHandler",
@@ -272,7 +286,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxArtProvider = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxArtProvider",
     IsNumber = false,
     Name = "wxArtProvider",
@@ -286,7 +302,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxAuiDefaultDockArt = {
     ["%encapsulate"] = true,
-    BaseClass = "wxAuiDockArt",
+    BaseClasses = {
+      [1] = "wxAuiDockArt",
+    },
     Condition = "wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI",
     IsNumber = false,
     Name = "wxAuiDefaultDockArt",
@@ -294,7 +312,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxAuiDefaultTabArt = {
     ["%encapsulate"] = true,
-    BaseClass = "wxAuiTabArt",
+    BaseClasses = {
+      [1] = "wxAuiTabArt",
+    },
     Condition = "wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI",
     IsNumber = false,
     Name = "wxAuiDefaultTabArt",
@@ -328,35 +348,45 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxAuiFloatingFrame = {
-    BaseClass = "wxFrame",
+    BaseClasses = {
+      [1] = "wxFrame",
+    },
     Condition = "wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI",
     IsNumber = false,
     Name = "wxAuiFloatingFrame",
     ValueType = "class",
   },
   wxAuiMDIChildFrame = {
-    BaseClass = "wxPanel",
+    BaseClasses = {
+      [1] = "wxPanel",
+    },
     Condition = "wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI",
     IsNumber = false,
     Name = "wxAuiMDIChildFrame",
     ValueType = "class",
   },
   wxAuiMDIClientWindow = {
-    BaseClass = "wxAuiNotebook",
+    BaseClasses = {
+      [1] = "wxAuiNotebook",
+    },
     Condition = "wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI",
     IsNumber = false,
     Name = "wxAuiMDIClientWindow",
     ValueType = "class",
   },
   wxAuiMDIParentFrame = {
-    BaseClass = "wxFrame",
+    BaseClasses = {
+      [1] = "wxFrame",
+    },
     Condition = "wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI",
     IsNumber = false,
     Name = "wxAuiMDIParentFrame",
     ValueType = "class",
   },
   wxAuiManager = {
-    BaseClass = "wxEvtHandler",
+    BaseClasses = {
+      [1] = "wxEvtHandler",
+    },
     Condition = "wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI",
     IsNumber = false,
     Name = "wxAuiManager",
@@ -369,7 +399,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxAuiManagerEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     Condition = "wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI",
     IsNumber = false,
     Name = "wxAuiManagerEvent",
@@ -382,14 +414,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxAuiNotebook = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI",
     IsNumber = false,
     Name = "wxAuiNotebook",
     ValueType = "class",
   },
   wxAuiNotebookEvent = {
-    BaseClass = "wxNotifyEvent",
+    BaseClasses = {
+      [1] = "wxNotifyEvent",
+    },
     Condition = "wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI",
     IsNumber = false,
     Name = "wxAuiNotebookEvent",
@@ -468,7 +504,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxAuiSimpleTabArt = {
     ["%encapsulate"] = true,
-    BaseClass = "wxAuiTabArt",
+    BaseClasses = {
+      [1] = "wxAuiTabArt",
+    },
     Condition = "wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI",
     IsNumber = false,
     Name = "wxAuiSimpleTabArt",
@@ -489,21 +527,27 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxAuiTabCtrl = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxAUI && wxCHECK_VERSION(2,8,0) && wxUSE_AUI",
     IsNumber = false,
     Name = "wxAuiTabCtrl",
     ValueType = "class",
   },
   wxAutoBufferedPaintDC = {
-    BaseClass = "wxDC",
+    BaseClasses = {
+      [1] = "wxDC",
+    },
     Condition = "(wxLUA_USE_wxDC) && (wxCHECK_VERSION(2,8,0))",
     IsNumber = false,
     Name = "wxAutoBufferedPaintDC",
     ValueType = "class",
   },
   wxBMPHandler = {
-    BaseClass = "wxImageHandler",
+    BaseClasses = {
+      [1] = "wxImageHandler",
+    },
     Condition = "wxLUA_USE_wxImage && wxUSE_IMAGE",
     IsNumber = false,
     Name = "wxBMPHandler",
@@ -521,28 +565,33 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxBestHelpController = {
-    BaseClass = "wxHelpControllerBase",
+    BaseClasses = {
+      [1] = "wxHelpControllerBase",
+    },
     Condition = "(wxLUA_USE_wxHelpController && wxUSE_HELP) && (defined(__WXMSW__))",
     IsNumber = false,
     Name = "wxBestHelpController",
     ValueType = "class",
   },
   wxBitmap = {
-    BaseClass = "wxGDIObject",
+    BaseClasses = {
+      [1] = "wxGDIObject",
+    },
     Condition = "wxLUA_USE_wxBitmap",
     IsNumber = false,
     Name = "wxBitmap",
     ValueType = "class",
   },
   wxBitmapButton = {
-    BaseClass = "wxButton",
+    BaseClasses = {
+      [1] = "wxButton",
+    },
     Condition = "(wxLUA_USE_wxButton && wxUSE_BUTTON) && (wxLUA_USE_wxBitmapButton && wxUSE_BMPBUTTON)",
     IsNumber = false,
     Name = "wxBitmapButton",
     ValueType = "class",
   },
   wxBitmapComboBox = {
-    BaseClass = "wxControlWithItems",
     Condition = "wxLUA_USE_wxBitmapComboBox && wxUSE_BITMAPCOMBOBOX",
     IsNumber = false,
     Name = "wxBitmapComboBox",
@@ -550,7 +599,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxBitmapDataObject = {
     ["%encapsulate"] = true,
-    BaseClass = "wxDataObjectSimple",
+    BaseClasses = {
+      [1] = "wxDataObjectSimple",
+    },
     Condition = "wxLUA_USE_wxDataObject && wxUSE_DATAOBJ",
     IsNumber = false,
     Name = "wxBitmapDataObject",
@@ -562,14 +613,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxBookCtrlBase = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxNotebook && wxUSE_BOOKCTRL",
     IsNumber = false,
     Name = "wxBookCtrlBase",
     ValueType = "class",
   },
   wxBookCtrlBaseEvent = {
-    BaseClass = "wxNotifyEvent",
+    BaseClasses = {
+      [1] = "wxNotifyEvent",
+    },
     Condition = "wxLUA_USE_wxNotebook && wxUSE_BOOKCTRL",
     IsNumber = false,
     Name = "wxBookCtrlBaseEvent",
@@ -581,35 +636,45 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxBoxSizer = {
-    BaseClass = "wxSizer",
+    BaseClasses = {
+      [1] = "wxSizer",
+    },
     Condition = "(wxLUA_USE_wxSizer) && (wxCHECK_VERSION(2,8,0))",
     IsNumber = false,
     Name = "wxBoxSizer",
     ValueType = "class",
   },
   wxBrush = {
-    BaseClass = "wxGDIObject",
+    BaseClasses = {
+      [1] = "wxGDIObject",
+    },
     Condition = "wxLUA_USE_wxColourPenBrush",
     IsNumber = false,
     Name = "wxBrush",
     ValueType = "class",
   },
   wxBrushList = {
-    BaseClass = "wxList",
+    BaseClasses = {
+      [1] = "wxList",
+    },
     Condition = "(wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxBrushList)",
     IsNumber = false,
     Name = "wxBrushList",
     ValueType = "class",
   },
   wxBufferedDC = {
-    BaseClass = "wxMemoryDC",
+    BaseClasses = {
+      [1] = "wxMemoryDC",
+    },
     Condition = "wxLUA_USE_wxDC",
     IsNumber = false,
     Name = "wxBufferedDC",
     ValueType = "class",
   },
   wxBufferedPaintDC = {
-    BaseClass = "wxBufferedDC",
+    BaseClasses = {
+      [1] = "wxBufferedDC",
+    },
     Condition = "wxLUA_USE_wxDC",
     IsNumber = false,
     Name = "wxBufferedPaintDC",
@@ -623,14 +688,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxBusyInfo = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxBusyInfo && wxUSE_BUSYINFO",
     IsNumber = false,
     Name = "wxBusyInfo",
     ValueType = "class",
   },
   wxButton = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxButton && wxUSE_BUTTON",
     IsNumber = false,
     Name = "wxButton",
@@ -642,21 +711,27 @@ serverkuh_lua_dataTypeTable =
     ValueType = "number",
   },
   wxCURHandler = {
-    BaseClass = "wxICOHandler",
+    BaseClasses = {
+      [1] = "wxICOHandler",
+    },
     Condition = "(wxLUA_USE_wxImage && wxUSE_IMAGE) && (wxUSE_ICO_CUR)",
     IsNumber = false,
     Name = "wxCURHandler",
     ValueType = "class",
   },
   wxCalculateLayoutEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     Condition = "wxLUA_USE_wxSashWindow && wxUSE_SASH",
     IsNumber = false,
     Name = "wxCalculateLayoutEvent",
     ValueType = "class",
   },
   wxCalendarCtrl = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxCalendarCtrl && wxUSE_CALENDARCTRL",
     IsNumber = false,
     Name = "wxCalendarCtrl",
@@ -676,7 +751,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxCalendarEvent = {
-    BaseClass = "wxDateEvent",
+    BaseClasses = {
+      [1] = "wxDateEvent",
+    },
     Condition = "wxLUA_USE_wxCalendarCtrl && wxUSE_CALENDARCTRL",
     IsNumber = false,
     Name = "wxCalendarEvent",
@@ -708,7 +785,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "number",
   },
   wxCheckBox = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxCheckBox && wxUSE_CHECKBOX",
     IsNumber = false,
     Name = "wxCheckBox",
@@ -721,34 +800,44 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxCheckListBox = {
-    BaseClass = "wxListBox",
+    BaseClasses = {
+      [1] = "wxListBox",
+    },
     Condition = "(wxLUA_USE_wxListBox && wxUSE_LISTBOX) && (wxLUA_USE_wxCheckListBox && wxUSE_CHECKLISTBOX)",
     IsNumber = false,
     Name = "wxCheckListBox",
     ValueType = "class",
   },
   wxChildFocusEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     IsNumber = false,
     Name = "wxChildFocusEvent",
     ValueType = "class",
   },
   wxChoice = {
-    BaseClass = "wxControlWithItems",
+    BaseClasses = {
+      [1] = "wxControlWithItems",
+    },
     Condition = "wxLUA_USE_wxChoice && wxUSE_CHOICE",
     IsNumber = false,
     Name = "wxChoice",
     ValueType = "class",
   },
   wxChoicebook = {
-    BaseClass = "wxBookCtrlBase",
+    BaseClasses = {
+      [1] = "wxBookCtrlBase",
+    },
     Condition = "wxLUA_USE_wxNotebook && wxLUA_USE_wxChoice && wxUSE_CHOICEBOOK",
     IsNumber = false,
     Name = "wxChoicebook",
     ValueType = "class",
   },
   wxChoicebookEvent = {
-    BaseClass = "wxBookCtrlBaseEvent",
+    BaseClasses = {
+      [1] = "wxBookCtrlBaseEvent",
+    },
     Condition = "wxLUA_USE_wxNotebook && wxLUA_USE_wxChoice && wxUSE_CHOICEBOOK",
     IsNumber = false,
     Name = "wxChoicebookEvent",
@@ -761,7 +850,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxClientDC = {
-    BaseClass = "wxWindowDC",
+    BaseClasses = {
+      [1] = "wxWindowDC",
+    },
     Condition = "wxLUA_USE_wxDC",
     IsNumber = false,
     Name = "wxClientDC",
@@ -778,7 +869,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxClipboard = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxClipboard && wxUSE_CLIPBOARD",
     IsNumber = false,
     Name = "wxClipboard",
@@ -792,41 +885,53 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxClipboardTextEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     Condition = "(wxLUA_USE_wxClipboard && wxUSE_CLIPBOARD) && (wxCHECK_VERSION(2,8,0))",
     IsNumber = false,
     Name = "wxClipboardTextEvent",
     ValueType = "class",
   },
   wxCloseEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxCloseEvent",
     ValueType = "class",
   },
   wxCollapsiblePane = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxCollapsiblePane && wxUSE_COLLPANE",
     IsNumber = false,
     Name = "wxCollapsiblePane",
     ValueType = "class",
   },
   wxCollapsiblePaneEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     Condition = "wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxCollapsiblePane && wxUSE_COLLPANE",
     IsNumber = false,
     Name = "wxCollapsiblePaneEvent",
     ValueType = "class",
   },
   wxColour = {
-    BaseClass = "wxGDIObject",
+    BaseClasses = {
+      [1] = "wxGDIObject",
+    },
     Condition = "wxLUA_USE_wxColourPenBrush",
     IsNumber = false,
     Name = "wxColour",
     ValueType = "class",
   },
   wxColourData = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxColourDialog && wxUSE_COLOURDLG",
     IsNumber = false,
     Name = "wxColourData",
@@ -840,48 +945,62 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxColourDialog = {
-    BaseClass = "wxDialog",
+    BaseClasses = {
+      [1] = "wxDialog",
+    },
     Condition = "wxLUA_USE_wxColourDialog && wxUSE_COLOURDLG",
     IsNumber = false,
     Name = "wxColourDialog",
     ValueType = "class",
   },
   wxColourPickerCtrl = {
-    BaseClass = "wxPickerBase",
+    BaseClasses = {
+      [1] = "wxPickerBase",
+    },
     Condition = "(wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)",
     IsNumber = false,
     Name = "wxColourPickerCtrl",
     ValueType = "class",
   },
   wxColourPickerEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     Condition = "(wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxColourPickerCtrl && wxUSE_COLOURPICKERCTRL)",
     IsNumber = false,
     Name = "wxColourPickerEvent",
     ValueType = "class",
   },
   wxComboBox = {
-    BaseClass = "wxControlWithItems",
+    BaseClasses = {
+      [1] = "wxControlWithItems",
+    },
     Condition = "wxLUA_USE_wxComboBox && wxUSE_COMBOBOX",
     IsNumber = false,
     Name = "wxComboBox",
     ValueType = "class",
   },
   wxCommand = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxCommandProcessor",
     IsNumber = false,
     Name = "wxCommand",
     ValueType = "class",
   },
   wxCommandEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxCommandEvent",
     ValueType = "class",
   },
   wxCommandProcessor = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxCommandProcessor",
     IsNumber = false,
     Name = "wxCommandProcessor",
@@ -889,7 +1008,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxConfig = {
     ["%encapsulate"] = true,
-    BaseClass = "wxConfigBase",
+    BaseClasses = {
+      [1] = "wxConfigBase",
+    },
     Condition = "wxLUA_USE_wxConfig && wxUSE_CONFIG",
     IsNumber = false,
     Name = "wxConfig",
@@ -916,33 +1037,43 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxContextHelp = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxHelpController && wxUSE_HELP",
     IsNumber = false,
     Name = "wxContextHelp",
     ValueType = "class",
   },
   wxContextHelpButton = {
-    BaseClass = "wxBitmapButton",
+    BaseClasses = {
+      [1] = "wxBitmapButton",
+    },
     Condition = "(wxLUA_USE_wxHelpController && wxUSE_HELP) && (wxLUA_USE_wxBitmapButton && wxUSE_BMPBUTTON)",
     IsNumber = false,
     Name = "wxContextHelpButton",
     ValueType = "class",
   },
   wxContextMenuEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     IsNumber = false,
     Name = "wxContextMenuEvent",
     ValueType = "class",
   },
   wxControl = {
-    BaseClass = "wxWindow",
+    BaseClasses = {
+      [1] = "wxWindow",
+    },
     IsNumber = false,
     Name = "wxControl",
     ValueType = "class",
   },
   wxControlWithItems = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "(wxLUA_USE_wxChoice || wxLUA_USE_wxComboBox || wxLUA_USE_wxListBox ) && wxUSE_CONTROLS",
     IsNumber = false,
     Name = "wxControlWithItems",
@@ -968,14 +1099,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxCursor = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxCursor",
     IsNumber = false,
     Name = "wxCursor",
     ValueType = "class",
   },
   wxDC = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxDC",
     IsNumber = false,
     Name = "wxDC",
@@ -1027,7 +1162,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxDataObjectComposite = {
     ["%encapsulate"] = true,
-    BaseClass = "wxDataObject",
+    BaseClasses = {
+      [1] = "wxDataObject",
+    },
     Condition = "wxLUA_USE_wxDataObject && wxUSE_DATAOBJ",
     IsNumber = false,
     Name = "wxDataObjectComposite",
@@ -1035,7 +1172,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxDataObjectSimple = {
     ["%encapsulate"] = true,
-    BaseClass = "wxDataObject",
+    BaseClasses = {
+      [1] = "wxDataObject",
+    },
     Condition = "wxLUA_USE_wxDataObject && wxUSE_DATAOBJ",
     IsNumber = false,
     Name = "wxDataObjectSimple",
@@ -1049,14 +1188,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxDateEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     Condition = "wxLUA_USE_wxCalendarCtrl && wxUSE_CALENDARCTRL",
     IsNumber = false,
     Name = "wxDateEvent",
     ValueType = "class",
   },
   wxDatePickerCtrl = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "(wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDatePickerCtrl && wxUSE_DATEPICKCTRL)",
     IsNumber = false,
     Name = "wxDatePickerCtrl",
@@ -1127,14 +1270,18 @@ serverkuh_lua_dataTypeTable =
   },
   wxDateTimeWorkDays = {
     ["%encapsulate"] = true,
-    BaseClass = "wxDateTimeHolidayAuthority",
+    BaseClasses = {
+      [1] = "wxDateTimeHolidayAuthority",
+    },
     Condition = "wxLUA_USE_wxDateTimeHolidayAuthority && wxUSE_DATETIME",
     IsNumber = false,
     Name = "wxDateTimeWorkDays",
     ValueType = "class",
   },
   wxDialog = {
-    BaseClass = "wxTopLevelWindow",
+    BaseClasses = {
+      [1] = "wxTopLevelWindow",
+    },
     Condition = "wxLUA_USE_wxDialog",
     IsNumber = false,
     Name = "wxDialog",
@@ -1148,14 +1295,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxDirDialog = {
-    BaseClass = "wxDialog",
+    BaseClasses = {
+      [1] = "wxDialog",
+    },
     Condition = "wxLUA_USE_wxDirDialog && wxUSE_DIRDLG",
     IsNumber = false,
     Name = "wxDirDialog",
     ValueType = "class",
   },
   wxDirPickerCtrl = {
-    BaseClass = "wxFileDirPickerCtrlBase",
+    BaseClasses = {
+      [1] = "wxFileDirPickerCtrlBase",
+    },
     Condition = "(wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))",
     IsNumber = false,
     Name = "wxDirPickerCtrl",
@@ -1174,55 +1325,71 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxDisplayChangedEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxDisplayChangedEvent",
     ValueType = "class",
   },
   wxDocChildFrame = {
-    BaseClass = "wxFrame",
+    BaseClasses = {
+      [1] = "wxFrame",
+    },
     Condition = "wxLUA_USE_MDI && wxUSE_MDI && wxUSE_DOC_VIEW_ARCHITECTURE",
     IsNumber = false,
     Name = "wxDocChildFrame",
     ValueType = "class",
   },
   wxDocMDIChildFrame = {
-    BaseClass = "wxMDIChildFrame",
+    BaseClasses = {
+      [1] = "wxMDIChildFrame",
+    },
     Condition = "wxLUA_USE_MDI && wxUSE_MDI && wxUSE_DOC_VIEW_ARCHITECTURE",
     IsNumber = false,
     Name = "wxDocMDIChildFrame",
     ValueType = "class",
   },
   wxDocMDIParentFrame = {
-    BaseClass = "wxMDIParentFrame",
+    BaseClasses = {
+      [1] = "wxMDIParentFrame",
+    },
     Condition = "wxLUA_USE_MDI && wxUSE_MDI && wxUSE_DOC_VIEW_ARCHITECTURE",
     IsNumber = false,
     Name = "wxDocMDIParentFrame",
     ValueType = "class",
   },
   wxDocManager = {
-    BaseClass = "wxEvtHandler",
+    BaseClasses = {
+      [1] = "wxEvtHandler",
+    },
     Condition = "wxLUA_USE_MDI && wxUSE_MDI && wxUSE_DOC_VIEW_ARCHITECTURE",
     IsNumber = false,
     Name = "wxDocManager",
     ValueType = "class",
   },
   wxDocParentFrame = {
-    BaseClass = "wxFrame",
+    BaseClasses = {
+      [1] = "wxFrame",
+    },
     Condition = "wxLUA_USE_MDI && wxUSE_MDI && wxUSE_DOC_VIEW_ARCHITECTURE",
     IsNumber = false,
     Name = "wxDocParentFrame",
     ValueType = "class",
   },
   wxDocTemplate = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_MDI && wxUSE_MDI && wxUSE_DOC_VIEW_ARCHITECTURE",
     IsNumber = false,
     Name = "wxDocTemplate",
     ValueType = "class",
   },
   wxDocument = {
-    BaseClass = "wxEvtHandler",
+    BaseClasses = {
+      [1] = "wxEvtHandler",
+    },
     Condition = "wxLUA_USE_MDI && wxUSE_MDI && wxUSE_DOC_VIEW_ARCHITECTURE",
     IsNumber = false,
     Name = "wxDocument",
@@ -1240,7 +1407,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxDropFilesEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     Condition = "wxLUA_USE_wxDragDrop && wxUSE_DRAG_AND_DROP",
     IsNumber = false,
     Name = "wxDropFilesEvent",
@@ -1301,7 +1470,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxEffects = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     IsNumber = false,
     Name = "wxEffects",
     ValueType = "class",
@@ -1312,13 +1483,17 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxEraseEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxEraseEvent",
     ValueType = "class",
   },
   wxEvent = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     IsNumber = false,
     Name = "wxEvent",
     ValueType = "class",
@@ -1329,27 +1504,35 @@ serverkuh_lua_dataTypeTable =
     ValueType = "number",
   },
   wxEvtHandler = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     IsNumber = false,
     Name = "wxEvtHandler",
     ValueType = "class",
   },
   wxExtHelpController = {
-    BaseClass = "wxHelpControllerBase",
+    BaseClasses = {
+      [1] = "wxHelpControllerBase",
+    },
     Condition = "(wxLUA_USE_wxHelpController && wxUSE_HELP) && (!defined(__WXMSW__))",
     IsNumber = false,
     Name = "wxExtHelpController",
     ValueType = "class",
   },
   wxFSFile = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "(wxUSE_STREAMS) && (wxUSE_FILESYSTEM)",
     IsNumber = false,
     Name = "wxFSFile",
     ValueType = "class",
   },
   wxFTP = {
-    BaseClass = "wxProtocol",
+    BaseClasses = {
+      [1] = "wxProtocol",
+    },
     Condition = "(wxLUA_USE_wxSocket && wxUSE_SOCKETS) && (wxUSE_PROTOCOL_FTP)",
     IsNumber = false,
     Name = "wxFTP",
@@ -1382,7 +1565,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxFileConfig = {
     ["%encapsulate"] = true,
-    BaseClass = "wxConfigBase",
+    BaseClasses = {
+      [1] = "wxConfigBase",
+    },
     Condition = "wxLUA_USE_wxConfig && wxUSE_CONFIG",
     IsNumber = false,
     Name = "wxFileConfig",
@@ -1390,35 +1575,45 @@ serverkuh_lua_dataTypeTable =
   },
   wxFileDataObject = {
     ["%encapsulate"] = true,
-    BaseClass = "wxDataObjectSimple",
+    BaseClasses = {
+      [1] = "wxDataObjectSimple",
+    },
     Condition = "wxLUA_USE_wxDataObject && wxUSE_DATAOBJ",
     IsNumber = false,
     Name = "wxFileDataObject",
     ValueType = "class",
   },
   wxFileDialog = {
-    BaseClass = "wxDialog",
+    BaseClasses = {
+      [1] = "wxDialog",
+    },
     Condition = "wxLUA_USE_wxFileDialog && wxUSE_FILEDLG",
     IsNumber = false,
     Name = "wxFileDialog",
     ValueType = "class",
   },
   wxFileDirPickerCtrlBase = {
-    BaseClass = "wxPickerBase",
+    BaseClasses = {
+      [1] = "wxPickerBase",
+    },
     Condition = "(wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && ((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))",
     IsNumber = false,
     Name = "wxFileDirPickerCtrlBase",
     ValueType = "class",
   },
   wxFileDirPickerEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     Condition = "(wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && ((wxLUA_USE_wxDirPickerCtrl || wxLUA_USE_wxFilePickerCtrl ) && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))",
     IsNumber = false,
     Name = "wxFileDirPickerEvent",
     ValueType = "class",
   },
   wxFileHistory = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxFileHistory && wxUSE_DOC_VIEW_ARCHITECTURE",
     IsNumber = false,
     Name = "wxFileHistory",
@@ -1426,7 +1621,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxFileInputStream = {
     ["%encapsulate"] = true,
-    BaseClass = "wxInputStream",
+    BaseClasses = {
+      [1] = "wxInputStream",
+    },
     Condition = "wxUSE_STREAMS",
     IsNumber = false,
     Name = "wxFileInputStream",
@@ -1452,28 +1649,36 @@ serverkuh_lua_dataTypeTable =
   },
   wxFileOutputStream = {
     ["%encapsulate"] = true,
-    BaseClass = "wxOutputStream",
+    BaseClasses = {
+      [1] = "wxOutputStream",
+    },
     Condition = "wxUSE_STREAMS",
     IsNumber = false,
     Name = "wxFileOutputStream",
     ValueType = "class",
   },
   wxFilePickerCtrl = {
-    BaseClass = "wxFileDirPickerCtrlBase",
+    BaseClasses = {
+      [1] = "wxFileDirPickerCtrlBase",
+    },
     Condition = "(wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxDirPickerCtrl && (wxUSE_FILEPICKERCTRL || wxUSE_DIRPICKERCTRL ))",
     IsNumber = false,
     Name = "wxFilePickerCtrl",
     ValueType = "class",
   },
   wxFileSystem = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "(wxUSE_STREAMS) && (wxUSE_FILESYSTEM)",
     IsNumber = false,
     Name = "wxFileSystem",
     ValueType = "class",
   },
   wxFileSystemHandler = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "(wxUSE_STREAMS) && (wxUSE_FILESYSTEM)",
     IsNumber = false,
     Name = "wxFileSystemHandler",
@@ -1498,28 +1703,36 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxFilterFSHandler = {
-    BaseClass = "wxFileSystemHandler",
+    BaseClasses = {
+      [1] = "wxFileSystemHandler",
+    },
     Condition = "(wxUSE_STREAMS) && (wxUSE_FILESYSTEM)",
     IsNumber = false,
     Name = "wxFilterFSHandler",
     ValueType = "class",
   },
   wxFindDialogEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     Condition = "wxUSE_FINDREPLDLG && wxLUA_USE_wxFindReplaceDialog",
     IsNumber = false,
     Name = "wxFindDialogEvent",
     ValueType = "class",
   },
   wxFindReplaceData = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxUSE_FINDREPLDLG && wxLUA_USE_wxFindReplaceDialog",
     IsNumber = false,
     Name = "wxFindReplaceData",
     ValueType = "class",
   },
   wxFindReplaceDialog = {
-    BaseClass = "wxDialog",
+    BaseClasses = {
+      [1] = "wxDialog",
+    },
     Condition = "wxUSE_FINDREPLDLG && wxLUA_USE_wxFindReplaceDialog",
     IsNumber = false,
     Name = "wxFindReplaceDialog",
@@ -1538,7 +1751,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxFlexGridSizer = {
-    BaseClass = "wxGridSizer",
+    BaseClasses = {
+      [1] = "wxGridSizer",
+    },
     Condition = "(wxLUA_USE_wxSizer) && (wxCHECK_VERSION(2,8,0))",
     IsNumber = false,
     Name = "wxFlexGridSizer",
@@ -1561,27 +1776,35 @@ serverkuh_lua_dataTypeTable =
     ValueType = "number",
   },
   wxFocusEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxFocusEvent",
     ValueType = "class",
   },
   wxFont = {
-    BaseClass = "wxGDIObject",
+    BaseClasses = {
+      [1] = "wxGDIObject",
+    },
     Condition = "wxLUA_USE_wxFont",
     IsNumber = false,
     Name = "wxFont",
     ValueType = "class",
   },
   wxFontData = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxUSE_FONTDLG && wxLUA_USE_wxFontDialog",
     IsNumber = false,
     Name = "wxFontData",
     ValueType = "class",
   },
   wxFontDialog = {
-    BaseClass = "wxDialog",
+    BaseClasses = {
+      [1] = "wxDialog",
+    },
     Condition = "wxUSE_FONTDLG && wxLUA_USE_wxFontDialog",
     IsNumber = false,
     Name = "wxFontDialog",
@@ -1619,14 +1842,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxFontPickerCtrl = {
-    BaseClass = "wxPickerBase",
+    BaseClasses = {
+      [1] = "wxPickerBase",
+    },
     Condition = "(wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)",
     IsNumber = false,
     Name = "wxFontPickerCtrl",
     ValueType = "class",
   },
   wxFontPickerEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     Condition = "(wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker) && (wxLUA_USE_wxFontPickerCtrl && wxUSE_FONTPICKERCTRL)",
     IsNumber = false,
     Name = "wxFontPickerEvent",
@@ -1645,7 +1872,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxFrame = {
-    BaseClass = "wxTopLevelWindow",
+    BaseClasses = {
+      [1] = "wxTopLevelWindow",
+    },
     Condition = "wxLUA_USE_wxFrame",
     IsNumber = false,
     Name = "wxFrame",
@@ -1659,7 +1888,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxGBSizerItem = {
-    BaseClass = "wxSizerItem",
+    BaseClasses = {
+      [1] = "wxSizerItem",
+    },
     Condition = "(wxLUA_USE_wxSizer) && (wxCHECK_VERSION(2,8,0))",
     IsNumber = false,
     Name = "wxGBSizerItem",
@@ -1673,55 +1904,71 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxGDIObject = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     IsNumber = false,
     Name = "wxGDIObject",
     ValueType = "class",
   },
   wxGIFHandler = {
-    BaseClass = "wxImageHandler",
+    BaseClasses = {
+      [1] = "wxImageHandler",
+    },
     Condition = "(wxLUA_USE_wxImage && wxUSE_IMAGE) && (wxUSE_GIF)",
     IsNumber = false,
     Name = "wxGIFHandler",
     ValueType = "class",
   },
   wxGLCanvas = {
-    BaseClass = "wxWindow",
+    BaseClasses = {
+      [1] = "wxWindow",
+    },
     Condition = "wxLUA_USE_wxGLCanvas && wxUSE_GLCANVAS",
     IsNumber = false,
     Name = "wxGLCanvas",
     ValueType = "class",
   },
   wxGLContext = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxGLCanvas && wxUSE_GLCANVAS",
     IsNumber = false,
     Name = "wxGLContext",
     ValueType = "class",
   },
   wxGauge = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxGauge && wxUSE_GAUGE",
     IsNumber = false,
     Name = "wxGauge",
     ValueType = "class",
   },
   wxGenericDirCtrl = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxGenericDirCtrl && wxUSE_DIRDLG",
     IsNumber = false,
     Name = "wxGenericDirCtrl",
     ValueType = "class",
   },
   wxGenericValidator = {
-    BaseClass = "wxValidator",
+    BaseClasses = {
+      [1] = "wxValidator",
+    },
     Condition = "(wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxGenericValidator)",
     IsNumber = false,
     Name = "wxGenericValidator",
     ValueType = "class",
   },
   wxGrid = {
-    BaseClass = "wxScrolledWindow",
+    BaseClasses = {
+      [1] = "wxScrolledWindow",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGrid",
@@ -1734,7 +1981,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxGridBagSizer = {
-    BaseClass = "wxFlexGridSizer",
+    BaseClasses = {
+      [1] = "wxFlexGridSizer",
+    },
     Condition = "(wxLUA_USE_wxSizer) && (wxCHECK_VERSION(2,8,0))",
     IsNumber = false,
     Name = "wxGridBagSizer",
@@ -1742,7 +1991,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellAttr = {
     ["%encapsulate"] = true,
-    BaseClass = "wxClientDataContainer",
+    BaseClasses = {
+      [1] = "wxClientDataContainer",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellAttr",
@@ -1756,7 +2007,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellAttrProvider = {
     ["%encapsulate"] = true,
-    BaseClass = "wxClientDataContainer",
+    BaseClasses = {
+      [1] = "wxClientDataContainer",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellAttrProvider",
@@ -1764,7 +2017,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellAutoWrapStringEditor = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellTextEditor",
+    BaseClasses = {
+      [1] = "wxGridCellTextEditor",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellAutoWrapStringEditor",
@@ -1772,7 +2027,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellAutoWrapStringRenderer = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellStringRenderer",
+    BaseClasses = {
+      [1] = "wxGridCellStringRenderer",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellAutoWrapStringRenderer",
@@ -1780,7 +2037,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellBoolEditor = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellEditor",
+    BaseClasses = {
+      [1] = "wxGridCellEditor",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellBoolEditor",
@@ -1788,7 +2047,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellBoolRenderer = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellRenderer",
+    BaseClasses = {
+      [1] = "wxGridCellRenderer",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellBoolRenderer",
@@ -1796,7 +2057,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellChoiceEditor = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellEditor",
+    BaseClasses = {
+      [1] = "wxGridCellEditor",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellChoiceEditor",
@@ -1818,7 +2081,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellDateTimeRenderer = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellStringRenderer",
+    BaseClasses = {
+      [1] = "wxGridCellStringRenderer",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellDateTimeRenderer",
@@ -1826,7 +2091,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellEditor = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellWorker",
+    BaseClasses = {
+      [1] = "wxGridCellWorker",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellEditor",
@@ -1834,7 +2101,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellEnumEditor = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellChoiceEditor",
+    BaseClasses = {
+      [1] = "wxGridCellChoiceEditor",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellEnumEditor",
@@ -1842,7 +2111,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellEnumRenderer = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellStringRenderer",
+    BaseClasses = {
+      [1] = "wxGridCellStringRenderer",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellEnumRenderer",
@@ -1850,7 +2121,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellFloatEditor = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellTextEditor",
+    BaseClasses = {
+      [1] = "wxGridCellTextEditor",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellFloatEditor",
@@ -1858,7 +2131,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellFloatRenderer = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellStringRenderer",
+    BaseClasses = {
+      [1] = "wxGridCellStringRenderer",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellFloatRenderer",
@@ -1866,7 +2141,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellNumberEditor = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellTextEditor",
+    BaseClasses = {
+      [1] = "wxGridCellTextEditor",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellNumberEditor",
@@ -1874,7 +2151,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellNumberRenderer = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellStringRenderer",
+    BaseClasses = {
+      [1] = "wxGridCellStringRenderer",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellNumberRenderer",
@@ -1882,7 +2161,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellRenderer = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellWorker",
+    BaseClasses = {
+      [1] = "wxGridCellWorker",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellRenderer",
@@ -1890,7 +2171,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellStringRenderer = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellRenderer",
+    BaseClasses = {
+      [1] = "wxGridCellRenderer",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellStringRenderer",
@@ -1898,7 +2181,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellTextEditor = {
     ["%encapsulate"] = true,
-    BaseClass = "wxGridCellEditor",
+    BaseClasses = {
+      [1] = "wxGridCellEditor",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellTextEditor",
@@ -1906,56 +2191,72 @@ serverkuh_lua_dataTypeTable =
   },
   wxGridCellWorker = {
     ["%encapsulate"] = true,
-    BaseClass = "wxClientDataContainer",
+    BaseClasses = {
+      [1] = "wxClientDataContainer",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridCellWorker",
     ValueType = "class",
   },
   wxGridEditorCreatedEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridEditorCreatedEvent",
     ValueType = "class",
   },
   wxGridEvent = {
-    BaseClass = "wxNotifyEvent",
+    BaseClasses = {
+      [1] = "wxNotifyEvent",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridEvent",
     ValueType = "class",
   },
   wxGridRangeSelectEvent = {
-    BaseClass = "wxNotifyEvent",
+    BaseClasses = {
+      [1] = "wxNotifyEvent",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridRangeSelectEvent",
     ValueType = "class",
   },
   wxGridSizeEvent = {
-    BaseClass = "wxNotifyEvent",
+    BaseClasses = {
+      [1] = "wxNotifyEvent",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridSizeEvent",
     ValueType = "class",
   },
   wxGridSizer = {
-    BaseClass = "wxSizer",
+    BaseClasses = {
+      [1] = "wxSizer",
+    },
     Condition = "(wxLUA_USE_wxSizer) && (wxCHECK_VERSION(2,8,0))",
     IsNumber = false,
     Name = "wxGridSizer",
     ValueType = "class",
   },
   wxGridStringTable = {
-    BaseClass = "wxGridTableBase",
+    BaseClasses = {
+      [1] = "wxGridTableBase",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridStringTable",
     ValueType = "class",
   },
   wxGridTableBase = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxGridTableBase",
@@ -1975,7 +2276,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxHTTP = {
-    BaseClass = "wxProtocol",
+    BaseClasses = {
+      [1] = "wxProtocol",
+    },
     Condition = "(wxLUA_USE_wxSocket && wxUSE_SOCKETS) && (wxUSE_PROTOCOL_HTTP)",
     IsNumber = false,
     Name = "wxHTTP",
@@ -1995,14 +2298,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxHelpController = {
-    BaseClass = "wxHelpControllerBase",
+    BaseClasses = {
+      [1] = "wxHelpControllerBase",
+    },
     Condition = "wxLUA_USE_wxHelpController && wxUSE_HELP",
     IsNumber = false,
     Name = "wxHelpController",
     ValueType = "class",
   },
   wxHelpControllerBase = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxHelpController && wxUSE_HELP",
     IsNumber = false,
     Name = "wxHelpControllerBase",
@@ -2010,14 +2317,18 @@ serverkuh_lua_dataTypeTable =
   },
   wxHelpControllerHelpProvider = {
     ["%encapsulate"] = true,
-    BaseClass = "wxSimpleHelpProvider",
+    BaseClasses = {
+      [1] = "wxSimpleHelpProvider",
+    },
     Condition = "wxLUA_USE_wxHelpController && wxUSE_HELP",
     IsNumber = false,
     Name = "wxHelpControllerHelpProvider",
     ValueType = "class",
   },
   wxHelpEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     IsNumber = false,
     Name = "wxHelpEvent",
     ValueType = "class",
@@ -2048,63 +2359,81 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxHtmlCell = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxHTML && wxUSE_HTML",
     IsNumber = false,
     Name = "wxHtmlCell",
     ValueType = "class",
   },
   wxHtmlCellEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     Condition = "(wxLUA_USE_wxHTML && wxUSE_HTML) && (wxCHECK_VERSION(2,8,0))",
     IsNumber = false,
     Name = "wxHtmlCellEvent",
     ValueType = "class",
   },
   wxHtmlColourCell = {
-    BaseClass = "wxHtmlCell",
+    BaseClasses = {
+      [1] = "wxHtmlCell",
+    },
     Condition = "(wxLUA_USE_wxHTML && wxUSE_HTML) && (wxCHECK_VERSION(2,8,0))",
     IsNumber = false,
     Name = "wxHtmlColourCell",
     ValueType = "class",
   },
   wxHtmlContainerCell = {
-    BaseClass = "wxHtmlCell",
+    BaseClasses = {
+      [1] = "wxHtmlCell",
+    },
     Condition = "wxLUA_USE_wxHTML && wxUSE_HTML",
     IsNumber = false,
     Name = "wxHtmlContainerCell",
     ValueType = "class",
   },
   wxHtmlDCRenderer = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxHTML && wxUSE_HTML",
     IsNumber = false,
     Name = "wxHtmlDCRenderer",
     ValueType = "class",
   },
   wxHtmlEasyPrinting = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxHTML && wxUSE_HTML",
     IsNumber = false,
     Name = "wxHtmlEasyPrinting",
     ValueType = "class",
   },
   wxHtmlFontCell = {
-    BaseClass = "wxHtmlCell",
+    BaseClasses = {
+      [1] = "wxHtmlCell",
+    },
     Condition = "(wxLUA_USE_wxHTML && wxUSE_HTML) && (wxCHECK_VERSION(2,8,0))",
     IsNumber = false,
     Name = "wxHtmlFontCell",
     ValueType = "class",
   },
   wxHtmlHelpController = {
-    BaseClass = "wxHelpControllerBase",
+    BaseClasses = {
+      [1] = "wxHelpControllerBase",
+    },
     Condition = "(wxLUA_USE_wxHTML && wxUSE_HTML) && (wxLUA_USE_wxHtmlHelpController && wxUSE_WXHTML_HELP)",
     IsNumber = false,
     Name = "wxHtmlHelpController",
     ValueType = "class",
   },
   wxHtmlHelpData = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "(wxLUA_USE_wxHTML && wxUSE_HTML) && (wxLUA_USE_wxHtmlHelpController && wxUSE_WXHTML_HELP)",
     IsNumber = false,
     Name = "wxHtmlHelpData",
@@ -2117,42 +2446,54 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxHtmlParser = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxHTML && wxUSE_HTML",
     IsNumber = false,
     Name = "wxHtmlParser",
     ValueType = "class",
   },
   wxHtmlPrintout = {
-    BaseClass = "wxPrintout",
+    BaseClasses = {
+      [1] = "wxPrintout",
+    },
     Condition = "wxLUA_USE_wxHTML && wxUSE_HTML",
     IsNumber = false,
     Name = "wxHtmlPrintout",
     ValueType = "class",
   },
   wxHtmlTag = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxHTML && wxUSE_HTML",
     IsNumber = false,
     Name = "wxHtmlTag",
     ValueType = "class",
   },
   wxHtmlWidgetCell = {
-    BaseClass = "wxHtmlCell",
+    BaseClasses = {
+      [1] = "wxHtmlCell",
+    },
     Condition = "wxLUA_USE_wxHTML && wxUSE_HTML",
     IsNumber = false,
     Name = "wxHtmlWidgetCell",
     ValueType = "class",
   },
   wxHtmlWinParser = {
-    BaseClass = "wxHtmlParser",
+    BaseClasses = {
+      [1] = "wxHtmlParser",
+    },
     Condition = "wxLUA_USE_wxHTML && wxUSE_HTML",
     IsNumber = false,
     Name = "wxHtmlWinParser",
     ValueType = "class",
   },
   wxHtmlWindow = {
-    BaseClass = "wxScrolledWindow",
+    BaseClasses = {
+      [1] = "wxScrolledWindow",
+    },
     Condition = "wxLUA_USE_wxHTML && wxUSE_HTML",
     IsNumber = false,
     Name = "wxHtmlWindow",
@@ -2171,49 +2512,63 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxHyperlinkCtrl = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxCHECK_VERSION(2,8,0) && wxUSE_HYPERLINKCTRL && wxLUA_USE_wxHyperlinkCtrl",
     IsNumber = false,
     Name = "wxHyperlinkCtrl",
     ValueType = "class",
   },
   wxHyperlinkEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     Condition = "wxCHECK_VERSION(2,8,0) && wxUSE_HYPERLINKCTRL && wxLUA_USE_wxHyperlinkCtrl",
     IsNumber = false,
     Name = "wxHyperlinkEvent",
     ValueType = "class",
   },
   wxICOHandler = {
-    BaseClass = "wxBMPHandler",
+    BaseClasses = {
+      [1] = "wxBMPHandler",
+    },
     Condition = "(wxLUA_USE_wxImage && wxUSE_IMAGE) && (wxUSE_ICO_CUR)",
     IsNumber = false,
     Name = "wxICOHandler",
     ValueType = "class",
   },
   wxIFFHandler = {
-    BaseClass = "wxImageHandler",
+    BaseClasses = {
+      [1] = "wxImageHandler",
+    },
     Condition = "(wxLUA_USE_wxImage && wxUSE_IMAGE) && (wxUSE_IFF)",
     IsNumber = false,
     Name = "wxIFFHandler",
     ValueType = "class",
   },
   wxIPV4address = {
-    BaseClass = "wxIPaddress",
+    BaseClasses = {
+      [1] = "wxIPaddress",
+    },
     Condition = "wxLUA_USE_wxSocket && wxUSE_SOCKETS",
     IsNumber = false,
     Name = "wxIPV4address",
     ValueType = "class",
   },
   wxIPaddress = {
-    BaseClass = "wxSockAddress",
+    BaseClasses = {
+      [1] = "wxSockAddress",
+    },
     Condition = "wxLUA_USE_wxSocket && wxUSE_SOCKETS",
     IsNumber = false,
     Name = "wxIPaddress",
     ValueType = "class",
   },
   wxIcon = {
-    BaseClass = "wxGDIObject",
+    BaseClasses = {
+      [1] = "wxGDIObject",
+    },
     Condition = "wxLUA_USE_wxIcon",
     IsNumber = false,
     Name = "wxIcon",
@@ -2233,13 +2588,17 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxIconizeEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxIconizeEvent",
     ValueType = "class",
   },
   wxIdleEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxIdleEvent",
     ValueType = "class",
@@ -2250,14 +2609,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxImage = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxImage && wxUSE_IMAGE",
     IsNumber = false,
     Name = "wxImage",
     ValueType = "class",
   },
   wxImageHandler = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxImage && wxUSE_IMAGE",
     IsNumber = false,
     Name = "wxImageHandler",
@@ -2285,28 +2648,36 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxImageList = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxImageList",
     IsNumber = false,
     Name = "wxImageList",
     ValueType = "class",
   },
   wxIndividualLayoutConstraint = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "(wxLUA_USE_wxSizer) && (wxLUA_USE_wxLayoutConstraints && (!wxCHECK_VERSION(2,6,0)))",
     IsNumber = false,
     Name = "wxIndividualLayoutConstraint",
     ValueType = "class",
   },
   wxInitDialogEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxInitDialogEvent",
     ValueType = "class",
   },
   wxInputStream = {
     ["%encapsulate"] = true,
-    BaseClass = "wxStreamBase",
+    BaseClasses = {
+      [1] = "wxStreamBase",
+    },
     Condition = "wxUSE_STREAMS",
     IsNumber = false,
     Name = "wxInputStream",
@@ -2333,7 +2704,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "number",
   },
   wxInternetFSHandler = {
-    BaseClass = "wxFileSystemHandler",
+    BaseClasses = {
+      [1] = "wxFileSystemHandler",
+    },
     Condition = "(wxUSE_STREAMS) && (wxUSE_FILESYSTEM) && (wxUSE_FS_INET && wxUSE_SOCKETS)",
     IsNumber = false,
     Name = "wxInternetFSHandler",
@@ -2346,21 +2719,27 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxJPEGHandler = {
-    BaseClass = "wxImageHandler",
+    BaseClasses = {
+      [1] = "wxImageHandler",
+    },
     Condition = "(wxLUA_USE_wxImage && wxUSE_IMAGE) && (wxUSE_LIBJPEG)",
     IsNumber = false,
     Name = "wxJPEGHandler",
     ValueType = "class",
   },
   wxJoystick = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxJoystick && wxUSE_JOYSTICK",
     IsNumber = false,
     Name = "wxJoystick",
     ValueType = "class",
   },
   wxJoystickEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     Condition = "wxLUA_USE_wxJoystick && wxUSE_JOYSTICK",
     IsNumber = false,
     Name = "wxJoystickEvent",
@@ -2372,7 +2751,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxKeyEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxKeyEvent",
     ValueType = "class",
@@ -2409,7 +2790,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "struct",
   },
   wxLayoutAlgorithm = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxSashWindow && wxUSE_SASH",
     IsNumber = false,
     Name = "wxLayoutAlgorithm",
@@ -2422,7 +2805,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxLayoutConstraints = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "(wxLUA_USE_wxSizer) && (wxLUA_USE_wxLayoutConstraints && (!wxCHECK_VERSION(2,6,0)))",
     IsNumber = false,
     Name = "wxLayoutConstraints",
@@ -2441,14 +2826,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxList = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxList && !wxUSE_STL",
     IsNumber = false,
     Name = "wxList",
     ValueType = "class",
   },
   wxListBox = {
-    BaseClass = "wxControlWithItems",
+    BaseClasses = {
+      [1] = "wxControlWithItems",
+    },
     Condition = "wxLUA_USE_wxListBox && wxUSE_LISTBOX",
     IsNumber = false,
     Name = "wxListBox",
@@ -2461,21 +2850,27 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxListCtrl = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxListCtrl && wxUSE_LISTCTRL",
     IsNumber = false,
     Name = "wxListCtrl",
     ValueType = "class",
   },
   wxListEvent = {
-    BaseClass = "wxNotifyEvent",
+    BaseClasses = {
+      [1] = "wxNotifyEvent",
+    },
     Condition = "wxLUA_USE_wxListCtrl && wxUSE_LISTCTRL",
     IsNumber = false,
     Name = "wxListEvent",
     ValueType = "class",
   },
   wxListItem = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxListCtrl && wxUSE_LISTCTRL",
     IsNumber = false,
     Name = "wxListItem",
@@ -2489,28 +2884,36 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxListView = {
-    BaseClass = "wxListCtrl",
+    BaseClasses = {
+      [1] = "wxListCtrl",
+    },
     Condition = "wxLUA_USE_wxListCtrl && wxUSE_LISTCTRL",
     IsNumber = false,
     Name = "wxListView",
     ValueType = "class",
   },
   wxListbook = {
-    BaseClass = "wxBookCtrlBase",
+    BaseClasses = {
+      [1] = "wxBookCtrlBase",
+    },
     Condition = "wxLUA_USE_wxNotebook && wxLUA_USE_wxListCtrl && wxUSE_LISTBOOK",
     IsNumber = false,
     Name = "wxListbook",
     ValueType = "class",
   },
   wxListbookEvent = {
-    BaseClass = "wxBookCtrlBaseEvent",
+    BaseClasses = {
+      [1] = "wxBookCtrlBaseEvent",
+    },
     Condition = "wxLUA_USE_wxNotebook && wxLUA_USE_wxListCtrl && wxUSE_LISTBOOK",
     IsNumber = false,
     Name = "wxListbookEvent",
     ValueType = "class",
   },
   wxLocalFSHandler = {
-    BaseClass = "wxFileSystemHandler",
+    BaseClasses = {
+      [1] = "wxFileSystemHandler",
+    },
     Condition = "(wxUSE_STREAMS) && (wxUSE_FILESYSTEM)",
     IsNumber = false,
     Name = "wxLocalFSHandler",
@@ -2550,7 +2953,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxLogBuffer = {
     ["%encapsulate"] = true,
-    BaseClass = "wxLog",
+    BaseClasses = {
+      [1] = "wxLog",
+    },
     Condition = "wxLUA_USE_wxLog && wxUSE_LOG",
     IsNumber = false,
     Name = "wxLogBuffer",
@@ -2558,7 +2963,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxLogChain = {
     ["%encapsulate"] = true,
-    BaseClass = "wxLog",
+    BaseClasses = {
+      [1] = "wxLog",
+    },
     Condition = "wxLUA_USE_wxLog && wxUSE_LOG",
     IsNumber = false,
     Name = "wxLogChain",
@@ -2566,7 +2973,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxLogGui = {
     ["%encapsulate"] = true,
-    BaseClass = "wxLog",
+    BaseClasses = {
+      [1] = "wxLog",
+    },
     Condition = "(wxLUA_USE_wxLog && wxUSE_LOG) && (wxUSE_LOGGUI)",
     IsNumber = false,
     Name = "wxLogGui",
@@ -2579,7 +2988,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxLogNull = {
     ["%encapsulate"] = true,
-    BaseClass = "wxLog",
+    BaseClasses = {
+      [1] = "wxLog",
+    },
     Condition = "wxLUA_USE_wxLog && wxUSE_LOG",
     IsNumber = false,
     Name = "wxLogNull",
@@ -2587,7 +2998,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxLogPassThrough = {
     ["%encapsulate"] = true,
-    BaseClass = "wxLogChain",
+    BaseClasses = {
+      [1] = "wxLogChain",
+    },
     Condition = "wxLUA_USE_wxLog && wxUSE_LOG",
     IsNumber = false,
     Name = "wxLogPassThrough",
@@ -2595,7 +3008,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxLogTextCtrl = {
     ["%encapsulate"] = true,
-    BaseClass = "wxLog",
+    BaseClasses = {
+      [1] = "wxLog",
+    },
     Condition = "(wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL)",
     IsNumber = false,
     Name = "wxLogTextCtrl",
@@ -2603,7 +3018,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxLogWindow = {
     ["%encapsulate"] = true,
-    BaseClass = "wxLogPassThrough",
+    BaseClasses = {
+      [1] = "wxLogPassThrough",
+    },
     Condition = "(wxLUA_USE_wxLog && wxUSE_LOG) && (wxLUA_USE_wxLogWindow && wxUSE_LOGWINDOW)",
     IsNumber = false,
     Name = "wxLogWindow",
@@ -2617,28 +3034,36 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxLuaArtProvider = {
-    BaseClass = "wxArtProvider",
+    BaseClasses = {
+      [1] = "wxArtProvider",
+    },
     Condition = "wxLUA_USE_wxArtProvider",
     IsNumber = false,
     Name = "wxLuaArtProvider",
     ValueType = "class",
   },
   wxLuaGridTableBase = {
-    BaseClass = "wxGridTableBase",
+    BaseClasses = {
+      [1] = "wxGridTableBase",
+    },
     Condition = "wxLUA_USE_wxGrid && wxUSE_GRID",
     IsNumber = false,
     Name = "wxLuaGridTableBase",
     ValueType = "class",
   },
   wxLuaHtmlWinTagEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     Condition = "(wxLUA_USE_wxHTML && wxUSE_HTML) && (wxLUA_USE_wxLuaHtmlWindow)",
     IsNumber = false,
     Name = "wxLuaHtmlWinTagEvent",
     ValueType = "class",
   },
   wxLuaHtmlWindow = {
-    BaseClass = "wxHtmlWindow",
+    BaseClasses = {
+      [1] = "wxHtmlWindow",
+    },
     Condition = "(wxLUA_USE_wxHTML && wxUSE_HTML) && (wxLUA_USE_wxLuaHtmlWindow)",
     IsNumber = false,
     Name = "wxLuaHtmlWindow",
@@ -2650,55 +3075,71 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxLuaPrintout = {
-    BaseClass = "wxPrintout",
+    BaseClasses = {
+      [1] = "wxPrintout",
+    },
     Condition = "(wxLUA_USE_wxPrint && wxUSE_PRINTING_ARCHITECTURE) && (wxLUA_USE_wxLuaPrintout)",
     IsNumber = false,
     Name = "wxLuaPrintout",
     ValueType = "class",
   },
   wxLuaTreeItemData = {
-    BaseClass = "wxTreeItemData",
+    BaseClasses = {
+      [1] = "wxTreeItemData",
+    },
     Condition = "wxLUA_USE_wxTreeCtrl && wxUSE_TREECTRL",
     IsNumber = false,
     Name = "wxLuaTreeItemData",
     ValueType = "class",
   },
   wxMDIChildFrame = {
-    BaseClass = "wxFrame",
+    BaseClasses = {
+      [1] = "wxFrame",
+    },
     Condition = "wxLUA_USE_MDI && wxUSE_MDI && wxUSE_DOC_VIEW_ARCHITECTURE",
     IsNumber = false,
     Name = "wxMDIChildFrame",
     ValueType = "class",
   },
   wxMDIClientWindow = {
-    BaseClass = "wxWindow",
+    BaseClasses = {
+      [1] = "wxWindow",
+    },
     Condition = "wxLUA_USE_MDI && wxUSE_MDI && wxUSE_DOC_VIEW_ARCHITECTURE",
     IsNumber = false,
     Name = "wxMDIClientWindow",
     ValueType = "class",
   },
   wxMDIParentFrame = {
-    BaseClass = "wxFrame",
+    BaseClasses = {
+      [1] = "wxFrame",
+    },
     Condition = "wxLUA_USE_MDI && wxUSE_MDI && wxUSE_DOC_VIEW_ARCHITECTURE",
     IsNumber = false,
     Name = "wxMDIParentFrame",
     ValueType = "class",
   },
   wxMask = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxMask",
     IsNumber = false,
     Name = "wxMask",
     ValueType = "class",
   },
   wxMaximizeEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxMaximizeEvent",
     ValueType = "class",
   },
   wxMediaCtrl = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxMediaCtrl && wxUSE_MEDIACTRL",
     IsNumber = false,
     Name = "wxMediaCtrl",
@@ -2711,7 +3152,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxMediaEvent = {
-    BaseClass = "wxNotifyEvent",
+    BaseClasses = {
+      [1] = "wxNotifyEvent",
+    },
     Condition = "wxLUA_USE_wxMediaCtrl && wxUSE_MEDIACTRL",
     IsNumber = false,
     Name = "wxMediaEvent",
@@ -2725,21 +3168,27 @@ serverkuh_lua_dataTypeTable =
   },
   wxMemoryConfig = {
     ["%encapsulate"] = true,
-    BaseClass = "wxFileConfig",
+    BaseClasses = {
+      [1] = "wxFileConfig",
+    },
     Condition = "wxLUA_USE_wxConfig && wxUSE_CONFIG",
     IsNumber = false,
     Name = "wxMemoryConfig",
     ValueType = "class",
   },
   wxMemoryDC = {
-    BaseClass = "wxDC",
+    BaseClasses = {
+      [1] = "wxDC",
+    },
     Condition = "wxLUA_USE_wxDC",
     IsNumber = false,
     Name = "wxMemoryDC",
     ValueType = "class",
   },
   wxMemoryFSHandler = {
-    BaseClass = "wxFileSystemHandler",
+    BaseClasses = {
+      [1] = "wxFileSystemHandler",
+    },
     Condition = "wxUSE_STREAMS && wxUSE_FILESYSTEM",
     IsNumber = false,
     Name = "wxMemoryFSHandler",
@@ -2747,7 +3196,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxMemoryInputStream = {
     ["%encapsulate"] = true,
-    BaseClass = "wxInputStream",
+    BaseClasses = {
+      [1] = "wxInputStream",
+    },
     Condition = "wxUSE_STREAMS",
     IsNumber = false,
     Name = "wxMemoryInputStream",
@@ -2759,56 +3210,72 @@ serverkuh_lua_dataTypeTable =
     ValueType = "number",
   },
   wxMenu = {
-    BaseClass = "wxEvtHandler",
+    BaseClasses = {
+      [1] = "wxEvtHandler",
+    },
     Condition = "wxLUA_USE_wxMenu && wxUSE_MENUS",
     IsNumber = false,
     Name = "wxMenu",
     ValueType = "class",
   },
   wxMenuBar = {
-    BaseClass = "wxWindow",
+    BaseClasses = {
+      [1] = "wxWindow",
+    },
     Condition = "wxLUA_USE_wxMenu && wxUSE_MENUS",
     IsNumber = false,
     Name = "wxMenuBar",
     ValueType = "class",
   },
   wxMenuEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     Condition = "wxLUA_USE_wxMenu && wxUSE_MENUS",
     IsNumber = false,
     Name = "wxMenuEvent",
     ValueType = "class",
   },
   wxMenuItem = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxMenu && wxUSE_MENUS",
     IsNumber = false,
     Name = "wxMenuItem",
     ValueType = "class",
   },
   wxMenuItemList = {
-    BaseClass = "wxList",
+    BaseClasses = {
+      [1] = "wxList",
+    },
     Condition = "wxLUA_USE_wxMenu && wxUSE_MENUS",
     IsNumber = false,
     Name = "wxMenuItemList",
     ValueType = "class",
   },
   wxMessageDialog = {
-    BaseClass = "wxDialog",
+    BaseClasses = {
+      [1] = "wxDialog",
+    },
     Condition = "wxLUA_USE_wxMessageDialog && wxUSE_MSGDLG",
     IsNumber = false,
     Name = "wxMessageDialog",
     ValueType = "class",
   },
   wxMetafile = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxMetafile && wxUSE_METAFILE && (defined(__WXMSW__) || defined(__WXMAC__) || defined(__WXPM__))",
     IsNumber = false,
     Name = "wxMetafile",
     ValueType = "class",
   },
   wxMetafileDC = {
-    BaseClass = "wxDC",
+    BaseClasses = {
+      [1] = "wxDC",
+    },
     Condition = "wxLUA_USE_wxMetafile && wxUSE_METAFILE && (defined(__WXMSW__) || defined(__WXMAC__) || defined(__WXPM__))",
     IsNumber = false,
     Name = "wxMetafileDC",
@@ -2821,34 +3288,44 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxMiniFrame = {
-    BaseClass = "wxFrame",
+    BaseClasses = {
+      [1] = "wxFrame",
+    },
     Condition = "(wxLUA_USE_wxFrame) && (wxLUA_USE_wxMiniFrame)",
     IsNumber = false,
     Name = "wxMiniFrame",
     ValueType = "class",
   },
   wxMirrorDC = {
-    BaseClass = "wxDC",
+    BaseClasses = {
+      [1] = "wxDC",
+    },
     Condition = "wxLUA_USE_wxDC",
     IsNumber = false,
     Name = "wxMirrorDC",
     ValueType = "class",
   },
   wxMouseCaptureChangedEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxMouseCaptureChangedEvent",
     ValueType = "class",
   },
   wxMouseCaptureLostEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     Condition = "wxCHECK_VERSION(2,8,0)",
     IsNumber = false,
     Name = "wxMouseCaptureLostEvent",
     ValueType = "class",
   },
   wxMouseEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxMouseEvent",
     ValueType = "class",
@@ -2861,13 +3338,17 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxMoveEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxMoveEvent",
     ValueType = "class",
   },
   wxMultiChoiceDialog = {
-    BaseClass = "wxDialog",
+    BaseClasses = {
+      [1] = "wxDialog",
+    },
     Condition = "wxUSE_CHOICEDLG && wxLUA_USE_wxMultiChoiceDialog",
     IsNumber = false,
     Name = "wxMultiChoiceDialog",
@@ -2881,7 +3362,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxNavigationKeyEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxNavigationKeyEvent",
     ValueType = "class",
@@ -2898,14 +3381,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxNotebook = {
-    BaseClass = "wxBookCtrlBase",
+    BaseClasses = {
+      [1] = "wxBookCtrlBase",
+    },
     Condition = "wxLUA_USE_wxNotebook && wxUSE_NOTEBOOK",
     IsNumber = false,
     Name = "wxNotebook",
     ValueType = "class",
   },
   wxNotebookEvent = {
-    BaseClass = "wxBookCtrlBaseEvent",
+    BaseClasses = {
+      [1] = "wxBookCtrlBaseEvent",
+    },
     Condition = "wxLUA_USE_wxNotebook && wxUSE_NOTEBOOK",
     IsNumber = false,
     Name = "wxNotebookEvent",
@@ -2917,14 +3404,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxNotebookSizer = {
-    BaseClass = "wxSizer",
+    BaseClasses = {
+      [1] = "wxSizer",
+    },
     Condition = "(wxLUA_USE_wxSizer) && (wxCHECK_VERSION(2,8,0)) && (wxUSE_NOTEBOOK && (!wxCHECK_VERSION(2,6,0)))",
     IsNumber = false,
     Name = "wxNotebookSizer",
     ValueType = "class",
   },
   wxNotifyEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     IsNumber = false,
     Name = "wxNotifyEvent",
     ValueType = "class",
@@ -2959,75 +3450,97 @@ serverkuh_lua_dataTypeTable =
   },
   wxOutputStream = {
     ["%encapsulate"] = true,
-    BaseClass = "wxStreamBase",
+    BaseClasses = {
+      [1] = "wxStreamBase",
+    },
     Condition = "wxUSE_STREAMS",
     IsNumber = false,
     Name = "wxOutputStream",
     ValueType = "class",
   },
   wxPCXHandler = {
-    BaseClass = "wxImageHandler",
+    BaseClasses = {
+      [1] = "wxImageHandler",
+    },
     Condition = "(wxLUA_USE_wxImage && wxUSE_IMAGE) && (wxUSE_PCX)",
     IsNumber = false,
     Name = "wxPCXHandler",
     ValueType = "class",
   },
   wxPNGHandler = {
-    BaseClass = "wxImageHandler",
+    BaseClasses = {
+      [1] = "wxImageHandler",
+    },
     Condition = "(wxLUA_USE_wxImage && wxUSE_IMAGE) && (wxUSE_LIBPNG)",
     IsNumber = false,
     Name = "wxPNGHandler",
     ValueType = "class",
   },
   wxPNMHandler = {
-    BaseClass = "wxImageHandler",
+    BaseClasses = {
+      [1] = "wxImageHandler",
+    },
     Condition = "(wxLUA_USE_wxImage && wxUSE_IMAGE) && (wxUSE_PNM)",
     IsNumber = false,
     Name = "wxPNMHandler",
     ValueType = "class",
   },
   wxPageSetupDialog = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxPrint && wxUSE_PRINTING_ARCHITECTURE",
     IsNumber = false,
     Name = "wxPageSetupDialog",
     ValueType = "class",
   },
   wxPageSetupDialogData = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxPrint && wxUSE_PRINTING_ARCHITECTURE",
     IsNumber = false,
     Name = "wxPageSetupDialogData",
     ValueType = "class",
   },
   wxPaintDC = {
-    BaseClass = "wxWindowDC",
+    BaseClasses = {
+      [1] = "wxWindowDC",
+    },
     Condition = "wxLUA_USE_wxDC",
     IsNumber = false,
     Name = "wxPaintDC",
     ValueType = "class",
   },
   wxPaintEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxPaintEvent",
     ValueType = "class",
   },
   wxPalette = {
-    BaseClass = "wxGDIObject",
+    BaseClasses = {
+      [1] = "wxGDIObject",
+    },
     Condition = "wxLUA_USE_wxPalette && wxUSE_PALETTE",
     IsNumber = false,
     Name = "wxPalette",
     ValueType = "class",
   },
   wxPaletteChangedEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxPaletteChangedEvent",
     ValueType = "class",
   },
   wxPanel = {
-    BaseClass = "wxWindow",
+    BaseClasses = {
+      [1] = "wxWindow",
+    },
     IsNumber = false,
     Name = "wxPanel",
     ValueType = "class",
@@ -3039,7 +3552,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxPasswordEntryDialog = {
-    BaseClass = "wxTextEntryDialog",
+    BaseClasses = {
+      [1] = "wxTextEntryDialog",
+    },
     Condition = "wxUSE_TEXTDLG && wxLUA_USE_wxTextEntryDialog",
     IsNumber = false,
     Name = "wxPasswordEntryDialog",
@@ -3053,7 +3568,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxPathList = {
     ["%encapsulate"] = true,
-    BaseClass = "wxArrayString",
+    BaseClasses = {
+      [1] = "wxArrayString",
+    },
     IsNumber = false,
     Name = "wxPathList",
     ValueType = "class",
@@ -3065,21 +3582,27 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxPen = {
-    BaseClass = "wxGDIObject",
+    BaseClasses = {
+      [1] = "wxGDIObject",
+    },
     Condition = "wxLUA_USE_wxColourPenBrush",
     IsNumber = false,
     Name = "wxPen",
     ValueType = "class",
   },
   wxPenList = {
-    BaseClass = "wxList",
+    BaseClasses = {
+      [1] = "wxList",
+    },
     Condition = "(wxLUA_USE_wxColourPenBrush) && (wxLUA_USE_wxPenList)",
     IsNumber = false,
     Name = "wxPenList",
     ValueType = "class",
   },
   wxPickerBase = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxCHECK_VERSION(2,8,0) && wxLUA_USE_wxPicker",
     IsNumber = false,
     Name = "wxPickerBase",
@@ -3122,14 +3645,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxPostScriptDC = {
-    BaseClass = "wxDC",
+    BaseClasses = {
+      [1] = "wxDC",
+    },
     Condition = "(wxLUA_USE_wxPrint && wxUSE_PRINTING_ARCHITECTURE) && (wxUSE_POSTSCRIPT)",
     IsNumber = false,
     Name = "wxPostScriptDC",
     ValueType = "class",
   },
   wxPowerEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     Condition = "(wxCHECK_VERSION(2,8,0)) && (defined(wxHAS_POWER_EVENTS))",
     IsNumber = false,
     Name = "wxPowerEvent",
@@ -3142,21 +3669,27 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxPreviewCanvas = {
-    BaseClass = "wxWindow",
+    BaseClasses = {
+      [1] = "wxWindow",
+    },
     Condition = "wxLUA_USE_wxPrint && wxUSE_PRINTING_ARCHITECTURE",
     IsNumber = false,
     Name = "wxPreviewCanvas",
     ValueType = "class",
   },
   wxPreviewControlBar = {
-    BaseClass = "wxWindow",
+    BaseClasses = {
+      [1] = "wxWindow",
+    },
     Condition = "wxLUA_USE_wxPrint && wxUSE_PRINTING_ARCHITECTURE",
     IsNumber = false,
     Name = "wxPreviewControlBar",
     ValueType = "class",
   },
   wxPreviewFrame = {
-    BaseClass = "wxFrame",
+    BaseClasses = {
+      [1] = "wxFrame",
+    },
     Condition = "(wxLUA_USE_wxPrint && wxUSE_PRINTING_ARCHITECTURE) && (wxLUA_USE_wxLuaPrintout)",
     IsNumber = false,
     Name = "wxPreviewFrame",
@@ -3169,21 +3702,27 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxPrintData = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxPrint && wxUSE_PRINTING_ARCHITECTURE",
     IsNumber = false,
     Name = "wxPrintData",
     ValueType = "class",
   },
   wxPrintDialog = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxPrint && wxUSE_PRINTING_ARCHITECTURE",
     IsNumber = false,
     Name = "wxPrintDialog",
     ValueType = "class",
   },
   wxPrintDialogData = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxPrint && wxUSE_PRINTING_ARCHITECTURE",
     IsNumber = false,
     Name = "wxPrintDialogData",
@@ -3196,7 +3735,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxPrintPreview = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "(wxLUA_USE_wxPrint && wxUSE_PRINTING_ARCHITECTURE) && (wxLUA_USE_wxLuaPrintout)",
     IsNumber = false,
     Name = "wxPrintPreview",
@@ -3209,14 +3750,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxPrinter = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "(wxLUA_USE_wxPrint && wxUSE_PRINTING_ARCHITECTURE) && (wxLUA_USE_wxLuaPrintout)",
     IsNumber = false,
     Name = "wxPrinter",
     ValueType = "class",
   },
   wxPrinterDC = {
-    BaseClass = "wxDC",
+    BaseClasses = {
+      [1] = "wxDC",
+    },
     Condition = "(wxLUA_USE_wxPrint && wxUSE_PRINTING_ARCHITECTURE) && (defined(__WXMSW__) || defined(__WXMAC__))",
     IsNumber = false,
     Name = "wxPrinterDC",
@@ -3229,7 +3774,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxPrintout = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxPrint && wxUSE_PRINTING_ARCHITECTURE",
     IsNumber = false,
     Name = "wxPrintout",
@@ -3237,20 +3784,26 @@ serverkuh_lua_dataTypeTable =
   },
   wxProcess = {
     ["%encapsulate"] = true,
-    BaseClass = "wxEvtHandler",
+    BaseClasses = {
+      [1] = "wxEvtHandler",
+    },
     Condition = "wxLUA_USE_wxProcess",
     IsNumber = false,
     Name = "wxProcess",
     ValueType = "class",
   },
   wxProcessEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxProcessEvent",
     ValueType = "class",
   },
   wxProgressDialog = {
-    BaseClass = "wxDialog",
+    BaseClasses = {
+      [1] = "wxDialog",
+    },
     Condition = "wxUSE_PROGRESSDLG && wxLUA_USE_wxProgressDialog",
     IsNumber = false,
     Name = "wxProgressDialog",
@@ -3269,7 +3822,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxProtocol = {
-    BaseClass = "wxSocketClient",
+    BaseClasses = {
+      [1] = "wxSocketClient",
+    },
     Condition = "(wxLUA_USE_wxSocket && wxUSE_SOCKETS) && (wxUSE_PROTOCOL)",
     IsNumber = false,
     Name = "wxProtocol",
@@ -3282,34 +3837,44 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxQuantize = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxImage && wxUSE_IMAGE",
     IsNumber = false,
     Name = "wxQuantize",
     ValueType = "class",
   },
   wxQueryLayoutInfoEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     Condition = "wxLUA_USE_wxSashWindow && wxUSE_SASH",
     IsNumber = false,
     Name = "wxQueryLayoutInfoEvent",
     ValueType = "class",
   },
   wxQueryNewPaletteEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxQueryNewPaletteEvent",
     ValueType = "class",
   },
   wxRadioBox = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxRadioBox && wxUSE_RADIOBOX",
     IsNumber = false,
     Name = "wxRadioBox",
     ValueType = "class",
   },
   wxRadioButton = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxRadioButton && wxUSE_RADIOBTN",
     IsNumber = false,
     Name = "wxRadioButton",
@@ -3344,7 +3909,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxRegion = {
-    BaseClass = "wxGDIObject",
+    BaseClasses = {
+      [1] = "wxGDIObject",
+    },
     Condition = "wxLUA_USE_wxRegion",
     IsNumber = false,
     Name = "wxRegion",
@@ -3357,7 +3924,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxRegionIterator = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxRegion",
     IsNumber = false,
     Name = "wxRegionIterator",
@@ -3408,54 +3977,70 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxSashEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     Condition = "wxLUA_USE_wxSashWindow && wxUSE_SASH",
     IsNumber = false,
     Name = "wxSashEvent",
     ValueType = "class",
   },
   wxSashLayoutWindow = {
-    BaseClass = "wxSashWindow",
+    BaseClasses = {
+      [1] = "wxSashWindow",
+    },
     Condition = "wxLUA_USE_wxSashWindow && wxUSE_SASH",
     IsNumber = false,
     Name = "wxSashLayoutWindow",
     ValueType = "class",
   },
   wxSashWindow = {
-    BaseClass = "wxWindow",
+    BaseClasses = {
+      [1] = "wxWindow",
+    },
     Condition = "wxLUA_USE_wxSashWindow && wxUSE_SASH",
     IsNumber = false,
     Name = "wxSashWindow",
     ValueType = "class",
   },
   wxScreenDC = {
-    BaseClass = "wxDC",
+    BaseClasses = {
+      [1] = "wxDC",
+    },
     Condition = "wxLUA_USE_wxDC",
     IsNumber = false,
     Name = "wxScreenDC",
     ValueType = "class",
   },
   wxScrollBar = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxScrollBar && wxUSE_SCROLLBAR",
     IsNumber = false,
     Name = "wxScrollBar",
     ValueType = "class",
   },
   wxScrollEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     IsNumber = false,
     Name = "wxScrollEvent",
     ValueType = "class",
   },
   wxScrollWinEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxScrollWinEvent",
     ValueType = "class",
   },
   wxScrolledWindow = {
-    BaseClass = "wxPanel",
+    BaseClasses = {
+      [1] = "wxPanel",
+    },
     Condition = "wxLUA_USE_wxScrolledWindow",
     IsNumber = false,
     Name = "wxScrolledWindow",
@@ -3468,13 +4053,17 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxSetCursorEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxSetCursorEvent",
     ValueType = "class",
   },
   wxShowEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxShowEvent",
     ValueType = "class",
@@ -3492,21 +4081,27 @@ serverkuh_lua_dataTypeTable =
   },
   wxSimpleHelpProvider = {
     ["%encapsulate"] = true,
-    BaseClass = "wxHelpProvider",
+    BaseClasses = {
+      [1] = "wxHelpProvider",
+    },
     Condition = "wxLUA_USE_wxHelpController && wxUSE_HELP",
     IsNumber = false,
     Name = "wxSimpleHelpProvider",
     ValueType = "class",
   },
   wxSimpleHtmlListBox = {
-    BaseClass = "wxHtmlWindowInterface",
+    BaseClasses = {
+      [1] = "wxHtmlWindowInterface",
+    },
     Condition = "(wxLUA_USE_wxHTML && wxUSE_HTML) && (wxCHECK_VERSION(2,8,0))",
     IsNumber = false,
     Name = "wxSimpleHtmlListBox",
     ValueType = "class",
   },
   wxSingleChoiceDialog = {
-    BaseClass = "wxDialog",
+    BaseClasses = {
+      [1] = "wxDialog",
+    },
     Condition = "wxUSE_CHOICEDLG && wxLUA_USE_wxSingleChoiceDialog",
     IsNumber = false,
     Name = "wxSingleChoiceDialog",
@@ -3527,13 +4122,17 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxSizeEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxSizeEvent",
     ValueType = "class",
   },
   wxSizer = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "(wxLUA_USE_wxSizer) && (wxCHECK_VERSION(2,8,0))",
     IsNumber = false,
     Name = "wxSizer",
@@ -3547,35 +4146,45 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxSizerItem = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "(wxLUA_USE_wxSizer) && (wxCHECK_VERSION(2,8,0))",
     IsNumber = false,
     Name = "wxSizerItem",
     ValueType = "class",
   },
   wxSlider = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxSlider && wxUSE_SLIDER",
     IsNumber = false,
     Name = "wxSlider",
     ValueType = "class",
   },
   wxSockAddress = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxSocket && wxUSE_SOCKETS",
     IsNumber = false,
     Name = "wxSockAddress",
     ValueType = "class",
   },
   wxSocketBase = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxSocket && wxUSE_SOCKETS",
     IsNumber = false,
     Name = "wxSocketBase",
     ValueType = "class",
   },
   wxSocketClient = {
-    BaseClass = "wxSocketBase",
+    BaseClasses = {
+      [1] = "wxSocketBase",
+    },
     Condition = "wxLUA_USE_wxSocket && wxUSE_SOCKETS",
     IsNumber = false,
     Name = "wxSocketClient",
@@ -3588,7 +4197,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxSocketEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     Condition = "wxLUA_USE_wxSocket && wxUSE_SOCKETS",
     IsNumber = false,
     Name = "wxSocketEvent",
@@ -3613,7 +4224,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxSocketServer = {
-    BaseClass = "wxSocketBase",
+    BaseClasses = {
+      [1] = "wxSocketBase",
+    },
     Condition = "wxLUA_USE_wxSocket && wxUSE_SOCKETS",
     IsNumber = false,
     Name = "wxSocketServer",
@@ -3627,56 +4240,72 @@ serverkuh_lua_dataTypeTable =
   },
   wxSortedArrayString = {
     ["%encapsulate"] = true,
-    BaseClass = "wxArrayString",
+    BaseClasses = {
+      [1] = "wxArrayString",
+    },
     Condition = "wxLUA_USE_wxArrayString",
     IsNumber = false,
     Name = "wxSortedArrayString",
     ValueType = "class",
   },
   wxSound = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "(wxLUA_USE_wxWave) && (wxCHECK_VERSION(2,6,0) && wxUSE_SOUND)",
     IsNumber = false,
     Name = "wxSound",
     ValueType = "class",
   },
   wxSpinButton = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxSpinButton && wxUSE_SPINBTN",
     IsNumber = false,
     Name = "wxSpinButton",
     ValueType = "class",
   },
   wxSpinCtrl = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxSpinCtrl && wxUSE_SPINCTRL",
     IsNumber = false,
     Name = "wxSpinCtrl",
     ValueType = "class",
   },
   wxSpinEvent = {
-    BaseClass = "wxNotifyEvent",
+    BaseClasses = {
+      [1] = "wxNotifyEvent",
+    },
     Condition = "wxLUA_USE_wxSpinButton && wxUSE_SPINBTN",
     IsNumber = false,
     Name = "wxSpinEvent",
     ValueType = "class",
   },
   wxSplashScreen = {
-    BaseClass = "wxFrame",
+    BaseClasses = {
+      [1] = "wxFrame",
+    },
     Condition = "wxLUA_USE_wxSplashScreen",
     IsNumber = false,
     Name = "wxSplashScreen",
     ValueType = "class",
   },
   wxSplashScreenWindow = {
-    BaseClass = "wxWindow",
+    BaseClasses = {
+      [1] = "wxWindow",
+    },
     Condition = "wxLUA_USE_wxSplashScreen",
     IsNumber = false,
     Name = "wxSplashScreenWindow",
     ValueType = "class",
   },
   wxSplitterEvent = {
-    BaseClass = "wxNotifyEvent",
+    BaseClasses = {
+      [1] = "wxNotifyEvent",
+    },
     Condition = "wxLUA_USE_wxSplitterWindow",
     IsNumber = false,
     Name = "wxSplitterEvent",
@@ -3690,7 +4319,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "struct",
   },
   wxSplitterWindow = {
-    BaseClass = "wxWindow",
+    BaseClasses = {
+      [1] = "wxWindow",
+    },
     Condition = "wxLUA_USE_wxSplitterWindow",
     IsNumber = false,
     Name = "wxSplitterWindow",
@@ -3709,49 +4340,63 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxStaticBitmap = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxStaticBitmap && wxUSE_STATBMP",
     IsNumber = false,
     Name = "wxStaticBitmap",
     ValueType = "class",
   },
   wxStaticBox = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxStaticBox && wxUSE_STATBOX",
     IsNumber = false,
     Name = "wxStaticBox",
     ValueType = "class",
   },
   wxStaticBoxSizer = {
-    BaseClass = "wxBoxSizer",
+    BaseClasses = {
+      [1] = "wxBoxSizer",
+    },
     Condition = "(wxLUA_USE_wxSizer) && (wxCHECK_VERSION(2,8,0)) && (wxUSE_STATBOX)",
     IsNumber = false,
     Name = "wxStaticBoxSizer",
     ValueType = "class",
   },
   wxStaticLine = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxStaticLine && wxUSE_STATLINE",
     IsNumber = false,
     Name = "wxStaticLine",
     ValueType = "class",
   },
   wxStaticText = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxStaticText && wxUSE_STATTEXT",
     IsNumber = false,
     Name = "wxStaticText",
     ValueType = "class",
   },
   wxStatusBar = {
-    BaseClass = "wxWindow",
+    BaseClasses = {
+      [1] = "wxWindow",
+    },
     Condition = "wxLUA_USE_wxStatusBar && wxUSE_STATUSBAR",
     IsNumber = false,
     Name = "wxStatusBar",
     ValueType = "class",
   },
   wxStdDialogButtonSizer = {
-    BaseClass = "wxBoxSizer",
+    BaseClasses = {
+      [1] = "wxBoxSizer",
+    },
     Condition = "(wxLUA_USE_wxSizer) && (wxCHECK_VERSION(2,8,0)) && (wxUSE_BUTTON)",
     IsNumber = false,
     Name = "wxStdDialogButtonSizer",
@@ -3806,13 +4451,17 @@ serverkuh_lua_dataTypeTable =
     ValueType = "special",
   },
   wxStringClientData = {
-    BaseClass = "wxClientData",
+    BaseClasses = {
+      [1] = "wxClientData",
+    },
     IsNumber = false,
     Name = "wxStringClientData",
     ValueType = "class",
   },
   wxStringTokenizer = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     IsNumber = false,
     Name = "wxStringTokenizer",
     ValueType = "class",
@@ -3823,19 +4472,25 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxStyledTextCtrl = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     IsNumber = false,
     Name = "wxStyledTextCtrl",
     ValueType = "class",
   },
   wxStyledTextEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     IsNumber = false,
     Name = "wxStyledTextEvent",
     ValueType = "class",
   },
   wxSysColourChangedEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxSysColourChangedEvent",
     ValueType = "class",
@@ -3865,7 +4520,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxSystemOptions = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxSystemOptions",
     IsNumber = false,
     Name = "wxSystemOptions",
@@ -3884,42 +4541,54 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxTGAHandler = {
-    BaseClass = "wxImageHandler",
+    BaseClasses = {
+      [1] = "wxImageHandler",
+    },
     Condition = "(wxLUA_USE_wxImage && wxUSE_IMAGE) && (wxCHECK_VERSION(2,8,0) && wxUSE_TGA)",
     IsNumber = false,
     Name = "wxTGAHandler",
     ValueType = "class",
   },
   wxTIFFHandler = {
-    BaseClass = "wxImageHandler",
+    BaseClasses = {
+      [1] = "wxImageHandler",
+    },
     Condition = "(wxLUA_USE_wxImage && wxUSE_IMAGE) && (wxUSE_LIBTIFF)",
     IsNumber = false,
     Name = "wxTIFFHandler",
     ValueType = "class",
   },
   wxTabCtrl = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxCHECK_VERSION(2,4,0) && defined(__WXMSW__) && wxLUA_USE_wxTabCtrl && wxUSE_TAB_DIALOG",
     IsNumber = false,
     Name = "wxTabCtrl",
     ValueType = "class",
   },
   wxTabEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     Condition = "wxCHECK_VERSION(2,4,0) && defined(__WXMSW__) && wxLUA_USE_wxTabCtrl && wxUSE_TAB_DIALOG",
     IsNumber = false,
     Name = "wxTabEvent",
     ValueType = "class",
   },
   wxTaskBarIcon = {
-    BaseClass = "wxEvtHandler",
+    BaseClasses = {
+      [1] = "wxEvtHandler",
+    },
     Condition = "wxLUA_USE_wxTaskBarIcon && defined (wxHAS_TASK_BAR_ICON )",
     IsNumber = false,
     Name = "wxTaskBarIcon",
     ValueType = "class",
   },
   wxTaskBarIconEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     Condition = "wxLUA_USE_wxTaskBarIcon && defined (wxHAS_TASK_BAR_ICON )",
     IsNumber = false,
     Name = "wxTaskBarIconEvent",
@@ -3951,7 +4620,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "number",
   },
   wxTextCtrl = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL",
     IsNumber = false,
     Name = "wxTextCtrl",
@@ -3965,28 +4636,36 @@ serverkuh_lua_dataTypeTable =
   },
   wxTextDataObject = {
     ["%encapsulate"] = true,
-    BaseClass = "wxDataObjectSimple",
+    BaseClasses = {
+      [1] = "wxDataObjectSimple",
+    },
     Condition = "wxLUA_USE_wxDataObject && wxUSE_DATAOBJ",
     IsNumber = false,
     Name = "wxTextDataObject",
     ValueType = "class",
   },
   wxTextEntryDialog = {
-    BaseClass = "wxDialog",
+    BaseClasses = {
+      [1] = "wxDialog",
+    },
     Condition = "wxUSE_TEXTDLG && wxLUA_USE_wxTextEntryDialog",
     IsNumber = false,
     Name = "wxTextEntryDialog",
     ValueType = "class",
   },
   wxTextUrlEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     Condition = "wxLUA_USE_wxTextCtrl && wxUSE_TEXTCTRL",
     IsNumber = false,
     Name = "wxTextUrlEvent",
     ValueType = "class",
   },
   wxTextValidator = {
-    BaseClass = "wxValidator",
+    BaseClasses = {
+      [1] = "wxValidator",
+    },
     Condition = "(wxLUA_USE_wxValidator && wxUSE_VALIDATORS) && (wxLUA_USE_wxTextValidator)",
     IsNumber = false,
     Name = "wxTextValidator",
@@ -4000,56 +4679,72 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxTimer = {
-    BaseClass = "wxEvtHandler",
+    BaseClasses = {
+      [1] = "wxEvtHandler",
+    },
     Condition = "wxLUA_USE_wxTimer && wxUSE_TIMER",
     IsNumber = false,
     Name = "wxTimer",
     ValueType = "class",
   },
   wxTimerEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     Condition = "wxLUA_USE_wxTimer && wxUSE_TIMER",
     IsNumber = false,
     Name = "wxTimerEvent",
     ValueType = "class",
   },
   wxToggleButton = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxToggleButton && wxUSE_TOGGLEBTN",
     IsNumber = false,
     Name = "wxToggleButton",
     ValueType = "class",
   },
   wxToolBar = {
-    BaseClass = "wxToolBarBase",
+    BaseClasses = {
+      [1] = "wxToolBarBase",
+    },
     Condition = "wxLUA_USE_wxToolbar",
     IsNumber = false,
     Name = "wxToolBar",
     ValueType = "class",
   },
   wxToolBarBase = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxToolbar",
     IsNumber = false,
     Name = "wxToolBarBase",
     ValueType = "class",
   },
   wxToolBarSimple = {
-    BaseClass = "wxToolBarBase",
+    BaseClasses = {
+      [1] = "wxToolBarBase",
+    },
     Condition = "(wxLUA_USE_wxToolbar) && (!wxCHECK_VERSION(2,6,0))",
     IsNumber = false,
     Name = "wxToolBarSimple",
     ValueType = "class",
   },
   wxToolBarTool = {
-    BaseClass = "wxToolBarToolBase",
+    BaseClasses = {
+      [1] = "wxToolBarToolBase",
+    },
     Condition = "wxLUA_USE_wxToolbar",
     IsNumber = false,
     Name = "wxToolBarTool",
     ValueType = "class",
   },
   wxToolBarToolBase = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxToolbar",
     IsNumber = false,
     Name = "wxToolBarToolBase",
@@ -4062,28 +4757,36 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxToolTip = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxTooltip && wxUSE_TOOLTIPS",
     IsNumber = false,
     Name = "wxToolTip",
     ValueType = "class",
   },
   wxToolbook = {
-    BaseClass = "wxBookCtrlBase",
+    BaseClasses = {
+      [1] = "wxBookCtrlBase",
+    },
     Condition = "wxCHECK_VERSION(2,8,0) && wxUSE_TOOLBOOK && wxLUA_USE_wxToolbook",
     IsNumber = false,
     Name = "wxToolbook",
     ValueType = "class",
   },
   wxToolbookEvent = {
-    BaseClass = "wxBookCtrlBaseEvent",
+    BaseClasses = {
+      [1] = "wxBookCtrlBaseEvent",
+    },
     Condition = "wxCHECK_VERSION(2,8,0) && wxUSE_TOOLBOOK && wxLUA_USE_wxToolbook",
     IsNumber = false,
     Name = "wxToolbookEvent",
     ValueType = "class",
   },
   wxTopLevelWindow = {
-    BaseClass = "wxWindow",
+    BaseClasses = {
+      [1] = "wxWindow",
+    },
     Condition = "wxLUA_USE_wxFrame || wxLUA_USE_wxDialog",
     IsNumber = false,
     Name = "wxTopLevelWindow",
@@ -4095,21 +4798,27 @@ serverkuh_lua_dataTypeTable =
     ValueType = "number",
   },
   wxTreeCtrl = {
-    BaseClass = "wxControl",
+    BaseClasses = {
+      [1] = "wxControl",
+    },
     Condition = "wxLUA_USE_wxTreeCtrl && wxUSE_TREECTRL",
     IsNumber = false,
     Name = "wxTreeCtrl",
     ValueType = "class",
   },
   wxTreeEvent = {
-    BaseClass = "wxNotifyEvent",
+    BaseClasses = {
+      [1] = "wxNotifyEvent",
+    },
     Condition = "wxLUA_USE_wxTreeCtrl && wxUSE_TREECTRL",
     IsNumber = false,
     Name = "wxTreeEvent",
     ValueType = "class",
   },
   wxTreeItemData = {
-    BaseClass = "wxClientData",
+    BaseClasses = {
+      [1] = "wxClientData",
+    },
     Condition = "wxLUA_USE_wxTreeCtrl && wxUSE_TREECTRL",
     IsNumber = false,
     Name = "wxTreeItemData",
@@ -4135,14 +4844,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxTreebook = {
-    BaseClass = "wxBookCtrlBase",
+    BaseClasses = {
+      [1] = "wxBookCtrlBase",
+    },
     Condition = "wxCHECK_VERSION(2,8,0) && wxUSE_TREEBOOK && wxLUA_USE_wxTreebook",
     IsNumber = false,
     Name = "wxTreebook",
     ValueType = "class",
   },
   wxTreebookEvent = {
-    BaseClass = "wxBookCtrlBaseEvent",
+    BaseClasses = {
+      [1] = "wxBookCtrlBaseEvent",
+    },
     Condition = "wxCHECK_VERSION(2,8,0) && wxUSE_TREEBOOK && wxLUA_USE_wxTreebook",
     IsNumber = false,
     Name = "wxTreebookEvent",
@@ -4156,7 +4869,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxURI = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxSocket && wxUSE_SOCKETS",
     IsNumber = false,
     Name = "wxURI",
@@ -4181,7 +4896,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxURL = {
-    BaseClass = "wxURI",
+    BaseClasses = {
+      [1] = "wxURI",
+    },
     Condition = "(wxLUA_USE_wxSocket && wxUSE_SOCKETS) && (wxUSE_URL)",
     IsNumber = false,
     Name = "wxURL",
@@ -4189,7 +4906,9 @@ serverkuh_lua_dataTypeTable =
   },
   wxURLDataObject = {
     ["%encapsulate"] = true,
-    BaseClass = "wxTextDataObject",
+    BaseClasses = {
+      [1] = "wxTextDataObject",
+    },
     Condition = "(wxLUA_USE_wxDataObject && wxUSE_DATAOBJ) && (wxCHECK_VERSION(2,8,0))",
     IsNumber = false,
     Name = "wxURLDataObject",
@@ -4227,7 +4946,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxUpdateUIEvent = {
-    BaseClass = "wxCommandEvent",
+    BaseClasses = {
+      [1] = "wxCommandEvent",
+    },
     IsNumber = false,
     Name = "wxUpdateUIEvent",
     ValueType = "class",
@@ -4238,7 +4959,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxValidator = {
-    BaseClass = "wxEvtHandler",
+    BaseClasses = {
+      [1] = "wxEvtHandler",
+    },
     Condition = "wxLUA_USE_wxValidator && wxUSE_VALIDATORS",
     IsNumber = false,
     Name = "wxValidator",
@@ -4252,7 +4975,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxView = {
-    BaseClass = "wxEvtHandler",
+    BaseClasses = {
+      [1] = "wxEvtHandler",
+    },
     Condition = "wxLUA_USE_MDI && wxUSE_MDI && wxUSE_DOC_VIEW_ARCHITECTURE",
     IsNumber = false,
     Name = "wxView",
@@ -4265,40 +4990,52 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxWave = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "(wxLUA_USE_wxWave) && (defined(__WXMSW__) && !wxCHECK_VERSION(2,6,0) && wxUSE_WAVE)",
     IsNumber = false,
     Name = "wxWave",
     ValueType = "class",
   },
   wxWinHelpController = {
-    BaseClass = "wxHelpControllerBase",
+    BaseClasses = {
+      [1] = "wxHelpControllerBase",
+    },
     Condition = "(wxLUA_USE_wxHelpController && wxUSE_HELP) && (defined(__WXMSW__))",
     IsNumber = false,
     Name = "wxWinHelpController",
     ValueType = "class",
   },
   wxWindow = {
-    BaseClass = "wxEvtHandler",
+    BaseClasses = {
+      [1] = "wxEvtHandler",
+    },
     IsNumber = false,
     Name = "wxWindow",
     ValueType = "class",
   },
   wxWindowCreateEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxWindowCreateEvent",
     ValueType = "class",
   },
   wxWindowDC = {
-    BaseClass = "wxDC",
+    BaseClasses = {
+      [1] = "wxDC",
+    },
     Condition = "wxLUA_USE_wxDC",
     IsNumber = false,
     Name = "wxWindowDC",
     ValueType = "class",
   },
   wxWindowDestroyEvent = {
-    BaseClass = "wxEvent",
+    BaseClasses = {
+      [1] = "wxEvent",
+    },
     IsNumber = false,
     Name = "wxWindowDestroyEvent",
     ValueType = "class",
@@ -4315,7 +5052,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "number",
   },
   wxWindowList = {
-    BaseClass = "wxList",
+    BaseClasses = {
+      [1] = "wxList",
+    },
     Condition = "wxLUA_USE_wxWindowList && !wxUSE_STL",
     IsNumber = false,
     Name = "wxWindowList",
@@ -4333,28 +5072,36 @@ serverkuh_lua_dataTypeTable =
     ValueType = "enum",
   },
   wxWizard = {
-    BaseClass = "wxDialog",
+    BaseClasses = {
+      [1] = "wxDialog",
+    },
     Condition = "wxUSE_WIZARDDLG && wxLUA_USE_wxWizard",
     IsNumber = false,
     Name = "wxWizard",
     ValueType = "class",
   },
   wxWizardEvent = {
-    BaseClass = "wxNotifyEvent",
+    BaseClasses = {
+      [1] = "wxNotifyEvent",
+    },
     Condition = "wxUSE_WIZARDDLG && wxLUA_USE_wxWizard",
     IsNumber = false,
     Name = "wxWizardEvent",
     ValueType = "class",
   },
   wxWizardPage = {
-    BaseClass = "wxPanel",
+    BaseClasses = {
+      [1] = "wxPanel",
+    },
     Condition = "wxUSE_WIZARDDLG && wxLUA_USE_wxWizard",
     IsNumber = false,
     Name = "wxWizardPage",
     ValueType = "class",
   },
   wxWizardPageSimple = {
-    BaseClass = "wxWizardPage",
+    BaseClasses = {
+      [1] = "wxWizardPage",
+    },
     Condition = "wxUSE_WIZARDDLG && wxLUA_USE_wxWizard",
     IsNumber = false,
     Name = "wxWizardPageSimple",
@@ -4366,14 +5113,18 @@ serverkuh_lua_dataTypeTable =
     ValueType = "number",
   },
   wxXPMHandler = {
-    BaseClass = "wxImageHandler",
+    BaseClasses = {
+      [1] = "wxImageHandler",
+    },
     Condition = "wxLUA_USE_wxImage && wxUSE_IMAGE",
     IsNumber = false,
     Name = "wxXPMHandler",
     ValueType = "class",
   },
   wxXmlDocument = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxXML && wxUSE_XML",
     IsNumber = false,
     Name = "wxXmlDocument",
@@ -4400,7 +5151,9 @@ serverkuh_lua_dataTypeTable =
     ValueType = "class",
   },
   wxXmlResource = {
-    BaseClass = "wxObject",
+    BaseClasses = {
+      [1] = "wxObject",
+    },
     Condition = "wxLUA_USE_wxXRC && wxUSE_XRC",
     IsNumber = false,
     Name = "wxXmlResource",

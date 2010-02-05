@@ -17,7 +17,7 @@
 -- Globals
 -- ---------------------------------------------------------------------------
 
-WXLUA_BINDING_VERSION = 26 -- Used to verify that the bindings are updated
+WXLUA_BINDING_VERSION = 27 -- Used to verify that the bindings are updated
                            -- This must match modules/wxlua/include/wxldefs.h
                            -- otherwise a compile time error will be generated.
 
@@ -193,14 +193,14 @@ end
 function AllocDataType(name, value_type, is_number, abstract)
     dataTypeTable[name] =
     {
-        Name      = name,       -- typename, eg. void, bool, wxInt32
-        ValueType = value_type, -- "number", "enum", "class", "special" (special handling)
-                                -- determines how to handle the data type
-        BaseClass = nil,        -- the BaseClass of this, if this is a class
-        IsNumber  = is_number,  -- can this data type be stored as a double (Lua's number type)
-        Abstract  = abstract,
-        Condition = nil,        -- conditions for this data type, eg. wxLUA_USE_xxx
-        ["%encapsulate"] = nil, -- Non wxObject derived class
+        Name        = name,       -- typename, eg. void, bool, wxInt32
+        ValueType   = value_type, -- "number", "enum", "class", "special" (special handling)
+                                  -- determines how to handle the data type
+        BaseClasses = nil,        -- the BaseClass of this, if this is a class
+        IsNumber    = is_number,  -- can this data type be stored as a double (Lua's number type)
+        Abstract    = abstract,
+        Condition   = nil,        -- conditions for this data type, eg. wxLUA_USE_xxx
+        ["%encapsulate"] = nil,   -- Non wxObject derived class
     }
 end
 
@@ -472,9 +472,13 @@ function IsDerivedClass(classname, base_classname)
         return true
     end
 
-    if dataTypeTable[classname].BaseClass then
-        local c = dataTypeTable[dataTypeTable[classname].BaseClass].Name
-        return IsDerivedClass(c, base_classname)
+    if dataTypeTable[classname].BaseClasses then
+        for _, c in ipairs(dataTypeTable[classname].BaseClasses) do
+            local c_name = dataTypeTable[c].Name
+            if IsDerivedClass(c_name, base_classname) then
+                return true
+            end
+        end
     end
 
     return false
@@ -1767,9 +1771,11 @@ function BuildDataTypeTable(interfaceData)
                     end
 
                     -- set class's BaseClass
-                    if not dataTypeTable[classname].BaseClass then
-                        dataTypeTable[classname].BaseClass = tag
+                    if not dataTypeTable[classname].BaseClasses then
+                        dataTypeTable[classname].BaseClasses = {}
                     end
+
+                    table.insert(dataTypeTable[classname].BaseClasses, tag)
 
                     action = "find_classcomma"
                 elseif action == "find_structname" then
@@ -4018,16 +4024,18 @@ function GenerateLuaLanguageBinding(interface)
             end
 
             -- Figure out if we really need to have member enums for the class
-            local enumArrayName = MakeVar(parseObject.Name).."_enums"
-            local enumArrayCountName = MakeVar(parseObject.Name).."_enumCount"
-            local ExternEnumDeclaration = "extern "..output_cpp_impexpsymbol.." wxLuaBindNumber "..enumArrayName.."[];\n"
-            local ExternEnumCountDeclaration = "extern "..MakeImpExpData("int").." "..enumArrayCountName..";\n"
+                local enumArrayName = "g_wxluanumberArray_None"
+                local enumArrayCountName = 0
+                local ExternEnumDeclaration = ""
+                local ExternEnumCountDeclaration = ""
 
-            if enumClassBindingTable[MakeVar(parseObject.Name)] == nil then
-                enumArrayName = "g_wxluanumberArray_None"
-                enumArrayCountName = 0
-                ExternEnumDeclaration = ""
-                ExternEnumCountDeclaration = ""
+            if enumClassBindingTable[MakeVar(parseObject.Name)] ~= nil then
+                enumArrayName = MakeVar(parseObject.Name).."_enums"
+                enumArrayCountName = MakeVar(parseObject.Name).."_enumCount"
+                --ExternEnumDeclaration = "extern "..output_cpp_impexpsymbol.." wxLuaBindNumber "..enumArrayName.."[];\n"
+                --ExternEnumCountDeclaration = "extern "..MakeImpExpData("int").." "..enumArrayCountName..";\n"
+                ExternEnumDeclaration = "extern wxLuaBindNumber "..enumArrayName.."[];\n"
+                ExternEnumCountDeclaration = "extern int "..enumArrayCountName..";\n"
             end
 
 
@@ -4036,8 +4044,10 @@ function GenerateLuaLanguageBinding(interface)
             local classTypeBinding =
             {
                 ExternDeclaration            = "extern "..MakeImpExpData("int").." wxluatype_"..MakeClassVar(parseObject.Name)..";\n",
-                ExternMethodDeclaration      = "extern "..output_cpp_impexpsymbol.." wxLuaBindMethod "..MakeVar(parseObject.Name).."_methods[];\n",
-                ExternMethodCountDeclaration = "extern "..MakeImpExpData("int").." "..MakeVar(parseObject.Name).."_methodCount;\n",
+                --ExternMethodDeclaration      = "extern "..output_cpp_impexpsymbol.." wxLuaBindMethod "..MakeVar(parseObject.Name).."_methods[];\n",
+                --ExternMethodCountDeclaration = "extern "..MakeImpExpData("int").." "..MakeVar(parseObject.Name).."_methodCount;\n",
+                ExternMethodDeclaration      = "extern wxLuaBindMethod "..MakeVar(parseObject.Name).."_methods[];\n",
+                ExternMethodCountDeclaration = "extern int "..MakeVar(parseObject.Name).."_methodCount;\n",
                 ExternEnumDeclaration        = ExternEnumDeclaration,
                 ExternEnumCountDeclaration   = ExternEnumCountDeclaration,
                 Condition                    = tagcondition
@@ -4056,9 +4066,11 @@ function GenerateLuaLanguageBinding(interface)
             interface.objectData[o].TagDeclaration = decl
 
             -- Class Binding
-            local baseclass = "NULL"
-            if dataTypeTable[parseObject.Name].BaseClass then
-                baseclass = "\""..dataTypeTable[parseObject.Name].BaseClass.."\""
+            local baseclassNames = "NULL"
+            local baseclassBinds = "NULL"
+            if dataTypeTable[parseObject.Name].BaseClasses then
+                baseclassNames = "wxluabaseclassnames_"..MakeVar(parseObject.Name)
+                baseclassBinds = "wxluabaseclassbinds_"..MakeVar(parseObject.Name)
             end
 
             local classinfo = "NULL"
@@ -4121,16 +4133,17 @@ function GenerateLuaLanguageBinding(interface)
             local classBinding =
             {
                 LuaName = MakeVar(parseObject.Name),
-                Map = "    { \""..MakeVar(parseObject.Name).."\", "
+                Map = "    { wxluaclassname_"..MakeVar(parseObject.Name)..", "
                                 ..MakeVar(parseObject.Name).."_methods, "
                                 ..MakeVar(parseObject.Name).."_methodCount, "
                                 ..classinfo..", "
                                 .."&wxluatype_"..MakeClassVar(parseObject.Name)..", "
-                                ..MakeVar(baseclass)..", "
-                                .."NULL ,"
+                                ..baseclassNames..", "
+                                ..baseclassBinds..", "
                                 ..enumArrayName..", "
                                 ..enumArrayCountName..", "
                                 .."}, \n",
+                BaseClasses = dataTypeTable[parseObject.Name].BaseClasses,
                 Condition = classcondition
             }
 
@@ -4306,20 +4319,6 @@ function GenerateHookHeaderFileTable()
         end
     end
 
---[[
-    table.insert(fileData, "\n")
-
-    table.insert(fileData, "// ---------------------------------------------------------------------------\n")
-    table.insert(fileData, "// Functions to access wxLuaBindXXX structs\n")
-    table.insert(fileData, "// ---------------------------------------------------------------------------\n\n")
-
-    table.insert(fileData, "extern wxLuaBindClass  *"..hook_cpp_class_funcname.."(size_t &count);\n")
-    table.insert(fileData, "extern wxLuaBindNumber *"..hook_cpp_define_funcname.."(size_t &count);\n")
-    table.insert(fileData, "extern wxLuaBindString *"..hook_cpp_string_funcname.."(size_t &count);\n")
-    table.insert(fileData, "extern wxLuaBindEvent  *"..hook_cpp_event_funcname.."(size_t &count);\n")
-    table.insert(fileData, "extern wxLuaBindObject *"..hook_cpp_object_funcname.."(size_t &count);\n")
-    table.insert(fileData, "extern wxLuaBindMethod *"..hook_cpp_function_funcname.."(size_t &count);\n\n")
-]]
     -- ------------------------------------------------------------------------
     -- Class Tag Declaration - sorted by condition for the C++ compiler
     -- ------------------------------------------------------------------------
@@ -4338,12 +4337,12 @@ function GenerateHookHeaderFileTable()
 
         for idx, classTypeBinding in pairs_sort(classTypeBindingList) do
             table.insert(fileData, indent..classTypeBinding.ExternDeclaration)
-            table.insert(fileData, indent..classTypeBinding.ExternMethodDeclaration)
-            table.insert(fileData, indent..classTypeBinding.ExternMethodCountDeclaration)
-            if string.len(classTypeBinding.ExternEnumCountDeclaration) > 0 then
-                table.insert(fileData, indent..classTypeBinding.ExternEnumDeclaration)
-                table.insert(fileData, indent..classTypeBinding.ExternEnumCountDeclaration)
-            end
+            --table.insert(fileData, indent..classTypeBinding.ExternMethodDeclaration)
+            --table.insert(fileData, indent..classTypeBinding.ExternMethodCountDeclaration)
+            --if string.len(classTypeBinding.ExternEnumCountDeclaration) > 0 then
+            --    table.insert(fileData, indent..classTypeBinding.ExternEnumDeclaration)
+            --    table.insert(fileData, indent..classTypeBinding.ExternEnumCountDeclaration)
+            --end
         end
 
         if HasCondition(condition) then
@@ -4439,14 +4438,89 @@ function GenerateHookClassFileTable(fileData)
     table.insert(fileData, "// "..hook_cpp_class_funcname.."() is called to register classes\n")
     table.insert(fileData, "// ---------------------------------------------------------------------------\n\n")
 
+    local namedBindingTable = {}
+    GenerateLuaNameFromIndexedTable(classBindingTable, namedBindingTable)
+    local sortedBindings = TableSort(namedBindingTable)
+
+    -- Gather up all of the classnames
+    local classNames = {}
+
+    for n = 1, #sortedBindings do
+        for i = 1, #sortedBindings[n] do
+            classNames[sortedBindings[n][i].LuaName] = sortedBindings[n][i].LuaName
+            for _, bc in ipairs(sortedBindings[n][i].BaseClasses or {}) do
+                classNames[bc] = bc
+            end
+        end
+    end
+
+    classNames = TableSort(classNames)
+
+    for _, c in pairs(classNames) do
+        table.insert(fileData, "static const char* wxluaclassname_"..c.." = \""..c.."\";\n")
+    end
+
+    table.insert(fileData, "\n")
+
+    for n = 1, #sortedBindings do
+        for i = 1, #sortedBindings[n] do
+            if sortedBindings[n][i].BaseClasses then
+                local bc_n = 0
+                local s = "static const char* wxluabaseclassnames_"..sortedBindings[n][i].LuaName.."[] = {"
+                for _, bc in ipairs(sortedBindings[n][i].BaseClasses) do
+                    s = s.." wxluaclassname_"..bc..","
+                    bc_n = bc_n + 1
+                end
+
+                table.insert(fileData, s.." NULL };\n")
+                table.insert(fileData, "static wxLuaBindClass* wxluabaseclassbinds_"..sortedBindings[n][i].LuaName.."[] = { "..string.sub(string.rep("NULL, ", bc_n), 1, -3).." };\n")
+            end
+        end
+    end
+
+
+    -- ------------------------------------------------------------------------
+    -- Class Tag Declaration - sorted by condition for the C++ compiler
+    -- ------------------------------------------------------------------------
+
+    table.insert(fileData, "// ---------------------------------------------------------------------------\n")
+    table.insert(fileData, "// Lua Tag Method Values and Tables for each Class\n")
+    table.insert(fileData, "// ---------------------------------------------------------------------------\n\n")
+
+    for condition, classTypeBindingList in pairs_sort(classTypeBindingTable) do
+        local indent = ""
+
+        if HasCondition(condition) then
+            indent = "    "
+            table.insert(fileData, "#if "..condition.."\n")
+        end
+
+        for idx, classTypeBinding in pairs_sort(classTypeBindingList) do
+            --table.insert(fileData, indent..classTypeBinding.ExternDeclaration)
+            table.insert(fileData, indent..classTypeBinding.ExternMethodDeclaration)
+            table.insert(fileData, indent..classTypeBinding.ExternMethodCountDeclaration)
+            if string.len(classTypeBinding.ExternEnumCountDeclaration) > 0 then
+                table.insert(fileData, indent..classTypeBinding.ExternEnumDeclaration)
+                table.insert(fileData, indent..classTypeBinding.ExternEnumCountDeclaration)
+            end
+        end
+
+        if HasCondition(condition) then
+            table.insert(fileData, "#endif // "..condition.."\n\n")
+        else
+            table.insert(fileData, "\n")
+        end
+    end
+
+    table.insert(fileData, "\n")
+
+
+    table.insert(fileData, "\n\n")
+
     table.insert(fileData, "wxLuaBindClass* "..hook_cpp_class_funcname.."(size_t &count)\n{\n")
     table.insert(fileData, "    static wxLuaBindClass classList[] =\n    {\n")
 
-    local namedBindingTable = {}
-    GenerateLuaNameFromIndexedTable(classBindingTable, namedBindingTable)
-
     -- sort the bindings by class name and write them out alphabetically
-    local sortedBindings = TableSort(namedBindingTable)
     GenerateMap(fileData, sortedBindings, "    ")
 
     table.insert(fileData, "\n")

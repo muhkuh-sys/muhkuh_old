@@ -16,9 +16,9 @@
 // Check if the version of binding generator used to create this is older than
 //   the current version of the bindings.
 //   See 'bindings/genwxbind.lua' and 'modules/wxlua/include/wxldefs.h'
-#if WXLUA_BINDING_VERSION > 26
+#if WXLUA_BINDING_VERSION > 27
 #   error "The WXLUA_BINDING_VERSION in the bindings is too old, regenerate bindings."
-#endif //WXLUA_BINDING_VERSION > 26
+#endif //WXLUA_BINDING_VERSION > 27
 // ---------------------------------------------------------------------------
 
 // binding class
@@ -48,8 +48,6 @@ extern WXLUA_NO_DLLIMPEXP bool wxLuaBinding_dpm_netx5_lua_init();
 // ---------------------------------------------------------------------------
 
 extern WXLUA_NO_DLLIMPEXP_DATA(int) wxluatype_dpm;
-extern WXLUA_NO_DLLIMPEXP wxLuaBindMethod dpm_methods[];
-extern WXLUA_NO_DLLIMPEXP_DATA(int) dpm_methodCount;
 
 
 // ---------------------------------------------------------------------------

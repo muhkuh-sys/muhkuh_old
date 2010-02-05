@@ -1,6 +1,4 @@
 
-
-
 %include "../dpm_netx5_main.h"
 %include "../../dpm.h"
 // The dpm class defines the connection to a single netx dpm.

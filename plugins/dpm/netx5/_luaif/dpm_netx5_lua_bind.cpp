@@ -122,11 +122,23 @@ wxLuaBindMethod* wxLuaGetFunctionList_dpm_netx5_lua(size_t &count)
 // wxLuaGetClassList_dpm_netx5_lua() is called to register classes
 // ---------------------------------------------------------------------------
 
+static const char* wxluaclassname_dpm = "dpm";
+
+// ---------------------------------------------------------------------------
+// Lua Tag Method Values and Tables for each Class
+// ---------------------------------------------------------------------------
+
+extern wxLuaBindMethod dpm_methods[];
+extern int dpm_methodCount;
+
+
+
+
 wxLuaBindClass* wxLuaGetClassList_dpm_netx5_lua(size_t &count)
 {
     static wxLuaBindClass classList[] =
     {
-        { "dpm", dpm_methods, dpm_methodCount, CLASSINFO(dpm), &wxluatype_dpm, NULL, NULL ,g_wxluanumberArray_None, 0, }, 
+        { wxluaclassname_dpm, dpm_methods, dpm_methodCount, CLASSINFO(dpm), &wxluatype_dpm, NULL, NULL, g_wxluanumberArray_None, 0, }, 
 
         { 0, 0, 0, 0, 0, 0, 0 }, 
     };

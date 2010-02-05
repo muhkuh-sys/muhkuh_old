@@ -129,11 +129,23 @@ wxLuaBindMethod* wxLuaGetFunctionList_romloader_uart_lua(size_t &count)
 // wxLuaGetClassList_romloader_uart_lua() is called to register classes
 // ---------------------------------------------------------------------------
 
+static const char* wxluaclassname_romloader = "romloader";
+
+// ---------------------------------------------------------------------------
+// Lua Tag Method Values and Tables for each Class
+// ---------------------------------------------------------------------------
+
+extern wxLuaBindMethod romloader_methods[];
+extern int romloader_methodCount;
+
+
+
+
 wxLuaBindClass* wxLuaGetClassList_romloader_uart_lua(size_t &count)
 {
     static wxLuaBindClass classList[] =
     {
-        { "romloader", romloader_methods, romloader_methodCount, CLASSINFO(romloader), &wxluatype_romloader, NULL, NULL ,g_wxluanumberArray_None, 0, }, 
+        { wxluaclassname_romloader, romloader_methods, romloader_methodCount, CLASSINFO(romloader), &wxluatype_romloader, NULL, NULL, g_wxluanumberArray_None, 0, }, 
 
         { 0, 0, 0, 0, 0, 0, 0 }, 
     };

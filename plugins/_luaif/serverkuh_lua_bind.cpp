@@ -168,7 +168,7 @@ static int LUACALL wxLua_function_load(lua_State *L)
     // call load
     returns = (load(strFileName));
     // push the result string
-    wxlState.lua_PushLString(returns, returns.Len());
+    wxlState.lua_PushLString(returns.fn_str(), returns.Len());
 
     return 1;
 }
@@ -213,12 +213,27 @@ wxLuaBindMethod* wxLuaGetFunctionList_serverkuh_lua(size_t &count)
 // wxLuaGetClassList_serverkuh_lua() is called to register classes
 // ---------------------------------------------------------------------------
 
+static const char* wxluaclassname_muhkuh_plugin_instance = "muhkuh_plugin_instance";
+static const char* wxluaclassname_muhkuh_wrap_xml = "muhkuh_wrap_xml";
+
+// ---------------------------------------------------------------------------
+// Lua Tag Method Values and Tables for each Class
+// ---------------------------------------------------------------------------
+
+extern wxLuaBindMethod muhkuh_plugin_instance_methods[];
+extern int muhkuh_plugin_instance_methodCount;
+extern wxLuaBindMethod muhkuh_wrap_xml_methods[];
+extern int muhkuh_wrap_xml_methodCount;
+
+
+
+
 wxLuaBindClass* wxLuaGetClassList_serverkuh_lua(size_t &count)
 {
     static wxLuaBindClass classList[] =
     {
-        { "muhkuh_plugin_instance", muhkuh_plugin_instance_methods, muhkuh_plugin_instance_methodCount, NULL, &wxluatype_muhkuh_plugin_instance, NULL, NULL ,g_wxluanumberArray_None, 0, }, 
-        { "muhkuh_wrap_xml", muhkuh_wrap_xml_methods, muhkuh_wrap_xml_methodCount, NULL, &wxluatype_muhkuh_wrap_xml, NULL, NULL ,g_wxluanumberArray_None, 0, }, 
+        { wxluaclassname_muhkuh_plugin_instance, muhkuh_plugin_instance_methods, muhkuh_plugin_instance_methodCount, NULL, &wxluatype_muhkuh_plugin_instance, NULL, NULL, g_wxluanumberArray_None, 0, }, 
+        { wxluaclassname_muhkuh_wrap_xml, muhkuh_wrap_xml_methods, muhkuh_wrap_xml_methodCount, NULL, &wxluatype_muhkuh_wrap_xml, NULL, NULL, g_wxluanumberArray_None, 0, }, 
 
         { 0, 0, 0, 0, 0, 0, 0 }, 
     };

@@ -187,7 +187,7 @@ static int LUACALL wxLua_dpm_read_image(lua_State *L)
     // unsigned long ulNetxAddress
     unsigned long ulNetxAddress = (unsigned long)wxlua_getuintegertype(L, 2);
     // get this
-    dpm * self = (dpm *)wxluaT_getuserdatatype(L, 1, wxluatype_dpm);
+    romloader * self = (romloader *)wxluaT_getuserdatatype(L, 1, wxluatype_romloader);
     // call read_image
     returns = (self->read_image(ulNetxAddress, ulSize, L, iLuaCallbackTag, (void*)vplCallbackUserData));
 
@@ -293,7 +293,7 @@ static int LUACALL wxLua_dpm_write_image(lua_State *L)
     // unsigned long ulNetxAddress
     unsigned long ulNetxAddress = (unsigned long)wxlua_getuintegertype(L, 2);
     // get this
-    dpm * self = (dpm *)wxluaT_getuserdatatype(L, 1, wxluatype_dpm);
+    romloader * self = (romloader *)wxluaT_getuserdatatype(L, 1, wxluatype_romloader);
     // call write_image
     self->write_image(ulNetxAddress, strData, L, iLuaCallbackTag, (void*)vplCallbackUserData);
 

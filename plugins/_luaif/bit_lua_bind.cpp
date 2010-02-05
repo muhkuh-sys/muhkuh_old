@@ -211,6 +211,14 @@ wxLuaBindMethod* wxLuaGetFunctionList_bit_lua(size_t &count)
 // wxLuaGetClassList_bit_lua() is called to register classes
 // ---------------------------------------------------------------------------
 
+
+// ---------------------------------------------------------------------------
+// Lua Tag Method Values and Tables for each Class
+// ---------------------------------------------------------------------------
+
+
+
+
 wxLuaBindClass* wxLuaGetClassList_bit_lua(size_t &count)
 {
     static wxLuaBindClass classList[] =

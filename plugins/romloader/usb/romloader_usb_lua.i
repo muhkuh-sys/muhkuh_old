@@ -1,6 +1,4 @@
 
-
-
 %include "../romloader_usb_main.h"
 %include "../../romloader.h"
 %enum ROMLOADER_CHIPTYP
