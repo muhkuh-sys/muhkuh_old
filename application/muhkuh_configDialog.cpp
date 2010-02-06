@@ -191,7 +191,7 @@ void muhkuh_configDialog::createControls(void)
 
 	m_treeBook->AddPage(createControls_application(m_treeBook), _("Application"), true, 0);
 	m_treeBook->AddPage(createControls_repository(m_treeBook), _("Repositories"), false, 1);
-	m_treeBook->AddPage(createControls_lua(m_treeBook), _("Lua"), false, 3);
+	m_treeBook->AddPage(createControls_lua(m_treeBook), _("Lua"), false, 2);
 
 	ptbuttonSizer = new wxBoxSizer(wxHORIZONTAL);
 	ptMainSizer->Add(ptbuttonSizer, 0, wxEXPAND);
