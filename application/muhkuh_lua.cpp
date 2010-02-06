@@ -19,8 +19,15 @@
  ***************************************************************************/
 
 
+#include "muhkuh_version.h"
+
+static const char *pcMuhkuhVersion =
+{
+	MUHKUH_APPLICATION_NAME " " MUHKUH_VERSION_STRING
+};
+
 const char *get_version(void)
 {
-	return "01234";
+	return pcMuhkuhVersion;
 }
 
