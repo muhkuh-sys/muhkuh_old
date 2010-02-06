@@ -205,6 +205,10 @@ muhkuh_mainFrame::muhkuh_mainFrame(void)
 
 	/* open a new lua state */
 	m_ptLua_State = lua_open();
+	if( m_ptLua_State!=NULL )
+	{
+		luaL_openlibs(m_ptLua_State);
+	}
 }
 
 
