@@ -136,6 +136,12 @@ public:
 		const wxChar *pcMessage;
 	} LUA_ERROR_TO_STR_T;
 
+	typedef struct
+	{
+		int iLuaError;
+		const wxChar *pcMessage;
+	} LUA_TYPE_TO_STR_T;
+
 private:
 	void init_lua(void);
 	void createMenu(void);
@@ -257,10 +263,10 @@ private:
 	// lua stuff
 	static const LUA_ERROR_TO_STR_T atLuaErrorToString[];
 	wxString lua_error_to_string(int iLuaError);
+	static const LUA_TYPE_TO_STR_T atLuaTypeToString[];
+	wxString lua_type_to_string(int iLuaType);
 	bool lua_get_errorinfo(lua_State *L, int iStatus, int iTop, wxString *pstrErrorMsg, int *piLineNum);
 	lua_State *m_ptLua_State;
-
-
 
 
     DECLARE_EVENT_TABLE()

@@ -2,7 +2,16 @@ cmake_minimum_required(VERSION 2.8)
 
 project("muhkuh")
 
+find_package(SWIG REQUIRED)
+include(${SWIG_USE_FILE})
+
 include(${wxWidgets_USE_FILE})
+
+
+set_source_files_properties(muhkuh_app.i PROPERTIES CPLUSPLUS ON)
+set_source_files_properties(muhkuh_app.i PROPERTIES SWIG_FLAGS "")
+swig_build_wrapper(muhkuh_app_lua_wrapper lua muhkuh_app.i)
+
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${LUA_INCLUDE_DIR})
@@ -18,6 +27,8 @@ set(muhkuh_SOURCES
 	muhkuh_dirlistbox.cpp
 	muhkuh_htmltag_lua.cpp
 	muhkuh_icons.cpp
+	muhkuh_lua.cpp
+	${muhkuh_app_lua_wrapper}
 	muhkuh_mainFrame.cpp
 	muhkuh_repository.cpp
 	muhkuh_repository_manager.cpp
@@ -48,3 +59,6 @@ set(muhkuh_HEADERS
 add_executable(muhkuh ${muhkuh_SOURCES})
 target_link_libraries(muhkuh ${wxWidgets_LIBRARIES} lua)
 set_target_properties(muhkuh PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
+
+# Copy the tips file.
+file(COPY ${CMAKE_HOME_DIRECTORY}/bin/muhkuh_tips.txt DESTINATION ${CMAKE_BINARY_DIR}/bin/)

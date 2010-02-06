@@ -32,6 +32,11 @@
 #include "muhkuh_version.h"
 #include "readFsFile.h"
 
+
+extern "C" {
+	int luaopen_muhkuh_app(lua_State *L);
+}
+
 //-------------------------------------
 
 BEGIN_EVENT_TABLE(muhkuh_mainFrame, wxFrame)
@@ -208,6 +213,7 @@ muhkuh_mainFrame::muhkuh_mainFrame(void)
 	if( m_ptLua_State!=NULL )
 	{
 		luaL_openlibs(m_ptLua_State);
+		luaopen_muhkuh_app(m_ptLua_State);
 	}
 }
 
@@ -2021,10 +2027,41 @@ wxString muhkuh_mainFrame::lua_error_to_string(int iLuaError)
 	}
 	else
 	{
-		strMessage = wxT("Unknown lua error value");
+		strMessage.Printf(_("Unknown lua error code: %d"), iLuaError);
 	}
 
 	return strMessage;
+}
+
+
+const muhkuh_mainFrame::LUA_TYPE_TO_STR_T muhkuh_mainFrame::atLuaTypeToString[] =
+{
+	{ LUA_TNIL,		wxT("nil") },
+	{ LUA_TBOOLEAN,		wxT("boolean") },
+	{ LUA_TLIGHTUSERDATA,	wxT("light userdata") },
+	{ LUA_TNUMBER,		wxT("number") },
+	{ LUA_TSTRING,		wxT("string") },
+	{ LUA_TTABLE,		wxT("table") },
+	{ LUA_TFUNCTION,	wxT("function") },
+	{ LUA_TUSERDATA,	wxT("userdata") },
+	{ LUA_TTHREAD,		wxT("thread") }
+};
+
+wxString muhkuh_mainFrame::lua_type_to_string(int iLuaType)
+{
+	wxString strType;
+
+
+	if( iLuaType<(sizeof(atLuaTypeToString)/sizeof(atLuaTypeToString[0])) )
+	{
+		strType = atLuaTypeToString[iLuaType].pcMessage;
+	}
+	else
+	{
+		strType.Printf(_("Unknown lua type: %d"), iLuaType);
+	}
+
+	return strType;
 }
 
 
@@ -2117,12 +2154,12 @@ wxString muhkuh_mainFrame::local_htmlTag_lua(const wxString &strLuaCode)
 		iResult = luaL_loadbuffer(m_ptLua_State, strLuaCode.fn_str(), strLuaCode.Len(), "html lua tag");
 		if( iResult!=0 )
 		{
-			strHtmlCode = _("failed to load lua script!");
+			strMsg = lua_error_to_string(iResult);
+			strHtmlCode.Printf(_("failed to load lua script, error %d: %s"), iResult, strMsg.c_str());
 		}
 		else
 		{
 			iResult = lua_pcall(m_ptLua_State, 0, 1, 0);
-			
 			if( iResult!=0 )
 			{
 				lua_get_errorinfo(m_ptLua_State, iResult, iTopPre, &strErrorMsg, &iLineNr);
@@ -2143,7 +2180,8 @@ wxString muhkuh_mainFrame::local_htmlTag_lua(const wxString &strLuaCode)
 					}
 					else
 					{
-						strHtmlCode = _("html lua tag: invalid return type");
+						strMsg = lua_type_to_string(iResultType);
+						strHtmlCode.Printf(_("html lua tag: invalid return type, must be string, is %s"), strMsg.c_str());
 					}
 				}
 			}
