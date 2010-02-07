@@ -1151,10 +1151,13 @@ void muhkuh_mainFrame::finishTest(void)
 		fResult = process_server_output();
 	} while( fResult==true );
 
-	m_textTestOutput->AppendText(wxDateTime::Now().Format(wxT("%F %T")).c_str());
-	m_textTestOutput->AppendText(wxT("Test '"));
-	m_textTestOutput->AppendText(m_strRunningTestName);
-	m_textTestOutput->AppendText(wxT("' finished.\n"));
+	if( m_textTestOutput!=NULL )
+	{
+		m_textTestOutput->AppendText(wxDateTime::Now().Format(wxT("%F %T")).c_str());
+		m_textTestOutput->AppendText(wxT("Test '"));
+		m_textTestOutput->AppendText(m_strRunningTestName);
+		m_textTestOutput->AppendText(wxT("' finished.\n"));
+	}
 
 	/* forget current server output tab */
 	m_textTestOutput = NULL;
