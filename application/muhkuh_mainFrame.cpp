@@ -20,6 +20,7 @@
 
 
 #include <wx/stdpaths.h>
+#include <wx/txtstrm.h>
 #include <wx/url.h>
 
 
@@ -75,6 +76,7 @@ BEGIN_EVENT_TABLE(muhkuh_mainFrame, wxFrame)
 	EVT_AUI_PANE_CLOSE(muhkuh_mainFrame::OnPaneClose)
 
 	EVT_END_PROCESS(muhkuh_serverProcess_terminate,			muhkuh_mainFrame::OnServerProcessTerminate)
+	EVT_TIMER(wxID_ANY,						muhkuh_mainFrame::OnTimer)
 
 	EVT_MOVE(muhkuh_mainFrame::OnMove)
 	EVT_SIZE(muhkuh_mainFrame::OnSize)
@@ -96,6 +98,7 @@ muhkuh_mainFrame::muhkuh_mainFrame(void)
  , m_welcomeHtml(NULL)
  , m_testDetailsHtml(NULL)
  , m_ptLua_State(NULL)
+ , m_timerIdleWakeUp(this)
 {
 	wxLog *pOldLogTarget;
 	wxFileName cfgName;
@@ -572,7 +575,6 @@ void muhkuh_mainFrame::read_config(void)
 	// get lua settings
 	pConfig->SetPath(wxT("/Lua"));
 	m_strLuaIncludePath = pConfig->Read(wxT("includepaths"), wxT("lua/?.lua"));
-	m_strLuaDebuggerCode = pConfig->Read(wxT("debuggercode"), wxT("require(\"muhkuh_debugger\")\nmuhkuh_debugger.init()\n"));
 	m_strLuaStartupCode = pConfig->Read(wxT("startupcode"), wxT("require(\"muhkuh_system\")\nmuhkuh_system.boot_xml()\n"));
 
 	// get all repositories
@@ -697,7 +699,6 @@ void muhkuh_mainFrame::write_config(void)
 	// get lua settings
 	pConfig->SetPath(wxT("/Lua"));
 	pConfig->Write(wxT("includepaths"), m_strLuaIncludePath);
-	pConfig->Write(wxT("debuggercode"), m_strLuaDebuggerCode);
 	pConfig->Write(wxT("startupcode"), m_strLuaStartupCode);
 	pConfig->SetPath(wxT("/"));
 
@@ -797,12 +798,19 @@ void muhkuh_mainFrame::setState(muhkuh_mainFrame_state tNewState)
 }
 
 
+void muhkuh_mainFrame::OnTimer(wxTimerEvent &WXUNUSED(event))
+{
+	wxWakeUpIdle();
+}
+
+
 void muhkuh_mainFrame::OnIdle(wxIdleEvent& event)
 {
 	wxString strStatus;
 	wxString strMemStatus;
 	int iRepositoryIndex;
 	int iLuaMemKb;
+	bool fHasMoreInput;
 
 
 	switch(m_state)
@@ -846,7 +854,22 @@ void muhkuh_mainFrame::OnIdle(wxIdleEvent& event)
 
 	case muhkuh_mainFrame_state_testing:
 		strStatus.Printf(_("Test '%s' in progress..."), m_strRunningTestName.c_str());
+
+		fHasMoreInput = process_server_output();
+		if( fHasMoreInput==true )
+		{
+			/* send this idle event again */
+			event.RequestMore();
+		}
 		break;
+	}
+
+	// get the Lua Memory in kilobytes
+	if( m_ptLua_State!=NULL )
+	{
+		iLuaMemKb = lua_getgccount(m_ptLua_State);
+		strMemStatus.Printf(_("Lua uses %d kilobytes"), iLuaMemKb);
+		strStatus += strMemStatus;
 	}
 
 	// set the status text
@@ -1003,8 +1026,8 @@ void muhkuh_mainFrame::executeTest(muhkuh_wrap_xml *ptTestData, unsigned int uiI
 {
 	bool fResult;
 	wxString strMsg;
-	wxString strXmlUrl;
 	wxString strServerCmd;
+	wxFile tFile;
 
 
 	m_strRunningTestName = ptTestData->testDescription_getName();
@@ -1014,29 +1037,109 @@ void muhkuh_mainFrame::executeTest(muhkuh_wrap_xml *ptTestData, unsigned int uiI
 	strMsg.Printf(wxT("execute test '") + m_strRunningTestName + wxT("', index %d"), uiIndex);
 	wxLogMessage(strMsg);
 
-	// set state to 'testing'
-	// NOTE: this must be done before the call to 'RunString', or the state will not change before the first idle event
-	setState(muhkuh_mainFrame_state_testing);
-
-	strXmlUrl = m_ptRepositoryManager->getTestlistXmlUrl(m_sizRunningTest_RepositoryIdx, m_sizRunningTest_TestIdx);
-	strServerCmd.Printf(wxT("./serverkuh -c Muhkuh.cfg -i %d %s"), uiIndex, strXmlUrl.c_str());
-	wxLogMessage(wxT("starting server: ") + strServerCmd);
-
-	m_lServerPid = wxExecute(strServerCmd, wxEXEC_ASYNC|wxEXEC_MAKE_GROUP_LEADER, m_ptServerProcess);
-	if( m_lServerPid==0 )
+	// create the temp file with the lua init commands
+	m_strRunningTestTempFileName = wxFileName::CreateTempFileName(wxT("muhkuh_lua"));
+	fResult = tFile.Create(m_strRunningTestTempFileName.c_str(), true);
+	if( fResult!=true )
 	{
-		strMsg.Printf(_("Failed to start the server with command: %s"), strServerCmd.c_str());
+		strMsg.Printf(_("Failed to create temporary file '%s'!"), m_strRunningTestTempFileName.c_str());
 		wxMessageBox(strMsg, _("Server startup error"), wxICON_ERROR, this);
 	}
+	else
+	{
+		// write the test url to the startup file
+		tFile.Write(wxT("-- execute this test\n"));
+		tFile.Write(wxT("_G.__MUHKUH_TEST_XML = '"));
+		tFile.Write(m_ptRepositoryManager->getTestlistXmlUrl(m_sizRunningTest_RepositoryIdx, m_sizRunningTest_TestIdx));
+		tFile.Write(wxT("'\n\n"));
+
+		// set the include path
+		tFile.Write(wxT("-- include path\n"));
+		tFile.Write(wxT("package['path'] = '"));
+		tFile.Write(m_strLuaIncludePath);
+		tFile.Write(wxT("'\n\n"));
+
+		// write the startup string to the temp file
+		tFile.Write(m_strLuaStartupCode);
+		tFile.Close();
+
+		// set state to 'testing'
+		// NOTE: this must be done before the call to 'RunString', or the state will not change before the first idle event
+		setState(muhkuh_mainFrame_state_testing);
+
+		strServerCmd.Printf(wxT("lua %s"), m_strRunningTestTempFileName.c_str());
+		wxLogMessage(wxT("starting server: ") + strServerCmd);
+
+		m_lServerPid = wxExecute(strServerCmd, wxEXEC_ASYNC|wxEXEC_MAKE_GROUP_LEADER, m_ptServerProcess);
+		if( m_lServerPid==0 )
+		{
+			strMsg.Printf(_("Failed to start the server with command: %s"), strServerCmd.c_str());
+			wxMessageBox(strMsg, _("Server startup error"), wxICON_ERROR, this);
+		}
+		else
+		{
+			m_timerIdleWakeUp.Start(100);
+		}
+	}
+}
+
+
+bool muhkuh_mainFrame::process_server_output(void)
+{
+	bool fProcessedInput;
+	wxInputStream *ptIs;
+
+
+	fProcessedInput = false;
+
+	if( m_ptServerProcess!=NULL )
+	{
+		if( m_ptServerProcess->IsInputAvailable()==true )
+		{
+			ptIs = m_ptServerProcess->GetInputStream();
+			wxTextInputStream tis(*ptIs);
+			wxLogMessage(tis.ReadLine());
+			fProcessedInput = true;
+		}
+
+		if( m_ptServerProcess->IsErrorAvailable()==true )
+		{
+			ptIs = m_ptServerProcess->GetErrorStream();
+			wxTextInputStream tis(*ptIs);
+			wxLogError(tis.ReadLine());
+			fProcessedInput = true;
+		}
+	}
+
+	return fProcessedInput;
 }
 
 
 void muhkuh_mainFrame::finishTest(void)
 {
 	int iPanelIdx;
+	bool fResult;
 
 
 	wxLogMessage(_("Test '%s' finished, cleaning up..."), m_strRunningTestName.c_str());
+
+	m_timerIdleWakeUp.Stop();
+
+	/* show all server output */
+	do
+	{
+		fResult = process_server_output();
+	} while( fResult==true );
+
+	// remove the temp file
+	if( m_strRunningTestTempFileName.IsEmpty()==false && wxFileExists(m_strRunningTestTempFileName)==true )
+	{
+		fResult = wxRemoveFile(m_strRunningTestTempFileName);
+		if( fResult!=true )
+		{
+			wxLogWarning(_("Failed to remove the temp file '%s'."), m_strRunningTestTempFileName.c_str());
+		}
+	}
 }
 
 

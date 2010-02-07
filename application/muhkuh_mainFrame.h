@@ -59,6 +59,8 @@ public:
 	muhkuh_server_process(wxEvtHandler *parent, int id)
 	: wxProcess(parent, id)
 	{
+		/* catch stdout and stderr */
+		Redirect();
 	}
 };
 
@@ -80,6 +82,7 @@ public:
 	void OnShowTip(wxCommandEvent &event);
 	void OnRestoreDefaultPerspective(wxCommandEvent &event);
 
+	void OnTimer(wxTimerEvent &event);
 	void OnIdle(wxIdleEvent &event);
 
 	void OnTestExecute(wxCommandEvent &event);
@@ -154,6 +157,7 @@ private:
 	void write_config(void);
 
 	void executeTest(muhkuh_wrap_xml *ptTestData, unsigned int uiIndex);
+	bool process_server_output(void);
 	void finishTest(void);
 
 	void setState(muhkuh_mainFrame_state tNewState);
@@ -202,6 +206,7 @@ private:
 	long m_lServerPid;
 	// the server process notification
 	muhkuh_server_process *m_ptServerProcess;
+	wxTimer m_timerIdleWakeUp;
 
 	// main frame state
 	muhkuh_mainFrame_state m_state;
@@ -239,8 +244,8 @@ private:
 	wxString m_strLuaIncludePath;
 	// lua startup code
 	wxString m_strLuaStartupCode;
-	// lua debugger startup code
-	wxString m_strLuaDebuggerCode;
+	// the temp file with the settings and the startup code
+	wxString m_strRunningTestTempFileName;
 
 	// the welcome page file
 	wxString m_strWelcomePageFile;
