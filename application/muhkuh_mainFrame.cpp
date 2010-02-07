@@ -99,6 +99,7 @@ muhkuh_mainFrame::muhkuh_mainFrame(void)
  , m_testDetailsHtml(NULL)
  , m_ptLua_State(NULL)
  , m_timerIdleWakeUp(this)
+ , m_textTestOutput(NULL)
 {
 	wxLog *pOldLogTarget;
 	wxFileName cfgName;
@@ -1027,6 +1028,7 @@ void muhkuh_mainFrame::executeTest(muhkuh_wrap_xml *ptTestData, unsigned int uiI
 	bool fResult;
 	wxString strMsg;
 	wxString strServerCmd;
+	wxString strNow;
 	wxFile tFile;
 
 
@@ -1034,8 +1036,7 @@ void muhkuh_mainFrame::executeTest(muhkuh_wrap_xml *ptTestData, unsigned int uiI
 	m_sizRunningTest_RepositoryIdx = ptTestData->getRepositoryIndex();
 	m_sizRunningTest_TestIdx = ptTestData->getTestIndex();
 
-	strMsg.Printf(wxT("execute test '") + m_strRunningTestName + wxT("', index %d"), uiIndex);
-	wxLogMessage(strMsg);
+	wxLogMessage(_("execute test '%s', index %d"), m_strRunningTestName.c_str(), uiIndex);
 
 	// create the temp file with the lua init commands
 	m_strRunningTestTempFileName = wxFileName::CreateTempFileName(wxT("muhkuh_lua"));
@@ -1078,6 +1079,15 @@ void muhkuh_mainFrame::executeTest(muhkuh_wrap_xml *ptTestData, unsigned int uiI
 		}
 		else
 		{
+			strNow = wxDateTime::Now().Format(wxT("%F %T"));
+			// create start message for the report tab
+			strMsg.Printf(_("%s: started test '%s'.\n"), strNow.c_str(), m_strRunningTestName.c_str());
+			// create a new notebook tab
+			m_textTestOutput = new wxTextCtrl(this, wxID_ANY, strMsg, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxSUNKEN_BORDER | wxTE_READONLY);
+			strMsg = m_strRunningTestName + wxT(" - ") + strNow;
+			m_notebook->AddPage(m_textTestOutput, strMsg, true, m_frameIcons.GetIcon(16));
+
+			// start the timer to poll the server for input
 			m_timerIdleWakeUp.Start(100);
 		}
 	}
@@ -1088,17 +1098,24 @@ bool muhkuh_mainFrame::process_server_output(void)
 {
 	bool fProcessedInput;
 	wxInputStream *ptIs;
+	wxString strNow;
+	wxString strMsg;
 
 
 	fProcessedInput = false;
 
-	if( m_ptServerProcess!=NULL )
+	if( m_ptServerProcess!=NULL && m_textTestOutput!=NULL )
 	{
+		strNow = wxDateTime::Now().Format(wxT("%F %T"));
+
 		if( m_ptServerProcess->IsInputAvailable()==true )
 		{
 			ptIs = m_ptServerProcess->GetInputStream();
 			wxTextInputStream tis(*ptIs);
-			wxLogMessage(tis.ReadLine());
+			m_textTestOutput->AppendText(strNow);
+			m_textTestOutput->AppendText(wxT(":MSG:"));
+			m_textTestOutput->AppendText(tis.ReadLine());
+			m_textTestOutput->AppendText(wxT("\n"));
 			fProcessedInput = true;
 		}
 
@@ -1106,7 +1123,10 @@ bool muhkuh_mainFrame::process_server_output(void)
 		{
 			ptIs = m_ptServerProcess->GetErrorStream();
 			wxTextInputStream tis(*ptIs);
-			wxLogError(tis.ReadLine());
+			m_textTestOutput->AppendText(strNow);
+			m_textTestOutput->AppendText(wxT(":ERR:"));
+			m_textTestOutput->AppendText(tis.ReadLine());
+			m_textTestOutput->AppendText(wxT("\n"));
 			fProcessedInput = true;
 		}
 	}
@@ -1130,6 +1150,14 @@ void muhkuh_mainFrame::finishTest(void)
 	{
 		fResult = process_server_output();
 	} while( fResult==true );
+
+	m_textTestOutput->AppendText(wxDateTime::Now().Format(wxT("%F %T")).c_str());
+	m_textTestOutput->AppendText(wxT("Test '"));
+	m_textTestOutput->AppendText(m_strRunningTestName);
+	m_textTestOutput->AppendText(wxT("' finished.\n"));
+
+	/* forget current server output tab */
+	m_textTestOutput = NULL;
 
 	// remove the temp file
 	if( m_strRunningTestTempFileName.IsEmpty()==false && wxFileExists(m_strRunningTestTempFileName)==true )

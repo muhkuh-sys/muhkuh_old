@@ -207,6 +207,7 @@ private:
 	// the server process notification
 	muhkuh_server_process *m_ptServerProcess;
 	wxTimer m_timerIdleWakeUp;
+	wxTextCtrl *m_textTestOutput;
 
 	// main frame state
 	muhkuh_mainFrame_state m_state;
