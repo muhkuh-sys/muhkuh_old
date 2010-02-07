@@ -1027,6 +1027,7 @@ void muhkuh_mainFrame::executeTest(muhkuh_wrap_xml *ptTestData, unsigned int uiI
 {
 	bool fResult;
 	wxString strMsg;
+	wxString strStartupCode;
 	wxString strServerCmd;
 	wxString strNow;
 	wxFile tFile;
@@ -1038,6 +1039,21 @@ void muhkuh_mainFrame::executeTest(muhkuh_wrap_xml *ptTestData, unsigned int uiI
 
 	wxLogMessage(_("execute test '%s', index %d"), m_strRunningTestName.c_str(), uiIndex);
 
+
+	// create the startup code
+	strStartupCode.Append(wxT("-- execute this test\n"));
+	strStartupCode.Append(wxT("_G.__MUHKUH_TEST_XML = '"));
+	strStartupCode.Append(m_ptRepositoryManager->getTestlistXmlUrl(m_sizRunningTest_RepositoryIdx, m_sizRunningTest_TestIdx));
+	strStartupCode.Append(wxT("'\n\n"));
+
+	strStartupCode.Append(wxT("-- include path\n"));
+	strStartupCode.Append(wxT("package['path'] = '"));
+	strStartupCode.Append(m_strLuaIncludePath);
+	strStartupCode.Append(wxT("'\n\n"));
+
+	strStartupCode.Append(m_strLuaStartupCode);
+
+
 	// create the temp file with the lua init commands
 	m_strRunningTestTempFileName = wxFileName::CreateTempFileName(wxT("muhkuh_lua"));
 	fResult = tFile.Create(m_strRunningTestTempFileName.c_str(), true);
@@ -1048,20 +1064,8 @@ void muhkuh_mainFrame::executeTest(muhkuh_wrap_xml *ptTestData, unsigned int uiI
 	}
 	else
 	{
-		// write the test url to the startup file
-		tFile.Write(wxT("-- execute this test\n"));
-		tFile.Write(wxT("_G.__MUHKUH_TEST_XML = '"));
-		tFile.Write(m_ptRepositoryManager->getTestlistXmlUrl(m_sizRunningTest_RepositoryIdx, m_sizRunningTest_TestIdx));
-		tFile.Write(wxT("'\n\n"));
-
-		// set the include path
-		tFile.Write(wxT("-- include path\n"));
-		tFile.Write(wxT("package['path'] = '"));
-		tFile.Write(m_strLuaIncludePath);
-		tFile.Write(wxT("'\n\n"));
-
 		// write the startup string to the temp file
-		tFile.Write(m_strLuaStartupCode);
+		tFile.Write(strStartupCode);
 		tFile.Close();
 
 		// set state to 'testing'
@@ -1086,6 +1090,11 @@ void muhkuh_mainFrame::executeTest(muhkuh_wrap_xml *ptTestData, unsigned int uiI
 			m_textTestOutput = new wxTextCtrl(this, wxID_ANY, strMsg, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxSUNKEN_BORDER | wxTE_READONLY);
 			strMsg = m_strRunningTestName + wxT(" - ") + strNow;
 			m_notebook->AddPage(m_textTestOutput, strMsg, true, m_frameIcons.GetIcon(16));
+
+			m_textTestOutput->AppendText(wxT("startup code:\n"));
+			m_textTestOutput->AppendText(wxT("-----------------------------------------------------------------------------\n"));
+			m_textTestOutput->AppendText(strStartupCode);
+			m_textTestOutput->AppendText(wxT("-----------------------------------------------------------------------------\n"));
 
 			// start the timer to poll the server for input
 			m_timerIdleWakeUp.Start(100);
