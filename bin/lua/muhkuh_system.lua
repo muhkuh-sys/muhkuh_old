@@ -21,7 +21,6 @@
 module("muhkuh_system", package.seeall)
 
 
-
 -----------------------------------------------------------------------------
 -- @description Get the first child of a node with the name 'strName'.
 --
@@ -533,14 +532,44 @@ end
 -- @return table with all tests, <code>nil</code> on error
 --
 local function parse_xml()
+	local tXmlDocument
 	local rootNode
 	local foundNode
 	local test
 	local tests = {}
 
 
+	-- load the xml file
+	local strFile = muhkuh.load(__MUHKUH_TEST_XML)
+
+	-- create a local temp file
+	local tTmpName = wx.wxFileName()
+	tTmpName:AssignTempFileName("muhkuh_system")
+	if not tTmpName:IsOk() then
+		print("muhkuh_system_error: failed to create a temp file.")
+		return nil
+	end
+	local strTmpFileName = tTmpName:GetFullPath()
+	local tFile = wx.wxFile()
+	if not tFile:Create(strTmpFileName, true) then
+		print("muhkuh_system_error: failed to create temp file '" .. strTmpFileName .. "'")
+		return nil
+	end
+	tFile:Write(strFile)
+	tFile:Close()
+
+	tXmlDocument = wx.wxXmlDocument()
+	if not tXmlDocument:Load(strTmpFileName) then
+		wx.wxRemoveFile(strTmpFileName)
+		print("muhkuh_system_error: failed to parse xml file '" .. __MUHKUH_TEST_XML .. "'")
+		return nil
+	end
+
+	-- remove the temp file
+	wx.wxRemoveFile(strTmpFileName)
+
 	-- look for the first root node named "TestDescription"
-	rootNode = __MUHKUH_TEST_XML:GetRoot()
+	rootNode = tXmlDocument:GetRoot()
 	foundNode = get_matching_node(rootNode, "TestDescription")
 	-- found node?
 	if not foundNode then
@@ -597,6 +626,44 @@ local function parse_xml()
 end
 
 
+local function create_window()
+	local m_frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, "wxAUI Sample Application", wx.wxDefaultPosition, wx.wxSize(800, 600));
+
+	local m_auiMgr = wxaui.wxAuiManager()
+	m_auiMgr:SetManagedWindow(m_frame);
+
+	m_frame:CreateStatusBar();
+	m_frame:GetStatusBar():SetStatusText("Ready")
+
+	m_frame:SetMinSize(wx.wxSize(400,300));
+
+	local m_panel = wx.wxPanel(m_frame, wx.wxID_ANY)
+	local m_paneInfo = wxaui.wxAuiPaneInfo()
+	m_paneInfo:Name("testpanel")
+	m_paneInfo:CaptionVisible(false)
+	m_paneInfo:Center()
+	m_paneInfo:Position(0)
+	m_auiMgr:AddPane(m_panel, m_paneInfo);
+
+	local style = wx.wxTE_MULTILINE + wx.wxSUNKEN_BORDER + wx.wxTE_READONLY
+	local m_textCtrl = wx.wxTextCtrl(m_frame, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxDefaultSize, style)
+	m_paneInfo:Name("message_log")
+	m_paneInfo:CaptionVisible(true)
+	m_paneInfo:Caption("Message Log")
+	m_paneInfo:Bottom()
+	m_paneInfo:Position(0)
+	m_auiMgr:AddPane(m_textCtrl, m_paneInfo)
+
+	m_auiMgr:Update();
+
+	m_frame:Show(true)
+
+	_G.__MUHKUH_PANEL = m_panel
+	-- save this layout as the default perspective
+	-- m_strDefaultPerspective = m_auiMgr.SavePerspective();
+end
+
+
 -----------------------------------------------------------------------------
 -- @description Boot a test from a xml description.
 --
@@ -612,15 +679,21 @@ function boot_xml()
 		bit.bshr = bit.rshift
 	end
 
+
+	-- create the window
+	create_window()
+
+
 	alltests = parse_xml()
 	if not alltests then
 		wx.wxMessageBox("Failed to parse the XML file. Please send the log to the developer.", "Parse Error", wx.wxOK+wx.wxICON_ERROR, wx.NULL)
-		muhkuh.TestHasFinished()
 	else
 		-- set the global variable
 		_G.__MUHKUH_ALL_TESTS = alltests
 		-- run the main code
 		assert(loadstring(alltests[1].code, "@@0"))()
 	end
+
+	wx.wxGetApp():MainLoop()
 end
 
