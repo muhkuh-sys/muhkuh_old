@@ -21,6 +21,8 @@
 module("muhkuh_system", package.seeall)
 
 
+m_textCtrl = nil
+
 -----------------------------------------------------------------------------
 -- @description Get the first child of a node with the name 'strName'.
 --
@@ -626,8 +628,52 @@ local function parse_xml()
 end
 
 
+function catch_prints(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9)
+	if a0 then
+		m_textCtrl:AppendText(tostring(a0))
+	end
+
+	if a1 then
+		m_textCtrl:AppendText(tostring(a1))
+	end
+
+	if a2 then
+		m_textCtrl:AppendText(tostring(a2))
+	end
+
+	if a3 then
+		m_textCtrl:AppendText(tostring(a3))
+	end
+
+	if a4 then
+		m_textCtrl:AppendText(tostring(a4))
+	end
+
+	if a5 then
+		m_textCtrl:AppendText(tostring(a5))
+	end
+
+	if a6 then
+		m_textCtrl:AppendText(tostring(a6))
+	end
+
+	if a7 then
+		m_textCtrl:AppendText(tostring(a7))
+	end
+
+	if a8 then
+		m_textCtrl:AppendText(tostring(a8))
+	end
+
+	if a9 then
+		m_textCtrl:AppendText(tostring(a9))
+	end
+
+	m_textCtrl:AppendText("\n")
+end
+
 local function create_window()
-	local m_frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, "wxAUI Sample Application", wx.wxDefaultPosition, wx.wxSize(800, 600));
+	local m_frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, "Muhkuh - Insert Testname here", wx.wxDefaultPosition, wx.wxSize(800, 600));
 
 	local m_auiMgr = wxaui.wxAuiManager()
 	m_auiMgr:SetManagedWindow(m_frame);
@@ -646,7 +692,7 @@ local function create_window()
 	m_auiMgr:AddPane(m_panel, m_paneInfo);
 
 	local style = wx.wxTE_MULTILINE + wx.wxSUNKEN_BORDER + wx.wxTE_READONLY
-	local m_textCtrl = wx.wxTextCtrl(m_frame, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxDefaultSize, style)
+	m_textCtrl = wx.wxTextCtrl(m_frame, wx.wxID_ANY, "", wx.wxDefaultPosition, wx.wxDefaultSize, style)
 	m_paneInfo:Name("message_log")
 	m_paneInfo:CaptionVisible(true)
 	m_paneInfo:Caption("Message Log")
@@ -657,6 +703,9 @@ local function create_window()
 	m_auiMgr:Update();
 
 	m_frame:Show(true)
+
+	_G.print = catch_prints
+	print("Hallo!")
 
 	_G.__MUHKUH_PANEL = m_panel
 	-- save this layout as the default perspective
