@@ -438,7 +438,7 @@ void muhkuh_mainFrame::reloadWelcomePage(void)
 	if( m_strWelcomePageFile.IsEmpty()==true )
 	{
 		// use the default welcome message
-		strPage = _("<html><head><title>Welcome</title></head><body><h1>Welcome to <lua>return _G.__MUHKUH_VERSION</lua></h1></body></html>");
+		strPage = _("<html><head><title>Welcome</title></head><body><h1>Welcome to <lua>return muhkuh_app.get_version()</lua></h1></body></html>");
 	}
 	else
 	{
@@ -576,7 +576,7 @@ void muhkuh_mainFrame::read_config(void)
 	// get lua settings
 	pConfig->SetPath(wxT("/Lua"));
 	m_strLuaIncludePath = pConfig->Read(wxT("includepaths"), wxT("lua/?.lua"));
-	m_strLuaStartupCode = pConfig->Read(wxT("startupcode"), wxT("require(\"muhkuh_system\")\nmuhkuh_system.boot_xml()\n"));
+	m_strLuaStartupCode = pConfig->Read(wxT("startupcode"), wxT("require(\"wx\")\nrequire(\"bit\")\nrequire(\"muhkuh\")\nrequire(\"muhkuh_system\")muhkuh_system.boot_xml()\n"));
 
 	// get all repositories
 	m_ptRepositoryManager->read_config(pConfig);
