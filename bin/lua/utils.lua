@@ -61,7 +61,8 @@ function getlocalfile(name, suffix)
 	end
 	filehandle:write(bin)
 	filehandle:close()
-
+	filehandle = nil
+	collectgarbage("collect")
 	return tmpfilename
 end
 
@@ -162,6 +163,9 @@ function loadBin(strName)
 	local iLen = f:Length()
 	local iBytesRead, bin = f:Read(iLen)
 	f:Close()
+	f = nil
+	collectgarbage("collect")
+	
 	tprint((iBytesRead or 0) .. " bytes read")
 	if iBytesRead ~= iLen then
 		local msg = "Error reading file " .. strName
@@ -199,6 +203,9 @@ function writeBin(strName, bin, accessMode)
 
 	local iBytesWritten = f:Write(bin, bin:len())
 	f:Close()
+	f = nil
+	collectgarbage("collect")
+	
 	tprint(iBytesWritten .. " bytes written")
 	if iBytesWritten ~= bin:len() then
 		msg = "Error while writing to file " .. strName
