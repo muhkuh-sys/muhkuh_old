@@ -33,7 +33,7 @@ static int LUACALL wxLua_dpm_read_image(lua_State *L)
     luaL_unref(L, LUA_REGISTRYINDEX, iLuaCallbackTag);
 
     // push the result string
-    wxlState.lua_PushLString(returns,returns.Len());
+    wxlState.lua_PushLString(returns.To8BitData(),returns.Len());
 
     return 1;
 }

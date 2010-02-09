@@ -11,9 +11,6 @@
 		<!-- do not use monolithic wx build -->
 		<set var="WX_MONOLITHIC">0</set>
 
-		<!-- do not use unicode -->
-		<set var="WX_UNICODE">0</set>
-
 		<!-- use shared wx -->
 		<set var="WX_SHARED">1</set>
 

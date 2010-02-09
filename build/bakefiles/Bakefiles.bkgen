@@ -18,7 +18,7 @@
 	<add-flags>-I.</add-flags>
 
 	<!-- required settings for muhkuh application and plugins -->
-	<add-flags>-DWX_UNICODE_DEFAULT=0 -DWX_SHARED_DEFAULT=1 -DWX_MONOLITHIC=0 -DSHARED=1 -DUNICODE=0</add-flags>
+	<add-flags>-DWX_SHARED_DEFAULT=1 -DWX_MONOLITHIC=0 -DSHARED=1</add-flags>
 
 
 	<!-- ================================================================== -->

@@ -146,7 +146,7 @@ static int LUACALL wxLua_function_load(lua_State *L)
     // call load
     returns = (load(strFileName));
     // push the result string
-    wxlState.lua_PushLString(returns.fn_str(), returns.Len());
+    wxlState.lua_PushLString(returns.To8BitData(), returns.Len());
 
     return 1;
 }

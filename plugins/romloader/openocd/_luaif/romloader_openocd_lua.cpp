@@ -301,7 +301,7 @@ static int LUACALL wxLua_romloader_read_image(lua_State *L)
     luaL_unref(L, LUA_REGISTRYINDEX, iLuaCallbackTag);
 
     // push the result string
-    wxlState.lua_PushLString(returns.fn_str(),returns.Len());
+    wxlState.lua_PushLString(returns.To8BitData(),returns.Len());
 
     return 1;
 }
