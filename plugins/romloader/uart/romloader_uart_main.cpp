@@ -925,9 +925,9 @@ unsigned int romloader_uart::buildCrc(const char *pcData, size_t sizDataLen)
 }
 
 
-int romloader_uart::write_data(wxString &strData, unsigned long ulLoadAdr, lua_State *L, int iLuaCallbackTag, void *pvCallbackUserData, wxString &strErrorMsg)
+int romloader_uart::write_data(const char *pcData, size_t sizData, unsigned long ulLoadAdr, lua_State *L, int iLuaCallbackTag, void *pvCallbackUserData, wxString &strErrorMsg)
 {
-	size_t sizDataCnt, sizDataLen;
+	size_t sizDataCnt;
 	unsigned int uiCrc;
 	wxString strCommand;
 	size_t sizChunkSize;
@@ -944,14 +944,11 @@ int romloader_uart::write_data(wxString &strData, unsigned long ulLoadAdr, lua_S
 
 	sizMaxChunkSize = m_ptUartDev->GetMaxBlockSize();
 
-	// get the data length
-	sizDataLen = strData.Length();
-
 	// generate crc checksum
-	uiCrc = buildCrc(strData.fn_str(), strData.Len());
+	uiCrc = buildCrc(pcData, sizData);
 
 	// generate load command
-	strCommand.Printf(wxT("LOAD %08lX %08X %04X"), ulLoadAdr, sizDataLen, uiCrc);
+	strCommand.Printf(wxT("LOAD %08lX %08X %04X"), ulLoadAdr, sizData, uiCrc);
 	wxLogMessage(m_strMe + wxT("Command: ") + strCommand);
 
 	// send command
@@ -964,7 +961,7 @@ int romloader_uart::write_data(wxString &strData, unsigned long ulLoadAdr, lua_S
 	{
 		// now send the data part
 		sizDataCnt = 0;
-		while( sizDataCnt<sizDataLen )
+		while( sizDataCnt<sizData )
 		{
 			// check for response
 			ulPeek = m_ptUartDev->Peek();
@@ -985,7 +982,7 @@ int romloader_uart::write_data(wxString &strData, unsigned long ulLoadAdr, lua_S
 			}
 
 			// get the size of the next data chunk
-			sizChunkSize = sizDataLen - sizDataCnt;
+			sizChunkSize = sizData - sizDataCnt;
 			if( sizChunkSize>sizMaxChunkSize )
 			{
 				sizChunkSize = sizMaxChunkSize;
@@ -1000,7 +997,7 @@ int romloader_uart::write_data(wxString &strData, unsigned long ulLoadAdr, lua_S
 			}
 
 			// send data chunk
-			ulSent = m_ptUartDev->SendRaw((const unsigned char*)strData.Mid(sizDataCnt, sizChunkSize).c_str(), sizChunkSize, 1000);
+			ulSent = m_ptUartDev->SendRaw((const unsigned char*)(pcData+sizDataCnt), sizChunkSize, 1000);
 			if( ulSent!=sizChunkSize )
 			{
 				strErrorMsg.Printf(wxT("failed to send %d bytes: %d"), sizChunkSize, ulSent);
@@ -1023,7 +1020,7 @@ int romloader_uart::write_data(wxString &strData, unsigned long ulLoadAdr, lua_S
 }
 
 
-void romloader_uart::write_image(double dNetxAddress, wxString strData, lua_State *L, int iLuaCallbackTag, void *pvCallbackUserData)
+void romloader_uart::write_image(double dNetxAddress, const char *pcData, size_t sizData, lua_State *L, int iLuaCallbackTag, void *pvCallbackUserData)
 {
 	unsigned long ulNetxAddress;
 	wxString strResponse;
@@ -1039,7 +1036,7 @@ void romloader_uart::write_image(double dNetxAddress, wxString strData, lua_Stat
 	wxLogMessage(m_strMe + wxT("write_image %08lx"), ulNetxAddress);
 
 	// send the command
-	if( write_data(strData, ulNetxAddress, L, iLuaCallbackTag, pvCallbackUserData, strErrorMsg)==0 )
+	if( write_data(pcData, sizData, ulNetxAddress, L, iLuaCallbackTag, pvCallbackUserData, strErrorMsg)==0 )
 	{
 		// get the response
 		if( m_ptUartDev->WaitForResponse(strResponse, 65536, 1024)==false )

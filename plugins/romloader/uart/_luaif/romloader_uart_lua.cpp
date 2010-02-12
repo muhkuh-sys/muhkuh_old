@@ -384,25 +384,15 @@ static int LUACALL wxLua_romloader_write_image(lua_State *L)
         // no callback function provided
         wxlua_argerror(L, 4, wxT("a 'function'"));
     }
-    // wxString strData
-    wxString strData;
     size_t sizLen;
     const char *pcBuf;
     pcBuf = lua_tolstring(L, 3, &sizLen);
-    if( sizLen==0 )
-    {
-        strData = wxEmptyString;
-    }
-    else
-    {
-        strData = wxString::From8BitData(pcBuf, sizLen);
-    }
     // unsigned long ulNetxAddress
     double dNetxAddress = wxlua_getnumbertype(L, 2);
     // get this
     romloader * self = (romloader *)wxluaT_getuserdatatype(L, 1, wxluatype_romloader);
     // call write_image
-    self->write_image(dNetxAddress, strData, L, iLuaCallbackTag, (void*)vplCallbackUserData);
+    self->write_image(dNetxAddress, pcBuf, sizLen, L, iLuaCallbackTag, (void*)vplCallbackUserData);
 
     // remove ref to function
     luaL_unref(L, LUA_REGISTRYINDEX, iLuaCallbackTag);

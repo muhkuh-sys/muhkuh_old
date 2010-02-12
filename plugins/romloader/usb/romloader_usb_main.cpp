@@ -1185,7 +1185,7 @@ void romloader_usb::write_data32(double dNetxAddress, double dData)
 
 
 /* write a byte array from the pc to the netx */
-void romloader_usb::write_image(double dNetxAddress, wxString strData, lua_State *L, int iLuaCallbackTag, void *pvCallbackUserData)
+void romloader_usb::write_image(double dNetxAddress, const char *pcData, size_t sizData, lua_State *L, int iLuaCallbackTag, void *pvCallbackUserData)
 {
 	unsigned long ulNetxAddress;
 	int iResult;
@@ -1206,7 +1206,7 @@ void romloader_usb::write_image(double dNetxAddress, wxString strData, lua_State
 	else
 	{
 		// send the command
-		iResult = usb_load(strData.To8BitData(), strData.Len(), ulNetxAddress, L, iLuaCallbackTag, pvCallbackUserData);
+		iResult = usb_load(pcData, sizData, ulNetxAddress, L, iLuaCallbackTag, pvCallbackUserData);
 		if( iResult!=LIBUSB_SUCCESS )
 		{
 			strErrorMsg.Printf(_("failed to send load command: %s"), libusb_strerror(iResult).c_str());

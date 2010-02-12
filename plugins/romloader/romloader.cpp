@@ -365,7 +365,7 @@ void romloader::write_data32(double dNetxAddress, double dData)
 
 
 // write a byte array from the pc to the netx
-void romloader::write_image(double dNetxAddress, wxString strData, lua_State *L, int iLuaCallbackTag, void *pvCallbackUserData)
+void romloader::write_image(double dNetxAddress, const char *pcData, size_t sizData, lua_State *L, int iLuaCallbackTag, void *pvCallbackUserData)
 {
 	wxString strMsg;
 	int iResult;
@@ -381,7 +381,7 @@ void romloader::write_image(double dNetxAddress, wxString strData, lua_State *L,
 	}
 	else
 	{
-		iResult = m_tFunctionInterface.fn_write_image(m_pvHandle, ulNetxAddress, strData.To8BitData(), strData.Len(), L, iLuaCallbackTag, pvCallbackUserData);
+		iResult = m_tFunctionInterface.fn_write_image(m_pvHandle, ulNetxAddress, pcData, sizData, L, iLuaCallbackTag, pvCallbackUserData);
 		if( iResult!=0 )
 		{
 			strMsg.Printf(wxT("write_image failed with error %d"), iResult);

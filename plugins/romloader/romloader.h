@@ -150,7 +150,7 @@ public:
 	// write a long (32bit) from the pc to the netx
 	virtual void write_data32(double dNetxAddress, double dData);
 	// write a byte array from the pc to the netx
-	virtual void write_image(double dNetxAddress, wxString strData, lua_State *L, int iLuaCallbackTag, void *pvCallbackUserData);
+	virtual void write_image(double dNetxAddress, const char *pcData, size_t sizData, lua_State *L, int iLuaCallbackTag, void *pvCallbackUserData);
 
 	// call routine
 	virtual void call(double dNetxAddress, double dParameterR0, lua_State *L, int iLuaCallbackTag, void *pvCallbackUserData);
