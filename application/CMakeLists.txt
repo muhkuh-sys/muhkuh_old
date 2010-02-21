@@ -80,6 +80,14 @@ set(muhkuh_HEADERS
 )
 
 
+set(MUHKUH_VERSION_MAJ 1)
+set(MUHKUH_VERSION_MIN 0)
+set(MUHKUH_VERSION_SUB 619)
+set(MUHKUH_VERSION_YEAR 2010)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/templates/muhkuh.rc ${CMAKE_CURRENT_SOURCE_DIR}/muhkuh.rc)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/templates/muhkuh_version.h ${CMAKE_CURRENT_SOURCE_DIR}/muhkuh_version.h)
+
+
 # Build the executable.
 add_executable(muhkuh WIN32 ${muhkuh_SOURCES})
 set_property(TARGET muhkuh PROPERTY COMPILE_DEFINITIONS ${wxWidgets_DEFINITIONS} ${muhkuh_app_lua_definitions} ${muhkuh_app_python_definitions})
