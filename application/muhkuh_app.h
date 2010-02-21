@@ -20,6 +20,8 @@
 
 
 #include <wx/wx.h>
+
+#include <wx/app.h>
 #include <wx/config.h>
 #include <wx/fileconf.h>
 #include <wx/filename.h>

@@ -8,14 +8,38 @@ include(${SWIG_USE_FILE})
 include(${wxWidgets_USE_FILE})
 
 
-set_source_files_properties(muhkuh_app.i PROPERTIES CPLUSPLUS ON)
-set_source_files_properties(muhkuh_app.i PROPERTIES SWIG_FLAGS "")
-swig_build_wrapper(muhkuh_app_lua_wrapper lua muhkuh_app.i)
+if(${LUA51_FOUND})
+	set_source_files_properties(muhkuh_app.i PROPERTIES CPLUSPLUS ON)
+	set_source_files_properties(muhkuh_app.i PROPERTIES SWIG_FLAGS "")
+	swig_build_wrapper(muhkuh_app_lua_wrapper lua muhkuh_app.i)
+
+	set(muhkuh_app_lua_definitions USE_LUA=1)
+	set(muhkuh_app_lua_sources
+		muhkuh_htmltag_lua.cpp
+		muhkuh_lua.cpp
+		${muhkuh_app_lua_wrapper}
+	)
+	set(muhkuh_app_libs lua)
+
+	include_directories(${LUA_INCLUDE_DIR})
+endif(${LUA51_FOUND})
+
+
+if(${PYTHONLIBS_FOUND})
+	set(muhkuh_app_python_definitions USE_PYTHON=1)
+endif(${PYTHONLIBS_FOUND})
 
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${LUA_INCLUDE_DIR})
+include_directories(${wxWidgets_INCLUDE_DIRS})
 
+
+# Set the windows specific sources. This will be empty on other platforms.
+if(WIN32)
+	set(muhkuh_app_win_sources
+		muhkuh.rc
+	)
+endif(WIN32)
 
 set(muhkuh_SOURCES
 	growbuffer.cpp
@@ -25,15 +49,15 @@ set(muhkuh_SOURCES
 	muhkuh_configDialog.cpp
 	muhkuh_config_reposEntryDialog.cpp
 	muhkuh_dirlistbox.cpp
-	muhkuh_htmltag_lua.cpp
 	muhkuh_icons.cpp
-	muhkuh_lua.cpp
-	${muhkuh_app_lua_wrapper}
 	muhkuh_mainFrame.cpp
 	muhkuh_repository.cpp
 	muhkuh_repository_manager.cpp
 	muhkuh_wrap_xml.cpp
 	readFsFile.cpp
+	${muhkuh_app_lua_sources}
+	${muhkuh_app_python_sources}
+	${muhkuh_app_win_sources}
 )
 
 set(muhkuh_HEADERS
@@ -55,10 +79,13 @@ set(muhkuh_HEADERS
 	readFsFile.h
 )
 
+
 # Build the executable.
-add_executable(muhkuh ${muhkuh_SOURCES})
-target_link_libraries(muhkuh ${wxWidgets_LIBRARIES} lua)
+add_executable(muhkuh WIN32 ${muhkuh_SOURCES})
+set_property(TARGET muhkuh PROPERTY COMPILE_DEFINITIONS ${wxWidgets_DEFINITIONS} ${muhkuh_app_lua_definitions} ${muhkuh_app_python_definitions})
+target_link_libraries(muhkuh ${wxWidgets_LIBRARIES} ${muhkuh_app_libs})
 set_target_properties(muhkuh PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
+
 
 # Copy the tips file.
 file(COPY ${CMAKE_HOME_DIRECTORY}/bin/muhkuh_tips.txt DESTINATION ${CMAKE_BINARY_DIR}/bin/)

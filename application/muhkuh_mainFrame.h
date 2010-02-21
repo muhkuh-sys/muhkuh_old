@@ -36,12 +36,13 @@
 #include <wx/tipdlg.h>
 
 
+#if defined(USE_LUA)
 extern "C" {
 #include "lua.h"
 #include "lauxlib.h"
 #include "lualib.h"
 }
-
+#endif
 
 #ifndef __MUHKUH_MAINFRAME_H__
 #define __MUHKUH_MAINFRAME_H__
@@ -112,9 +113,6 @@ public:
 	void OnMove(wxMoveEvent &event);
 	void OnSize(wxSizeEvent &event);
 
-	static wxString htmlTag_lua(const wxString &strLuaCode);
-	wxString local_htmlTag_lua(const wxString &strLuaCode);
-
 	static bool repositoryScannerCallback(void *pvUser, wxString strMessage, int iProgressPos, int iProgressMax);
 	static const int m_iRepositoryProgressMax = 10000;
 
@@ -133,6 +131,10 @@ public:
 		MAINFRAME_INIT_STATE_SCANNED
 	} MAINFRAME_INIT_STATE_E;
 
+#if defined(USE_LUA)
+	static wxString htmlTag_lua(const wxString &strLuaCode);
+	wxString local_htmlTag_lua(const wxString &strLuaCode);
+
 	typedef struct
 	{
 		int iLuaError;
@@ -144,9 +146,9 @@ public:
 		int iLuaError;
 		const wxChar *pcMessage;
 	} LUA_TYPE_TO_STR_T;
+#endif
 
 private:
-	void init_lua(void);
 	void createMenu(void);
 	void createControls(void);
 	void createTipProvider(void);
@@ -241,6 +243,10 @@ private:
 	// the test details page
 	wxString m_strTestDetails;
 
+	/* NOTE: Keep the configuration dialog the same, even if lua or python
+	         is not compiled in. Just disable the controls, but show the
+		 user that it is there.
+        */
 	// the lua include path
 	wxString m_strLuaIncludePath;
 	// lua startup code
@@ -265,15 +271,17 @@ private:
 	wxSize m_frameSize;
 
 
-
 	// lua stuff
+#if defined(USE_LUA)
+	void init_lua(void);
+
 	static const LUA_ERROR_TO_STR_T atLuaErrorToString[];
 	wxString lua_error_to_string(int iLuaError);
 	static const LUA_TYPE_TO_STR_T atLuaTypeToString[];
 	wxString lua_type_to_string(int iLuaType);
 	bool lua_get_errorinfo(lua_State *L, int iStatus, int iTop, wxString *pstrErrorMsg, int *piLineNum);
 	lua_State *m_ptLua_State;
-
+#endif
 
     DECLARE_EVENT_TABLE()
 };

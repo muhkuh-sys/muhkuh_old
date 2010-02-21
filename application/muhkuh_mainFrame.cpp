@@ -33,10 +33,11 @@
 #include "muhkuh_version.h"
 #include "readFsFile.h"
 
-
+#if defined(USE_LUA)
 extern "C" {
 	int luaopen_muhkuh_app(lua_State *L);
 }
+#endif
 
 //-------------------------------------
 
@@ -97,9 +98,11 @@ muhkuh_mainFrame::muhkuh_mainFrame(void)
  , m_tipProvider(NULL)
  , m_welcomeHtml(NULL)
  , m_testDetailsHtml(NULL)
- , m_ptLua_State(NULL)
  , m_timerIdleWakeUp(this)
  , m_textTestOutput(NULL)
+#if defined(USE_LUA)
+ , m_ptLua_State(NULL)
+#endif
 {
 	wxLog *pOldLogTarget;
 	wxFileName cfgName;
@@ -212,6 +215,7 @@ muhkuh_mainFrame::muhkuh_mainFrame(void)
 
 	InitDialog();
 
+#if defined(USE_LUA)
 	/* open a new lua state */
 	m_ptLua_State = lua_open();
 	if( m_ptLua_State!=NULL )
@@ -219,6 +223,7 @@ muhkuh_mainFrame::muhkuh_mainFrame(void)
 		luaL_openlibs(m_ptLua_State);
 		luaopen_muhkuh_app(m_ptLua_State);
 	}
+#endif
 }
 
 
@@ -226,11 +231,13 @@ muhkuh_mainFrame::~muhkuh_mainFrame(void)
 {
 	write_config();
 
+#if defined(USE_LUA)
 	// delete the lua state
 	if( m_ptLua_State!=NULL )
 	{
 		lua_close(m_ptLua_State);
 	}
+#endif
 
 	// delete the help controller
 	if( m_ptHelp!=NULL )
@@ -810,7 +817,6 @@ void muhkuh_mainFrame::OnIdle(wxIdleEvent& event)
 	wxString strStatus;
 	wxString strMemStatus;
 	int iRepositoryIndex;
-	int iLuaMemKb;
 	bool fHasMoreInput;
 
 
@@ -865,13 +871,18 @@ void muhkuh_mainFrame::OnIdle(wxIdleEvent& event)
 		break;
 	}
 
+#if defined(USE_LUA)
 	// get the Lua Memory in kilobytes
 	if( m_ptLua_State!=NULL )
 	{
+		int iLuaMemKb;
+
+
 		iLuaMemKb = lua_getgccount(m_ptLua_State);
 		strMemStatus.Printf(_("Lua uses %d kilobytes"), iLuaMemKb);
 		strStatus += strMemStatus;
 	}
+#endif
 
 	// set the status text
 	SetStatusText(strStatus, 1);
@@ -1146,7 +1157,6 @@ bool muhkuh_mainFrame::process_server_output(void)
 
 void muhkuh_mainFrame::finishTest(void)
 {
-	int iPanelIdx;
 	bool fResult;
 
 
@@ -1867,7 +1877,6 @@ void muhkuh_mainFrame::OnNotebookPageClose(wxAuiNotebookEvent &event)
 {
 	int iSelection;
 	wxWindow *ptWin;
-	int iResult;
 
 
 	// get the selected Page
@@ -2127,6 +2136,7 @@ void muhkuh_mainFrame::OnSize(wxSizeEvent &event)
 }
 
 
+#if defined(USE_LUA)
 wxString muhkuh_mainFrame::htmlTag_lua(const wxString &strLuaCode)
 {
 	muhkuh_mainFrame *ptMainframe;
@@ -2145,7 +2155,6 @@ wxString muhkuh_mainFrame::htmlTag_lua(const wxString &strLuaCode)
 
 	return strText;
 }
-
 
 
 const muhkuh_mainFrame::LUA_ERROR_TO_STR_T muhkuh_mainFrame::atLuaErrorToString[] =
@@ -2338,7 +2347,7 @@ wxString muhkuh_mainFrame::local_htmlTag_lua(const wxString &strLuaCode)
 
 	return strHtmlCode;
 }
-
+#endif
 
 bool muhkuh_mainFrame::repositoryScannerCallback(void *pvUser, wxString strMessage, int iProgressPos, int iProgressMax)
 {
