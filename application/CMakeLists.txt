@@ -2,6 +2,19 @@ cmake_minimum_required(VERSION 2.8)
 
 project("muhkuh")
 
+set(MUHKUH_VERSION_MAJ 1)
+set(MUHKUH_VERSION_MIN 0)
+set(MUHKUH_VERSION_SUB 0)
+set(MUHKUH_VERSION_YEAR 2010)
+
+find_package(Subversion)
+if(Subversion_FOUND)
+	Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} MUHKUH_SVN)
+	MESSAGE("Current revision is ${MUHKUH_SVN_WC_REVISION}")
+	set(MUHKUH_VERSION_SUB ${MUHKUH_SVN_WC_REVISION})
+endif(Subversion_FOUND)
+
+
 find_package(SWIG REQUIRED)
 include(${SWIG_USE_FILE})
 
@@ -80,10 +93,6 @@ set(muhkuh_HEADERS
 )
 
 
-set(MUHKUH_VERSION_MAJ 1)
-set(MUHKUH_VERSION_MIN 0)
-set(MUHKUH_VERSION_SUB 619)
-set(MUHKUH_VERSION_YEAR 2010)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/templates/muhkuh.rc ${CMAKE_CURRENT_SOURCE_DIR}/muhkuh.rc)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/templates/muhkuh_version.h ${CMAKE_CURRENT_SOURCE_DIR}/muhkuh_version.h)
 
