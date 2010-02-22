@@ -471,64 +471,64 @@ void muhkuh_mainFrame::reloadDetailsPage(muhkuh_wrap_xml *ptWrapXml)
 
 	if( m_strDetailsPageFile.IsEmpty()==true )
 	{
-		strPage = wxT(	"<html><lua>\n"
-				"	local strPage\n"
-				"	local testDesc\n"
-				"	local testName\n"
-				"	local pageTitle\n"
-				"	local subTestName\n"
-				"\n"
-				"\n"
-				"	testDesc = muhkuh.GetSelectedTest()\n"
-				"	if testDesc then\n"
-				"		testName = testDesc:testDescription_getName()\n"
-				"		pageTitle = \"Test Details for \" .. testName\n"
-				"	else\n"
-				"		pageTitle = \"Test Details\"\n"
-				"	end\n"
-				"\n"
-				"	strPage =            \"<head>\\n\"\n"
-				"	strPage = strPage .. \"<meta name=\\\"Keywords\\\" content=\\\"Muhkuh\\\">\\n\"\n"
-				"	strPage = strPage .. \"<meta name=\\\"Author\\\" content=\\\"\" .. _G.__MUHKUH_VERSION .. \"\\\">\\n\"\n"
-				"	strPage = strPage .. \"<meta name=\\\"Description\\\" content=\\\"\" .. pageTitle .. \"\\\">\\n\"\n"
-				"	strPage = strPage .. \"<title>\" .. pageTitle .. \"</title>\\n\"\n"
-				"	strPage = strPage .. \"</head><body>\\n\"\n"
-				"\n"
-				"\n"
-				"	if testDesc then\n"
-				"		strPage = strPage .. \"<h1><a href=\\\"mtd://\" .. testName .. \"\\\">\" .. testName .. \"</a></h1>\\n\"\n"
-				"		strPage = strPage .. \"Version \" .. testDesc:testDescription_getVersion()\n"
-				"		strPage = strPage .. \"<p>\\n\"\n"
-				"\n"
-				"		strPage = strPage .. \"<table border=1><tr><th>Subtest</th><th>Version</th></tr><tbody>\\n\"\n"
-				"\n"
-				"		for iCnt = 0 , testDesc:testDescription_getTestCnt()-1 do\n"
-				"			if testDesc:testDescription_setTest(iCnt)~=true then\n"
-				"				strPage = strPage .. \"<tr><td>Error:</td><td>Failed to query subtest!</td><tr>\\n\"\n"
-				"				break\n"
-				"			else\n"
-				"				subTestName = testDesc:test_getName()\n"
-				"\n"
-				"				strPage = strPage .. \"<tr><td>\"\n"
-				"				strPage = strPage .. \"<a href=\\\"mtd://\" .. testName .. \"#\" .. subTestName .. \"\\\">\" .. subTestName .. \"</a>\"\n"
-				"				strPage = strPage .. \"</td><td>\"\n"
-				"				strPage = strPage .. testDesc:test_getVersion()\n"
-				"				strPage = strPage .. \"</td></tr>\\n\"\n"
-				"			end\n"
-				"		end\n"
-				"\n"
-				"		strPage = strPage .. \"</tbody></table>\\n\"\n"
-				"	else\n"
-				"		strPage = strPage .. \"<h1>\" .. pageTitle .. \"</h1>\\n\"\n"
-				"		strPage = strPage .. \"No test selected.<p>Please select a test in the test tree.\"\n"
-				"	end\n"
-				"\n"
-				"	strPage = strPage .. \"</body>\\n\"\n"
-				"\n"
-				"\n"
-				"	return strPage\n"
-				"</lua></html>\n"
-		);
+		strPage = wxT("<html><lua>\n")
+			  wxT("	local strPage\n")
+			  wxT("	local testDesc\n")
+			  wxT("	local testName\n")
+			  wxT("	local pageTitle\n")
+			  wxT("	local subTestName\n")
+			  wxT("\n")
+			  wxT("\n")
+			  wxT("	testDesc = muhkuh.GetSelectedTest()\n")
+			  wxT("	if testDesc then\n")
+			  wxT("		testName = testDesc:testDescription_getName()\n")
+			  wxT("		pageTitle = \"Test Details for \" .. testName\n")
+			  wxT("	else\n")
+			  wxT("		pageTitle = \"Test Details\"\n")
+			  wxT("	end\n")
+			  wxT("\n")
+			  wxT("	strPage =            \"<head>\\n\"\n")
+			  wxT("	strPage = strPage .. \"<meta name=\\\"Keywords\\\" content=\\\"Muhkuh\\\">\\n\"\n")
+			  wxT("	strPage = strPage .. \"<meta name=\\\"Author\\\" content=\\\"\" .. _G.__MUHKUH_VERSION .. \"\\\">\\n\"\n")
+			  wxT("	strPage = strPage .. \"<meta name=\\\"Description\\\" content=\\\"\" .. pageTitle .. \"\\\">\\n\"\n")
+			  wxT("	strPage = strPage .. \"<title>\" .. pageTitle .. \"</title>\\n\"\n")
+			  wxT("	strPage = strPage .. \"</head><body>\\n\"\n")
+			  wxT("\n")
+			  wxT("\n")
+			  wxT("	if testDesc then\n")
+			  wxT("		strPage = strPage .. \"<h1><a href=\\\"mtd://\" .. testName .. \"\\\">\" .. testName .. \"</a></h1>\\n\"\n")
+			  wxT("		strPage = strPage .. \"Version \" .. testDesc:testDescription_getVersion()\n")
+			  wxT("		strPage = strPage .. \"<p>\\n\"\n")
+			  wxT("\n")
+			  wxT("		strPage = strPage .. \"<table border=1><tr><th>Subtest</th><th>Version</th></tr><tbody>\\n\"\n")
+			  wxT("\n")
+			  wxT("		for iCnt = 0 , testDesc:testDescription_getTestCnt()-1 do\n")
+			  wxT("			if testDesc:testDescription_setTest(iCnt)~=true then\n")
+			  wxT("				strPage = strPage .. \"<tr><td>Error:</td><td>Failed to query subtest!</td><tr>\\n\"\n")
+			  wxT("				break\n")
+			  wxT("			else\n")
+			  wxT("				subTestName = testDesc:test_getName()\n")
+			  wxT("\n")
+			  wxT("				strPage = strPage .. \"<tr><td>\"\n")
+			  wxT("				strPage = strPage .. \"<a href=\\\"mtd://\" .. testName .. \"#\" .. subTestName .. \"\\\">\" .. subTestName .. \"</a>\"\n")
+			  wxT("				strPage = strPage .. \"</td><td>\"\n")
+			  wxT("				strPage = strPage .. testDesc:test_getVersion()\n")
+			  wxT("				strPage = strPage .. \"</td></tr>\\n\"\n")
+			  wxT("			end\n")
+			  wxT("		end\n")
+			  wxT("\n")
+			  wxT("		strPage = strPage .. \"</tbody></table>\\n\"\n")
+			  wxT("	else\n")
+			  wxT("		strPage = strPage .. \"<h1>\" .. pageTitle .. \"</h1>\\n\"\n")
+			  wxT("		strPage = strPage .. \"No test selected.<p>Please select a test in the test tree.\"\n")
+			  wxT("	end\n")
+			  wxT("\n")
+			  wxT("	strPage = strPage .. \"</body>\\n\"\n")
+			  wxT("\n")
+			  wxT("\n")
+			  wxT("	return strPage\n")
+			  wxT("</lua></html>\n")
+		;
 	}
 	else
 	{
@@ -2303,7 +2303,7 @@ wxString muhkuh_mainFrame::local_htmlTag_lua(const wxString &strLuaCode)
 	if( m_ptLua_State!=NULL )
 	{
 		iTopPre = lua_gettop(m_ptLua_State);
-		iResult = luaL_loadbuffer(m_ptLua_State, strLuaCode.fn_str(), strLuaCode.Len(), "html lua tag");
+		iResult = luaL_loadbuffer(m_ptLua_State, strLuaCode.To8BitData(), strLuaCode.Len(), "html lua tag");
 		if( iResult!=0 )
 		{
 			strMsg = lua_error_to_string(iResult);
