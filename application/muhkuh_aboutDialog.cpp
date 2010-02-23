@@ -98,7 +98,7 @@ void muhkuh_aboutDialog::setAbout(wxHtmlWindow *ptHtmlWin)
 	// describe the application here
 	strMsg += wxT("<center>");
 	strMsg += _("Your friendly testtool with super cow powers!");
-	strMsg += wxT("<p>(c) 2007, the Muhkuh team<br>");
+	strMsg += wxT("<p>(c) ") wxT(MUHKUH_VERSION_YEAR) wxT(", the Muhkuh team<br>");
 	strMsg += wxT("<a href=\"http://muhkuh.sf.net\">http://muhkuh.sf.net</a><br>");
 	strMsg += wxT("<a href=\"http://www.sf.net/projects/muhkuh\">http://www.sf.net/projects/muhkuh</a><p><br>");
 	strMsg += wxT("</center>");
