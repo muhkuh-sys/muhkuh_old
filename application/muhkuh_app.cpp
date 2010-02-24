@@ -79,7 +79,7 @@ bool muhkuh_app::OnInit()
 
 	// set application and vendor name, this is needed
 	// for the config file (unix) or registry keys (win)
-	SetVendorName(wxT(MUHKUH_APPLICATION_NAME " team"));
+	SetVendorName(wxT(MUHKUH_APPLICATION_NAME) wxT(" team"));
 	SetAppName(wxT(MUHKUH_APPLICATION_NAME));
 
 	// create the muhkuh main frame

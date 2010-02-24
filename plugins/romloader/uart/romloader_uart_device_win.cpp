@@ -531,7 +531,7 @@ unsigned long romloader_uart_device_win::ScanForPorts(wxArrayString *ptArray)
         if(_tcsncmp(szPortName, _T("COM"), 3)==0 )
         {
           // found a com port
-          wxLogMessage(wxT("Found COM port ") + wxString::FromAscii(szPortName));
+          wxLogMessage(wxT("Found COM port %s"), szPortName);
 	  ptArray->Add(szPortName);
         }
       }

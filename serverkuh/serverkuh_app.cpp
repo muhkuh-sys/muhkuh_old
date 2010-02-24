@@ -67,10 +67,9 @@ const wxCmdLineEntryDesc cmdLineDesc[] =
 	{ wxCMD_LINE_NONE }
 };
 
-const wxChar cmdLineLogo[] = wxT(
-	"serverkuh is .... "
-	"\n"
-);
+const wxChar cmdLineLogo[] =
+	wxT("serverkuh is .... ")
+	wxT("\n");
 
 
 void serverkuh_app::showHelp(wxCmdLineParser *ptParser)
@@ -78,26 +77,26 @@ void serverkuh_app::showHelp(wxCmdLineParser *ptParser)
 	// show general usage
 	ptParser->Usage();
 
-	wxLogMessage(wxT(
-		"\n"
-		"Examples:\n"
-		"  regkuh -rp plugins/romloader_uart.xml\n"
-		"        register the romloader_uart plugin in the plugins folder.\n"
-		"\n"
-		"Muhkuh home page: www.sf.net/projects/muhkuh\n"
-	));
+	wxLogMessage(
+		wxT("\n")
+		wxT("Examples:\n")
+		wxT("  regkuh -rp plugins/romloader_uart.xml\n")
+		wxT("        register the romloader_uart plugin in the plugins folder.\n")
+		wxT("\n")
+		wxT("Muhkuh home page: www.sf.net/projects/muhkuh\n")
+	);
 }
 
 
 void serverkuh_app::showVersion(void)
 {
-  wxLogMessage(wxT(
-	SERVERKUH_APPLICATION_NAME " " SERVERKUH_VERSION_STRING "\n"
-	"Copyright (c) 2008, the Muhkuh team.\n"
-	"There is NO warranty.  You may redistribute this software\n"
-	"under the terms of the GNU General Public License.\n"
-	"For more information about these matters, see the files named COPYING.\n"
-  ));
+  wxLogMessage(
+	wxT(SERVERKUH_APPLICATION_NAME) wxT(" ") wxT(SERVERKUH_VERSION_STRING) wxT("\n")
+	wxT("Copyright (c) 2008, the Muhkuh team.\n")
+	wxT("There is NO warranty.  You may redistribute this software\n")
+	wxT("under the terms of the GNU General Public License.\n")
+	wxT("For more information about these matters, see the files named COPYING.\n")
+  );
 }
 
 bool serverkuh_app::OnInit()
@@ -133,7 +132,7 @@ bool serverkuh_app::OnInit()
 #endif
 
 	// set application and vendor name
-	SetVendorName(wxT(SERVERKUH_APPLICATION_NAME " team"));
+	SetVendorName(wxT(SERVERKUH_APPLICATION_NAME) wxT(" team"));
 	SetAppName(wxT(SERVERKUH_APPLICATION_NAME));
 
 	// if the command line contains a "--", we want to pass

@@ -53,11 +53,10 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
 	{ wxCMD_LINE_NONE }
 };
 
-static const wxChar cmdLineLogo[] = wxT(
-	"regkuh is a helper tool for automatic installers. "
-	"It registers repositories and plugins in a configuration file and sets options like autostart, lua include paths, etc."
-	"\n"
-);
+static const wxChar cmdLineLogo[] =
+	wxT("regkuh is a helper tool for automatic installers. ")
+	wxT("It registers repositories and plugins in a configuration file and sets options like autostart, lua include paths, etc.")
+	wxT("\n");
 
 int main(int argc, char *argv[])
 {
@@ -239,7 +238,7 @@ int muhkuh_regApp::open_config_file(void)
 	strCfgFileName = cfgName.GetFullPath();
 	wxLogMessage(wxT("using cfg file: ") + strCfgFileName);
 
-	ptConfig = new wxFileConfig(wxT(MUHKUH_APPLICATION_NAME), wxT(MUHKUH_APPLICATION_NAME " team"), strCfgFileName, strCfgFileName, wxCONFIG_USE_LOCAL_FILE);
+	ptConfig = new wxFileConfig(wxT(MUHKUH_APPLICATION_NAME), wxT(MUHKUH_APPLICATION_NAME) wxT(" team"), strCfgFileName, strCfgFileName, wxCONFIG_USE_LOCAL_FILE);
 	wxConfigBase::Set(ptConfig);
 	ptConfig->SetRecordDefaults();
 
