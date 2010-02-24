@@ -7,9 +7,6 @@
 	<include file="muhkuh_serverkuh.bkl"/>
 	<include file="muhkuh_regkuh.bkl"/>
 
-	<!-- include the dpm plugins -->
-	<include file="muhkuh_dpm_netx5.bkl"/>
-
 	<!-- include the romloader plugins -->
 	<include file="muhkuh_romloader_usb.bkl"/>
 	<include file="muhkuh_romloader_baka.bkl"/>
