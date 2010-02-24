@@ -20,7 +20,7 @@
 
 
 #include <vector>
-#include <libusb-1.0/libusb.h>
+#include <usb.h>
 
 #include "../romloader.h"
 
@@ -39,6 +39,53 @@ extern "C"
 
 	WXEXPORT romloader *romloader_usb_create(void *pvHandle);
 }
+
+/*-----------------------------------*/
+
+/* NOTE: Seems like libusb-0.1 was the last version with a common api for
+ * linux and windows. The windows port has it's own 1.0 api.
+ * This plugin uses the libusb-1.0 api. It offers wrapper functions to link
+ * with an old libusb-0.1 api.
+ */
+#ifndef ROMLOADER_USB_LIBUSB_VERSION
+	#error "Missing libusb version, please define ROMLOADER_USB_LIBUSB_VERSION!"
+#elif ROMLOADER_USB_LIBUSB_VERSION==0
+	/* use libusb-0.1 */
+	#include <usb.h>
+	#include <errno.h>
+
+	#define libusb_device_handle usb_dev_handle
+	#define libusb_context void*
+	#define libusb_device struct usb_device
+
+	#define libusb_device_descriptor usb_device_descriptor
+
+	enum libusb_error
+	{
+		LIBUSB_SUCCESS = 0,
+		LIBUSB_ERROR_IO = -1,
+		LIBUSB_ERROR_INVALID_PARAM = -2,
+		LIBUSB_ERROR_ACCESS = -3,
+		LIBUSB_ERROR_NO_DEVICE = -4,
+		LIBUSB_ERROR_NOT_FOUND = -5,
+		LIBUSB_ERROR_BUSY = -6,
+		LIBUSB_ERROR_TIMEOUT = -7,
+		LIBUSB_ERROR_OVERFLOW = -8,
+		LIBUSB_ERROR_PIPE = -9,
+		LIBUSB_ERROR_INTERRUPTED = -10,
+		LIBUSB_ERROR_NO_MEM = -11,
+		LIBUSB_ERROR_NOT_SUPPORTED = -12,
+		LIBUSB_ERROR_OTHER = -99,
+	};
+#elif ROMLOADER_USB_LIBUSB_VERSION==1
+	/* use libusb-1.0 */
+	#include <libusb-1.0/libusb.h>
+
+	#define usb_bulk_pc_to_netx libusb_bulk_transfer
+	#define usb_bulk_netx_to_pc libusb_bulk_transfer
+#else
+	#error "The define ROMLOADER_USB_LIBUSB_VERSION specifies an unknown libusb version!"
+#endif
 
 /*-----------------------------------*/
 
@@ -131,8 +178,8 @@ private:
 	libusb_device_handle *m_ptUsbDevHandle;
 
 	/* bus number and device address for the connection */
-	uint8_t m_uiNetxBusNr;
-	uint8_t m_uiNetxDeviceAddress;
+	unsigned char m_ucNetxBusNr;
+	unsigned char m_ucNetxDeviceAddress;
 
 	// buffer for the read_image command
 	size_t sizBufLen;

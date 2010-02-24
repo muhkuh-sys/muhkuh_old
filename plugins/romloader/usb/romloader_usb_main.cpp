@@ -38,6 +38,346 @@ static wxLuaState *m_ptLuaState;
 
 /*-------------------------------------*/
 
+/*-------------------------------------*/
+
+/*
+ * libusb-0.1 compatibility functions
+ */
+
+#if ROMLOADER_USB_LIBUSB_VERSION==0
+
+#ifdef _WINDOWS
+#define LIBUSB_BUS_PATTERN "bus-%u"
+#define LIBUSB_DEV_PATTERN "\\\\.\\libusb0-%u"
+#else
+#define LIBUSB_BUS_PATTERN "%u"
+#define LIBUSB_DEV_PATTERN "%u"
+#endif
+
+
+int libusb_open(libusb_device *ptDevice, libusb_device_handle **pptDevHandle)
+{
+	libusb_device_handle *ptDevHandle;
+	int iError;
+
+
+	ptDevHandle = usb_open(ptDevice);
+	if( ptDevHandle!=NULL )
+	{
+		*pptDevHandle = ptDevHandle;
+		iError = 0;
+	}
+	else
+	{
+		*pptDevHandle = NULL;
+		iError = -1;
+	}
+
+	return iError;
+}
+
+
+void libusb_close(libusb_device_handle *dev_handle)
+{
+	usb_close(dev_handle);
+}
+
+
+int libusb_init(libusb_context **pptContext)
+{
+	usb_init();
+
+	/* use something different from NULL */
+	*pptContext = (libusb_context*)1;
+
+	return LIBUSB_SUCCESS;
+}
+
+
+void libusb_exit(libusb_context *ptContext)
+{
+}
+
+
+void libusb_set_debug(libusb_context *ptContext, int iLevel)
+{
+}
+
+
+int usb_bulk_pc_to_netx(libusb_device_handle *ptDevHandle, unsigned char ucEndPointOut, const unsigned char *pucDataOut, int iLength, int *piProcessed, unsigned int uiTimeoutMs)
+{
+	int iError;
+#ifdef WIN32
+	char *pcDataOut = (char*)pucDataOut;
+#else
+	const char *pcDataOut = (const char*)pucDataOut;
+#endif
+
+
+	iError = usb_bulk_write(ptDevHandle, ucEndPointOut, pcDataOut, iLength, uiTimeoutMs);
+	if( iError==iLength )
+	{
+		/* transfer ok! */
+		if( piProcessed!=NULL )
+		{
+			*piProcessed = iLength;
+		}
+		iError = 0;
+	}
+	else
+	{
+		/* do not return 0 in case of an error */
+		if( iError==0 )
+		{
+			iError = -1;
+		}
+		/* transfer failed */
+		if( piProcessed!=NULL )
+		{
+			*piProcessed = 0;
+		}
+	}
+
+	return iError;
+}
+
+
+int usb_bulk_netx_to_pc(libusb_device_handle *ptDevHandle, unsigned char ucEndPointIn, unsigned char *pucDataIn, int iLength, int *piProcessed, unsigned int uiTimeoutMs)
+{
+	int iError;
+
+
+	iError = usb_bulk_read(ptDevHandle, ucEndPointIn, (char*)pucDataIn, iLength, uiTimeoutMs);
+	if( iError==iLength )
+	{
+		/* transfer ok! */
+		if( piProcessed!=NULL )
+		{
+			*piProcessed = iLength;
+		}
+		iError = 0;
+	}
+	else
+	{
+		/* do not return 0 in case of an error */
+		if( iError==0 )
+		{
+			iError = -1;
+		}
+		/* transfer failed */
+		if( piProcessed!=NULL )
+		{
+			*piProcessed = 0;
+		}
+	}
+
+	return iError;
+}
+
+
+int libusb_get_device_descriptor(libusb_device *dev, struct libusb_device_descriptor *desc)
+{
+	*desc = dev->descriptor;
+	return LIBUSB_SUCCESS;
+}
+
+
+unsigned char libusb_get_bus_number(libusb_device *dev)
+{
+	unsigned char ucBusNr;
+	usb_bus *ptBus;
+	const char *pcBusName;
+	int iResult;
+	unsigned int uiBusNumber;
+
+
+	/* expect failure */
+	ucBusNr = 0xffU;
+
+	/* is the device valid? */
+	if( dev!=NULL )
+	{
+		/* does the device have a bus assigned? */
+		ptBus = dev->bus;
+		if( ptBus!=NULL )
+		{
+			/* does the bus have a directory name? */
+			pcBusName = ptBus->dirname;
+			if( pcBusName!=NULL )
+			{
+				/* parse the directory name */
+				iResult = sscanf(pcBusName, LIBUSB_BUS_PATTERN, &uiBusNumber);
+				/* does the directory name have the expected format? */
+				if( iResult==1 )
+				{
+					/* is the bus number in the valid range? */
+					if( uiBusNumber<0x80U )
+					{
+						/* set the result */
+						ucBusNr = (unsigned char)uiBusNumber;
+					}
+				}
+			}
+		}
+	}
+
+	return ucBusNr;
+}
+
+
+unsigned char libusb_get_device_address(libusb_device *dev)
+{
+	unsigned char ucDeviceAddress;
+	const char *pcFilename;
+	int iResult;
+	unsigned int uiDeviceNumber;
+
+
+	/* expect failure */
+	ucDeviceAddress = 0xffU;
+
+	/* is the device valid? */
+	if( dev!=NULL )
+	{
+		/* does the bus have a directory name? */
+		pcFilename = dev->filename;
+		if( pcFilename!=NULL )
+		{
+			/* parse the directory name */
+			iResult = sscanf(pcFilename, LIBUSB_DEV_PATTERN, &uiDeviceNumber);
+			/* does the directory name have the expected format? */
+			if( iResult==1 )
+			{
+				/* is the bus number in the valid range? */
+				if( uiDeviceNumber<0x80U )
+				{
+					/* set the result */
+					ucDeviceAddress = (unsigned char)uiDeviceNumber;
+				}
+			}
+		}
+	}
+
+	return ucDeviceAddress;
+}
+
+
+int libusb_reset_device(libusb_device_handle *dev)
+{
+	return usb_reset(dev);
+}
+
+
+int libusb_set_configuration(libusb_device_handle *dev, int configuration)
+{
+	return usb_set_configuration(dev, configuration);
+}
+
+
+int libusb_claim_interface(libusb_device_handle *dev, int iface)
+{
+	return usb_claim_interface(dev, iface);
+}
+
+
+int libusb_release_interface(libusb_device_handle *dev, int iface)
+{
+	return usb_release_interface(dev, iface);
+}
+
+
+ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device ***list)
+{
+	libusb_device **ptDeviceList;
+	libusb_device **ptCnt;
+	ssize_t ssizDeviceList;
+	struct usb_bus *ptBusses;
+	struct usb_bus *ptBusCnt;
+	struct usb_device *ptDevCnt;
+
+
+	/* detect all busses */
+	usb_find_busses();
+	/* detect all devices on each bus */
+	usb_find_devices();
+
+	/* init the device list */
+	ptDeviceList = NULL;
+
+	/* init the device counter */
+	ssizDeviceList = 0;
+
+	/* get the head of the bus list */
+	ptBusses = usb_get_busses();
+
+	/* loop over all bus entries and count the devices */
+	ptBusCnt = ptBusses;
+	while( ptBusCnt!=NULL )
+	{
+		/* loop over all devices on this bus */
+		ptDevCnt = ptBusCnt->devices;
+		while( ptDevCnt!=NULL )
+		{
+			/* found one more device */
+			++ssizDeviceList;
+
+			/* next device */
+			ptDevCnt = ptDevCnt->next;
+		}
+		/* scan next bus */
+		ptBusCnt = ptBusCnt->next;
+	}
+
+	/* found any devices? */
+	if( ssizDeviceList>0 )
+	{
+		/* allocate the array */
+		ptDeviceList = (libusb_device **)malloc(ssizDeviceList*sizeof(libusb_device*));
+		if( ptDeviceList==NULL )
+		{
+			ssizDeviceList = LIBUSB_ERROR_NO_MEM;
+		}
+		else
+		{
+			ptCnt = ptDeviceList;
+
+			/* loop over all bus entries and count the devices */
+			ptBusCnt = ptBusses;
+			while( ptBusCnt!=NULL )
+			{
+				/* loop over all devices on this bus */
+				ptDevCnt = ptBusCnt->devices;
+				while( ptDevCnt!=NULL )
+				{
+					/* add the device to the list */
+					*(ptCnt++) = ptDevCnt;
+
+					/* next device */
+					ptDevCnt = ptDevCnt->next;
+				}
+				/* scan next bus */
+				ptBusCnt = ptBusCnt->next;
+			}
+
+			*list = ptDeviceList;
+		}
+	}
+
+	return ssizDeviceList;
+}
+
+
+void libusb_free_device_list(libusb_device **list, int unref_devices)
+{
+	/* free the complete list */
+	free(list);
+}
+
+
+#endif
+
+/*-------------------------------------*/
+
 int fn_init(wxLog *ptLogTarget, wxXmlNode *ptCfgNode, wxString &strPluginId)
 {
 	wxLog *pOldLogTarget;
@@ -116,8 +456,8 @@ int fn_detect_interfaces(std::vector<muhkuh_plugin_instance*> *pvInterfaceList)
 	libusb_device **ptDevCnt, **ptDevEnd;
 	libusb_device *ptDev;
 	libusb_device_handle *ptDevHandle;
-	uint8_t uiBusNr;
-	uint8_t uiDevAdr;
+	unsigned char ucBusNr;
+	unsigned char ucDevAdr;
 	bool fDeviceIsBusy;
 	wxString strMe;
 	std::vector<struct usb_device *> tDeviceList;
@@ -169,9 +509,9 @@ int fn_detect_interfaces(std::vector<muhkuh_plugin_instance*> *pvInterfaceList)
 				if( fDeviceIsNetx==true )
 				{
 					/* construct the name */
-					uiBusNr = libusb_get_bus_number(ptDev);
-					uiDevAdr = libusb_get_device_address(ptDev);
-					ulDeviceId = uiDevAdr | (uiBusNr<<8);
+					ucBusNr = libusb_get_bus_number(ptDev);
+					ucDevAdr = libusb_get_device_address(ptDev);
+					ulDeviceId = ucDevAdr | (ucBusNr<<8);
 					pvDeviceId = (void*)ulDeviceId;
 					strName.Printf(wxT("romloader_usb_%08x"), ulDeviceId);
 					iResult = libusb_open(ptDev, &ptDevHandle);
@@ -264,8 +604,6 @@ void romloader_usb_close_instance(wxString &strInterface)
 romloader *romloader_usb_create(void *pvHandle)
 {
 	unsigned long ulDeviceId;
-	uint8_t uiBusNr;
-	uint8_t uiDevAdr;
 	romloader *ptInstance = NULL;
 	wxString strName;
 	wxString strTyp;
@@ -276,8 +614,6 @@ romloader *romloader_usb_create(void *pvHandle)
 	// create the new instance
 	strTyp = plugin_desc.strPluginId;
 
-	uiDevAdr = ulDeviceId & 0xff;
-	uiBusNr = (ulDeviceId>>8) & 0xff;
 	strName.Printf(wxT("romloader_usb_%08x"), ulDeviceId);
 
 	ptInstance = new romloader_usb(strName, strTyp, NULL, ulDeviceId, romloader_usb_close_instance, m_ptLuaState);
@@ -306,8 +642,8 @@ romloader_usb::romloader_usb(wxString strName, wxString strTyp, const romloader_
 	m_strInterface = strName;
 	m_strTyp = strTyp;
 
-	m_uiNetxDeviceAddress = ulDeviceId & 0xff;
-	m_uiNetxBusNr = (ulDeviceId>>8) & 0xff;
+	m_ucNetxDeviceAddress = ulDeviceId & 0xff;
+	m_ucNetxBusNr = (ulDeviceId>>8) & 0xff;
 
 	/* create a new libusb context */
 	iResult = libusb_init(&m_ptLibUsbContext);
@@ -747,10 +1083,8 @@ bool romloader_usb::parseDumpLine(const char *pcLine, size_t sizLineLen, unsigne
 	bool fResult;
 	int iMatches;
 	unsigned long ulResultAddress;
-	unsigned long ulResultData;
 	unsigned long ulChunkCnt;
 	unsigned int uiByte;
-	char cByte;
 
 
 	// expect success
@@ -1031,8 +1365,6 @@ void romloader_usb::write_data08(double dNetxAddress, double dData)
 	wxString strErrorMsg;
 	wxString strCommand;
 	wxString strResponse;
-	unsigned char *pucData;
-	unsigned int uiDataLen;
 	bool fOk;
 
 
@@ -1085,8 +1417,6 @@ void romloader_usb::write_data16(double dNetxAddress, double dData)
 	wxString strErrorMsg;
 	wxString strCommand;
 	wxString strResponse;
-	unsigned char *pucData;
-	unsigned int uiDataLen;
 	bool fOk;
 
 
@@ -1139,8 +1469,6 @@ void romloader_usb::write_data32(double dNetxAddress, double dData)
 	wxString strErrorMsg;
 	wxString strCommand;
 	wxString strResponse;
-	unsigned char *pucData;
-	unsigned int uiDataLen;
 	bool fOk;
 
 
@@ -1368,8 +1696,6 @@ int romloader_usb::usb_call(unsigned long ulNetxAddress, unsigned long ulParamet
 	wxString strResponse;
 	wxString strCallbackData;
 	size_t sizChunkRead;
-	unsigned char *pucBuf;
-	unsigned char *pucCnt, *pucEnd;
 	unsigned char aucSbuf[2] = { 0, 0 };
 
 
@@ -1445,7 +1771,6 @@ int romloader_usb::usb_sendCommand(wxString strCommand)
 	size_t sizCmdLen;
 	unsigned char abSend[64];
 	unsigned char abRec[64];
-	int iCmdLen;
 
 
 	// check the command size
@@ -1544,10 +1869,9 @@ int romloader_usb::libusb_open_by_bus_and_adr(wxString &strErrorMsg)
 	libusb_device **ptDevCnt, **ptDevEnd;
 	libusb_device *ptDev;
 	libusb_device_handle *ptDevHandle;
-	bool fDeviceIsBusy;
 	bool fDeviceIsNetx;
-	uint8_t uiBusNr;
-	uint8_t uiDevAdr;
+	unsigned char ucBusNr;
+	unsigned char ucDevAdr;
 
 
 	/* detect devices */
@@ -1570,9 +1894,9 @@ int romloader_usb::libusb_open_by_bus_and_adr(wxString &strErrorMsg)
 			if( fDeviceIsNetx==true )
 			{
 				/* is this the correct bus number and device address? */
-				uiBusNr = libusb_get_bus_number(ptDev);
-				uiDevAdr = libusb_get_device_address(ptDev);
-				if( uiBusNr==m_uiNetxBusNr && uiDevAdr==m_uiNetxDeviceAddress )
+				ucBusNr = libusb_get_bus_number(ptDev);
+				ucDevAdr = libusb_get_device_address(ptDev);
+				if( ucBusNr==m_ucNetxBusNr && ucDevAdr==m_ucNetxDeviceAddress )
 				{
 					iResult = libusb_open(ptDev, &ptDevHandle);
 					if( iResult!=LIBUSB_SUCCESS )
@@ -1673,7 +1997,7 @@ int romloader_usb::libusb_readBlock(unsigned char *pucReceiveBuffer, unsigned in
 
 	iSize = (int)uiSize;
 
-	iRet = libusb_bulk_transfer(m_ptUsbDevHandle, 0x81, pucReceiveBuffer, iSize, &iTransfered, iTimeoutMs);
+	iRet = usb_bulk_netx_to_pc(m_ptUsbDevHandle, 0x81, pucReceiveBuffer, iSize, &iTransfered, iTimeoutMs);
 	return iRet;
 }
 
@@ -1687,7 +2011,7 @@ int romloader_usb::libusb_writeBlock(unsigned char *pucSendBuffer, unsigned int 
 
 	iSize = (int)uiSize;
 
-	iRet = libusb_bulk_transfer(m_ptUsbDevHandle, 0x01, pucSendBuffer, iSize, &iTransfered, iTimeoutMs);
+	iRet = usb_bulk_pc_to_netx(m_ptUsbDevHandle, 0x01, pucSendBuffer, iSize, &iTransfered, iTimeoutMs);
 	return iRet;
 }
 
