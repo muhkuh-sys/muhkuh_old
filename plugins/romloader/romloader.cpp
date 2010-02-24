@@ -604,7 +604,7 @@ bool romloader::callback_string(lua_State *L, int iLuaCallbackTag, wxString strP
 		// push the function tag on the stack
 		lua_rawgeti(L, LUA_REGISTRYINDEX, iLuaCallbackTag);
 		// push the arguments on the stack
-		lua_pushlstring(L, strProgressData.fn_str(), strProgressData.Len());
+		lua_pushlstring(L, strProgressData.To8BitData(), strProgressData.Len());
 		fStillRunning = callback_common(L, pvCallbackUserData, iOldTopOfStack);
 	}
 
