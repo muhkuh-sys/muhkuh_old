@@ -130,6 +130,7 @@
 			<include>$(SRCDIR)/plugins/romloader/openocd/openocd/win/include</include>
 			<lib-path>$(SRCDIR)/plugins/romloader/openocd/openocd/win/lib/msvc</lib-path>
 			<sys-lib>ftd2xx</sys-lib>
+			<define>_CRT_SECURE_NO_WARNINGS</define>
 		</if>
 		<if cond="TARGETING_UNIX=='1'">
 			<sys-lib>ftdi</sys-lib>

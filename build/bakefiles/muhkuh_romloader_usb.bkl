@@ -26,9 +26,12 @@
 			<lib-path>$(SRCDIR)/plugins/romloader/usb/win/lib/msvc</lib-path>
 			<sys-lib>libusb</sys-lib>
 			<sys-lib>setupapi</sys-lib>
+			<define>_CRT_SECURE_NO_WARNINGS</define>
+			<define>ROMLOADER_USB_LIBUSB_VERSION=0</define>
 		</if>
 		<if cond="TARGETING_UNIX=='1'">
 			<sys-lib>usb-1.0</sys-lib>
+			<define>ROMLOADER_USB_LIBUSB_VERSION=1</define>
 		</if>
 
 		<wxlua-lib>wxluasocket</wxlua-lib>
