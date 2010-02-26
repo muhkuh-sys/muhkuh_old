@@ -1,6 +1,18 @@
 
 Changelog for Muhkuh
 
+ * Added Menu to Serverkuh containing an entry to close/re-open the log window
+
+Muhkuh 1.0.445
+
+ * fixed mhash for MSVS2008
+ * fixed bool/BOOL mismatch, fixed signed/unsigned mismatch
+ * fixed crash in romloader_usb connect routine
+ * ported romloader_usb plugin to libusb 1.0
+ * updated lua bindings to wxLua binding v26
+ * use bakefile templates for all components, added msvs2008 project
+ * added utils.getFileSize()
+
 
 Muhkuh 1.0.422
 
