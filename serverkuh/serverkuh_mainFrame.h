@@ -75,6 +75,8 @@ public:
 
 	void OnMove(wxMoveEvent &event);
 	void OnSize(wxSizeEvent &event);
+	void OnPaneClose(wxAuiManagerEvent &event);
+	void OnViewMessageLog(wxCommandEvent &event);
 
 	// process the lua events
 	void OnLuaDebug(wxLuaEvent &event);
@@ -96,6 +98,7 @@ public:
 
 private:
 	void createControls(void);
+	void createMenu(void);
 	void initLogging(wxCmdLineParser *ptParser);
 
 	bool scanFileXml(wxString &strXmlUrl);
@@ -157,6 +160,8 @@ private:
 	// the version string
 	wxString m_strVersion;
 
+	// menu bar
+	wxMenuBar *m_menuBar;
 	// main frame controls
 	wxAuiManager m_auiMgr;
 	// the default perspective

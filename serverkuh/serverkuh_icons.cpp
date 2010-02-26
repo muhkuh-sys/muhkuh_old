@@ -26,3 +26,4 @@
 #include "icons/custom/muhkuh_064.xpm"
 #include "icons/custom/muhkuh_128.xpm"
 
+#include "icons/famfamfam_silk_icons_v013/door_out.xpm"

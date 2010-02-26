@@ -31,6 +31,8 @@ extern const char *muhkuh_064_xpm[753];
 extern const char *muhkuh_128_xpm[1305];
 
 //-------------------------------------
+// the famfamfam icons
 
+extern const char *icon_famfamfam_silk_door_out[197];
 
 #endif	// __SERVERKUH_ICONS_H__

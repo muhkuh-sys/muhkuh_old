@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-
 #include <wx/fileconf.h>
 #include <wx/stdpaths.h>
 #include <wx/url.h>
@@ -62,14 +61,16 @@ serverkuh_mainFrame *g_ptMainFrame;
 BEGIN_EVENT_TABLE(serverkuh_mainFrame, wxFrame)
 	EVT_IDLE(serverkuh_mainFrame::OnIdle)
 
-	EVT_MENU(wxID_EXIT,						serverkuh_mainFrame::OnQuit)
+	EVT_MENU(wxID_EXIT,									serverkuh_mainFrame::OnQuit)
 
-	EVT_LUA_DEBUG_HOOK(wxID_ANY,					serverkuh_mainFrame::OnLuaDebug)
-	EVT_LUA_PRINT(wxID_ANY,						serverkuh_mainFrame::OnLuaPrint)
-	EVT_LUA_ERROR(wxID_ANY,						serverkuh_mainFrame::OnLuaError)
+	EVT_LUA_DEBUG_HOOK(wxID_ANY,						serverkuh_mainFrame::OnLuaDebug)
+	EVT_LUA_PRINT(wxID_ANY,								serverkuh_mainFrame::OnLuaPrint)
+	EVT_LUA_ERROR(wxID_ANY,								serverkuh_mainFrame::OnLuaError)
 
 	EVT_MOVE(serverkuh_mainFrame::OnMove)
 	EVT_SIZE(serverkuh_mainFrame::OnSize)
+	EVT_MENU(serverkuh_mainFrame_menuViewMessageLog,	serverkuh_mainFrame::OnViewMessageLog)
+	EVT_AUI_PANE_CLOSE(serverkuh_mainFrame::OnPaneClose)
 
 	EVT_SOCKET(muhkuh_debugClientSocket_event,			serverkuh_mainFrame::OnDebugSocket)
 END_EVENT_TABLE()
@@ -143,6 +144,9 @@ serverkuh_mainFrame::serverkuh_mainFrame(wxCmdLineParser *ptParser)
 	CreateStatusBar(2);
 	// use pane 1 for menu and toolbar help
 	SetStatusBarPane(0);
+
+	// create the menu bar
+	createMenu();
 
 	// create the controls
 	createControls();
@@ -281,6 +285,26 @@ void serverkuh_mainFrame::createControls(void)
 	m_strDefaultPerspective = m_auiMgr.SavePerspective();
 }
 
+void serverkuh_mainFrame::createMenu(void)
+{
+	wxMenu *file_menu;
+	wxMenu *view_menu;
+	wxMenuItem *ptMenuItem;
+
+	file_menu = new wxMenu;
+	ptMenuItem = new wxMenuItem(file_menu, wxID_EXIT, wxString(_("Quit"))+wxT("\tCtrl+Q"), _("Quit the program"));
+	ptMenuItem->SetBitmap(icon_famfamfam_silk_door_out);
+	file_menu->Append(ptMenuItem);
+
+	view_menu = new wxMenu;
+	view_menu->AppendCheckItem(serverkuh_mainFrame_menuViewMessageLog,		_("View Message Log"),			_("Toggle the visibility of the message log"));
+
+	m_menuBar = new wxMenuBar;
+	m_menuBar->Append(file_menu, _("&File"));
+	m_menuBar->Append(view_menu, _("&View"));
+
+	SetMenuBar(m_menuBar);
+}
 
 void serverkuh_mainFrame::initLogging(wxCmdLineParser *ptParser)
 {
@@ -356,7 +380,7 @@ void serverkuh_mainFrame::read_config(void)
 	wxConfigBase *pConfig;
 	bool fWinMaximized;
 	wxString strPerspective;
-
+	bool fPaneIsVisible;
 
 	// get the config
 	pConfig = wxConfigBase::Get();
@@ -391,7 +415,11 @@ void serverkuh_mainFrame::read_config(void)
 	if( strPerspective.IsEmpty()==false )
 	{
 		m_auiMgr.LoadPerspective(strPerspective,true);
+		// set the "view" buttons according to the new perspective
+		fPaneIsVisible = m_auiMgr.GetPane(m_textCtrl).IsShown();
+		m_menuBar->Check(serverkuh_mainFrame_menuViewMessageLog, fPaneIsVisible);
 	}
+
 }
 
 
@@ -1362,6 +1390,23 @@ void serverkuh_mainFrame::OnSize(wxSizeEvent &event)
 	{
 		// frame is in normal state -> remember size
 		m_frameSize = event.GetSize();
+	}
+}
+
+
+void serverkuh_mainFrame::OnViewMessageLog(wxCommandEvent &event)
+{
+	m_auiMgr.GetPane(m_textCtrl).Show(event.IsChecked());
+	m_auiMgr.Update();
+}
+
+void serverkuh_mainFrame::OnPaneClose(wxAuiManagerEvent &event)
+{
+	wxWindow *ptWindow;
+	ptWindow = event.pane->window;
+	if( ptWindow==m_textCtrl )
+	{
+		m_menuBar->Check(serverkuh_mainFrame_menuViewMessageLog, false);
 	}
 }
 
