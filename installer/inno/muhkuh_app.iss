@@ -1,10 +1,6 @@
 
-[Tasks]
-Name: associate; Description: &Associate .mtd files with the Muhkuh application; GroupDescription: File associations:
-
 [Components]
 Name: muhkuh; Description: Muhkuh base application; Types: full compact custom; Flags: fixed
-
 
 [Files]
 Source: bin\muhkuh.exe; DestDir: {app}\application; Components: muhkuh
@@ -12,8 +8,9 @@ Source: bin\serverkuh.exe; DestDir: {app}\application; Components: muhkuh
 Source: bin\muhkuh_tips.txt; DestDir: {app}\application; Components: muhkuh
 Source: icons\custom\muhkuh_uninstall.ico; DestDir: {app}\application; Components: muhkuh
 ; system dlls
-Source: bin\msvcr71.dll; DestDir: {app}\application; Components: muhkuh
-Source: bin\msvcp71.dll; DestDir: {app}\application; Components: muhkuh
+;Source: bin\msvcr71.dll; DestDir: {app}\application; Components: muhkuh
+;Source: bin\msvcp71.dll; DestDir: {app}\application; Components: muhkuh
+Source: bin\Microsoft.VC80.CRT\*; DestDir: {app}\application\Microsoft.VC80.CRT; Components: muhkuh
 ; the wxwidgets dlls
 Source: bin\wxbase28_net_vc.dll; DestDir: {app}\application; Components: muhkuh
 Source: bin\wxbase28_odbc_vc.dll; DestDir: {app}\application; Components: muhkuh
@@ -53,8 +50,3 @@ Source: bin\mhash.dll; DestDir: {app}\application; Components: muhkuh
 Source: docs\gpl-2.0.txt; DestDir: {app}\docs; Components: muhkuh
 Source: changelog.txt; DestDir: {app}\docs; Components: muhkuh
 
-[Registry]
-Root: HKCR; Subkey: .mtd; ValueType: string; ValueName: ; ValueData: MuhkuhTestDesctiption; Flags: uninsdeletevalue
-Root: HKCR; Subkey: MuhkuhTestDesctiption; ValueType: string; ValueName: ; ValueData: Muhkuh Test Description; Flags: uninsdeletekey
-Root: HKCR; Subkey: MuhkuhTestDesctiption\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\application\serverkuh.exe,0
-Root: HKCR; Subkey: MuhkuhTestDesctiption\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\application\serverkuh.exe"" ""-c"" ""{app}\application\Muhkuh.cfg"" ""-i"" ""0"" ""%1#zip:test_description.xml"""

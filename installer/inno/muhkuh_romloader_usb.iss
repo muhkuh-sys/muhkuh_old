@@ -4,6 +4,7 @@ Name: plugin_romloader_usb;     Description: "Romloader usb plugin";     Types: 
 
 
 [Files]
+Source: bin\Microsoft.VC80.CRT\*;                                DestDir: {app}\application\plugins\Microsoft.VC80.CRT; Components: plugin_romloader_usb
 Source: "bin\bootloader_usb.dll";                                DestDir: "{app}\application\plugins";  Components: plugin_romloader_usb
 Source: "bin\bootloader_usb.xml";                                DestDir: "{app}\application\plugins";  Components: plugin_romloader_usb
 Source: "plugins\romloader\usb\win\driver\libusb0.dll";          DestDir: "{app}\application";          Components: plugin_romloader_usb

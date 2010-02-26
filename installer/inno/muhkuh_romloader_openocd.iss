@@ -4,6 +4,7 @@ Name: plugin_romloader_openocd; Description: "Romloader openocd plugin"; Types: 
 
 
 [Files]
+Source: bin\Microsoft.VC80.CRT\*; DestDir: {app}\application\plugins\Microsoft.VC80.CRT; Components: plugin_romloader_openocd
 Source: "bin\openocd.dll";                     DestDir: "{app}\application\plugins"; Components: plugin_romloader_openocd
 Source: "bin\openocd_netx50_jtagkey_win.xml";  DestDir: "{app}\application\plugins"; Components: plugin_romloader_openocd
 Source: "bin\openocd_netx500_jtagkey_win.xml"; DestDir: "{app}\application\plugins"; Components: plugin_romloader_openocd
