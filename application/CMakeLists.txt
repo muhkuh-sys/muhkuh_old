@@ -62,6 +62,7 @@ set(muhkuh_SOURCES
 	muhkuh_configDialog.cpp
 	muhkuh_config_reposEntryDialog.cpp
 	muhkuh_dirlistbox.cpp
+	muhkuh_flags.cpp
 	muhkuh_icons.cpp
 	muhkuh_mainFrame.cpp
 	muhkuh_repository.cpp
@@ -81,6 +82,7 @@ set(muhkuh_HEADERS
 	muhkuh_configDialog.h
 	muhkuh_config_reposEntryDialog.h
 	muhkuh_dirlistbox.h
+	muhkuh_flags.h
 	muhkuh_icons.h
 	muhkuh_id.h
 	muhkuh_mainFrame.h

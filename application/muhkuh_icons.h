@@ -64,6 +64,7 @@ extern const char *icon_famfamfam_silk_plugin_go[169];
 extern const char *icon_famfamfam_silk_script[181];
 extern const char *icon_famfamfam_silk_tag_blue[107];
 extern const char *icon_famfamfam_silk_tick[100];
+extern const char *icon_famfamfam_silk_world[210];
 extern const char *icon_famfamfam_silk_wrench[127];
 
 //-------------------------------------

@@ -57,6 +57,7 @@
 #include "icons/famfamfam_silk_icons_v013/script.xpm"
 #include "icons/famfamfam_silk_icons_v013/tag_blue.xpm"
 #include "icons/famfamfam_silk_icons_v013/tick.xpm"
+#include "icons/famfamfam_silk_icons_v013/world.xpm"
 #include "icons/famfamfam_silk_icons_v013/wrench.xpm"
 
 #include "icons/lua/lua.xpm"

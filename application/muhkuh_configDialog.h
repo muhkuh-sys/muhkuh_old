@@ -83,6 +83,7 @@ private:
 	wxPanel *createControls_application(wxWindow *ptParent);
 	wxPanel *createControls_repository(wxWindow *ptParent);
 	wxPanel *createControls_lua(wxWindow *ptParent);
+	wxPanel *createControls_language(wxWindow *ptParent);
 
 	void ShowNewRepository(long lIdx);
 	void ShowNewPlugin(long lIdx);
