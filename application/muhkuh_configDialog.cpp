@@ -376,8 +376,10 @@ wxPanel *muhkuh_configDialog::createControls_language(wxWindow *ptParent)
 {
 	wxPanel *ptPanel;
 	wxBoxSizer *ptMainSizer;
+	wxStaticBoxSizer *ptLanguageBox;
 	wxImageList *ptImageList;
 	wxListCtrl *ptListCtrl;
+	wxStaticText *ptNote;
 
 
 	// create the plugin page
@@ -386,6 +388,9 @@ wxPanel *muhkuh_configDialog::createControls_language(wxWindow *ptParent)
 	// create the main sizer
 	ptMainSizer = new wxBoxSizer(wxVERTICAL);
 	ptPanel->SetSizer(ptMainSizer);
+
+	ptLanguageBox = new wxStaticBoxSizer(wxVERTICAL, ptPanel, _("Application Language"));
+	ptMainSizer->Add(ptLanguageBox, 1, wxEXPAND);
 
 	ptImageList = new wxImageList(16, 11, true, 241);
 	ptImageList->Add( wxIcon(icon_famfamfam_flags_ad) );
@@ -878,7 +883,10 @@ wxPanel *muhkuh_configDialog::createControls_language(wxWindow *ptParent)
 	ptListCtrl->InsertItem( 240, wxT("Zimbabwe"),                                      240);	/* zw */
 
 	ptListCtrl->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	ptMainSizer->Add(ptListCtrl, 1, wxEXPAND);
+	ptLanguageBox->Add(ptListCtrl, 1, wxEXPAND);
+
+	ptNote = new wxStaticText(ptPanel, wxID_ANY, _("Please note:\nChanging the application language requires a restart to take effect."));
+	ptMainSizer->Add(ptNote, 0, wxEXPAND);
 
 	return ptPanel;
 }
