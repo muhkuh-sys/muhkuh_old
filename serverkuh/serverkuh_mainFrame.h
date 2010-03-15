@@ -79,11 +79,8 @@ public:
 	void OnViewMessageLog(wxCommandEvent &event);
 
 	// process the lua events
-	void OnLuaDebug(wxLuaEvent &event);
 	void OnLuaPrint(wxLuaEvent &event);
 	void OnLuaError(wxLuaEvent &event);
-
-	void OnDebugSocket(wxSocketEvent &event);
 
 	// the lua functions
 	void setLuaArgs(wxChar **argv, int argc);
@@ -116,25 +113,6 @@ private:
 
 	bool check_plugins(void);
 
-	bool dbg_enable(void);
-
-	bool dbg_read_string(wxString &strData);
-	bool dbg_read_int(int *piData);
-
-	void dbg_write_u08(unsigned char ucData);
-	void dbg_write_int(int iData);
-	void dbg_write_str(wxString strData);
-
-	void dbg_get_stack(int iLevel);
-	void dbg_get_locals(int iLevel);
-	void dbg_get_upvalue(int iLevel, int iIndex);
-
-	void dbg_get_step_command(void);
-	bool dbg_get_command(void);
-
-	wxString dbg_getStackValue(int iIndex);
-	wxString dbg_dumpTable(int iIndex);
-
 	// main frame init state
 	typedef enum
 	{
@@ -142,14 +120,6 @@ private:
 		MAINFRAME_INIT_STATE_CONFIGURED,
 		MAINFRAME_INIT_STATE_RUNNING
 	} MAINFRAME_INIT_STATE_E;
-
-	typedef enum
-	{
-		DBGMODE_Run			= 0,
-		DBGMODE_StepInto		= 1,
-		DBGMODE_StepOver		= 2,
-		DBGMODE_StepOut			= 3
-	} tDBGMODE;
 
 	// state of the init process
 	MAINFRAME_INIT_STATE_E m_eInitState;
@@ -169,16 +139,6 @@ private:
 	// the application icons in different sizes
 	wxIconBundle m_frameIcons;
 
-	// the debug server name
-	wxString m_strDebugServerName;
-	// the debug server port
-	long m_lDebugServerPort;
-	// the debug client socket
-	wxSocketClient *m_ptDebugClientSocket;
-	// the debug mode
-	tDBGMODE m_dbg_mode;
-	// debug frame count
-	unsigned int m_uiDbgFrameLevel;
 	// the lua state
 	wxLuaState *m_ptLuaState;
 	// the test panel

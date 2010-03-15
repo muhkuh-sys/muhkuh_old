@@ -27,7 +27,6 @@
 #include "application/muhkuh_lua_interface.h"
 #include "application/readFsFile.h"
 #include "application/muhkuh_brokenPluginDialog.h"
-#include "application/muhkuh_debug_messages.h"
 
 #include "serverkuh_icons.h"
 #include "serverkuh_id.h"
@@ -52,7 +51,6 @@ WXLUA_DECLARE_BIND_WXXML
 WXLUA_DECLARE_BIND_WXXRC
 WXLUA_DECLARE_BIND_WXHTML
 WXLUA_DECLARE_BIND_WXAUI
-WXLUA_DECLARE_BIND_WXSTC
 
 serverkuh_mainFrame *g_ptMainFrame;
 
@@ -63,7 +61,6 @@ BEGIN_EVENT_TABLE(serverkuh_mainFrame, wxFrame)
 
 	EVT_MENU(wxID_EXIT,									serverkuh_mainFrame::OnQuit)
 
-	EVT_LUA_DEBUG_HOOK(wxID_ANY,						serverkuh_mainFrame::OnLuaDebug)
 	EVT_LUA_PRINT(wxID_ANY,								serverkuh_mainFrame::OnLuaPrint)
 	EVT_LUA_ERROR(wxID_ANY,								serverkuh_mainFrame::OnLuaError)
 
@@ -71,8 +68,6 @@ BEGIN_EVENT_TABLE(serverkuh_mainFrame, wxFrame)
 	EVT_SIZE(serverkuh_mainFrame::OnSize)
 	EVT_MENU(serverkuh_mainFrame_menuViewMessageLog,	serverkuh_mainFrame::OnViewMessageLog)
 	EVT_AUI_PANE_CLOSE(serverkuh_mainFrame::OnPaneClose)
-
-	EVT_SOCKET(muhkuh_debugClientSocket_event,			serverkuh_mainFrame::OnDebugSocket)
 END_EVENT_TABLE()
 
 serverkuh_mainFrame::serverkuh_mainFrame(wxCmdLineParser *ptParser)
@@ -82,7 +77,6 @@ serverkuh_mainFrame::serverkuh_mainFrame(wxCmdLineParser *ptParser)
  , m_ptPluginManager(NULL)
  , m_ptWrapXml(NULL)
  , m_eInitState(MAINFRAME_INIT_STATE_UNCONFIGURED)
- , m_ptDebugClientSocket(NULL)
  , m_argvLua(NULL)
  , m_argcLua(0)
 {
@@ -93,8 +87,6 @@ serverkuh_mainFrame::serverkuh_mainFrame(wxCmdLineParser *ptParser)
 	int iLastColon;
 	int iLastSlash;
 	int iLastValid;
-	int iColonPos;
-	wxString strDebugServerAndPort;
 	wxString strMsg;
 
 
@@ -190,22 +182,6 @@ serverkuh_mainFrame::serverkuh_mainFrame(wxCmdLineParser *ptParser)
 	InitDialog();
 
 	g_ptMainFrame = this;
-
-	// get the debug server and port
-	m_strDebugServerName = wxEmptyString;
-	m_lDebugServerPort = -1;
-	if( ptParser->Found(wxT("d"), &strDebugServerAndPort)==true )
-	{
-		iColonPos = strDebugServerAndPort.Find(wxT(':'), false);
-		if( iColonPos!=wxNOT_FOUND && iColonPos==strDebugServerAndPort.Find(wxT(':'), true) &&  strDebugServerAndPort.AfterFirst(wxT(':')).ToLong(&m_lDebugServerPort)==true )
-		{
-			m_strDebugServerName = strDebugServerAndPort.BeforeFirst(wxT(':'));
-		}
-		else
-		{
-			wxMessageBox(_("Failed to parse debug server and port from the comand line! The connection to the debugger will not be esablished."), _("Command line error"), wxICON_ERROR, this);
-		}
-	}
 
 	// get the test index
 	if( ptParser->Found(wxT("i"), &m_lTestIndex)!=true )
@@ -509,54 +485,6 @@ bool serverkuh_mainFrame::scanFileXml(wxString &strXmlUrl)
 }
 
 
-bool serverkuh_mainFrame::dbg_enable(void)
-{
-	bool fResult;
-	wxIPV4address tIpAdr;
-
-
-	// expect failure
-	fResult = false;
-
-	m_ptDebugClientSocket = new wxSocketClient(wxSOCKET_WAITALL);
-	m_ptDebugClientSocket->SetEventHandler(*this, muhkuh_debugClientSocket_event);
-	m_ptDebugClientSocket->SetNotify(wxSOCKET_CONNECTION_FLAG|wxSOCKET_INPUT_FLAG|wxSOCKET_LOST_FLAG);
-	m_ptDebugClientSocket->Notify(true);
-
-	if( tIpAdr.Hostname(m_strDebugServerName)==false )
-	{
-		wxLogError(_("failed to set debug server's hostname!"));
-	}
-	else if( tIpAdr.Service(m_lDebugServerPort)==false )
-	{
-		wxLogError(_("failed to set debug server's port!"));
-	}
-	else
-	{
-		m_ptDebugClientSocket->Connect(tIpAdr, false);
-		m_ptDebugClientSocket->WaitOnConnect(100);
-
-		if( m_ptDebugClientSocket->IsConnected()!=true )
-		{
-			m_ptDebugClientSocket->Close();
-			wxLogMessage(_("failed to connect to the debug server!"));
-		}
-		else
-		{
-			wxLogMessage(_("connected to the debug server!"));
-
-			m_ptLuaState->SetLuaDebugHook(LUA_MASKCALL|LUA_MASKRET|LUA_MASKLINE, 0, 0, true);
-
-			m_dbg_mode = DBGMODE_StepInto;
-
-			fResult = true;
-		}
-	}
-
-	return fResult;
-}
-
-
 void serverkuh_mainFrame::setLuaArgs(wxChar **argv, int argc)
 {
 	m_argvLua = argv;
@@ -593,7 +521,6 @@ bool serverkuh_mainFrame::initLuaState(void)
 		WXLUA_IMPLEMENT_BIND_WXXRC
 		WXLUA_IMPLEMENT_BIND_WXHTML
 		WXLUA_IMPLEMENT_BIND_WXAUI
-		WXLUA_IMPLEMENT_BIND_WXSTC
 
 		// init the muhkuh lua bindings
 		fResult = wxLuaBinding_serverkuh_lua_init();
@@ -651,12 +578,6 @@ bool serverkuh_mainFrame::initLuaState(void)
 							// set the lua version
 							m_ptLuaState->lua_PushString(m_strVersion.ToAscii());
 							m_ptLuaState->lua_SetGlobal("__MUHKUH_VERSION");
-
-							// only create debug hooks and connection if debug server is set
-							if( m_strDebugServerName.IsEmpty()==false )
-							{
-								dbg_enable();
-							}
 						}
 					}
 				}
@@ -681,13 +602,6 @@ void serverkuh_mainFrame::clearLuaState(void)
 	// plugins which are already gone after a config change
 	ptBindings = wxLuaBinding::GetBindingList();
 	ptBindings->Clear();
-
-	// disconnect from any debug server
-	if( m_ptDebugClientSocket!=NULL )
-	{
-		m_ptDebugClientSocket->Destroy();
-		m_ptDebugClientSocket = NULL;
-	}
 
 	if( m_ptLuaState!=NULL )
 	{
@@ -888,478 +802,6 @@ void serverkuh_mainFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 }
 
 
-void serverkuh_mainFrame::OnLuaDebug(wxLuaEvent &event)
-{
-	bool fPauseExec;
-
-
-	// assume to continue
-	fPauseExec = false;
-
-	switch( event.m_lua_Debug->event )
-	{
-	case LUA_HOOKCALL:
-		// count frames if in step over mode
-		if( m_dbg_mode==DBGMODE_StepOver || m_dbg_mode==DBGMODE_StepOut )
-		{
-			++m_uiDbgFrameLevel;
-		}
-		break;
-
-	case LUA_HOOKRET:
-	case LUA_HOOKTAILRET:
-		// dec frames in step over mode
-		if( m_dbg_mode==DBGMODE_StepOver || m_dbg_mode==DBGMODE_StepOut )
-		{
-			if( m_uiDbgFrameLevel>0 )
-			{
-				--m_uiDbgFrameLevel;
-			}
-		}
-		break;
-
-	case LUA_HOOKLINE:
-		switch( m_dbg_mode )
-		{
-		case DBGMODE_Run:
-			// do not stop
-			break;
-
-		case DBGMODE_StepInto:
-			// always stop
-			fPauseExec = true;
-			break;
-
-		case DBGMODE_StepOver:
-		case DBGMODE_StepOut:
-			// stop if execution if the requested level is reached
-			if( m_uiDbgFrameLevel==0 )
-			{
-				fPauseExec = true;
-			}
-			break;
-		}
-	}
-
-
-	if( fPauseExec==true )
-	{
-		// write the command
-		dbg_write_u08(MUHDBG_InterpreterHalted);
-		dbg_get_stack(0);
-		dbg_get_step_command();
-	}
-}
-
-
-void serverkuh_mainFrame::dbg_get_step_command(void)
-{
-	bool fContinueExecution;
-
-
-	// wait until a step, run or exit command was received
-	do
-	{
-		fContinueExecution = dbg_get_command();
-	} while( fContinueExecution==false );
-}
-
-
-bool serverkuh_mainFrame::dbg_get_command(void)
-{
-	bool fContinueExecution;
-	unsigned char ucPacketTyp;
-	bool fOk;
-	int iLevel;
-	int iIndex;
-
-
-	fContinueExecution = false;
-
-	// wait for a command
-	m_ptDebugClientSocket->Read(&ucPacketTyp, 1);
-	if( m_ptDebugClientSocket->LastCount()==1 )
-	{
-		switch( ucPacketTyp )
-		{
-		case MUHDBG_CmdStepInto:
-			m_dbg_mode = DBGMODE_StepInto;
-			fContinueExecution = true;
-			break;
-
-		case MUHDBG_CmdStepOver:
-			// new mode is 'step over the next line'
-			m_dbg_mode = DBGMODE_StepOver;
-			// init frame level to 0 (stay on this level)
-			m_uiDbgFrameLevel = 0;
-			fContinueExecution = true;
-			break;
-
-		case MUHDBG_CmdStepOut:
-			m_dbg_mode = DBGMODE_StepOut;
-			// init frame level to 1 (go one level up)
-			m_uiDbgFrameLevel = 1;
-			fContinueExecution = true;
-			break;
-
-		case MUHDBG_CmdContinue:
-			m_dbg_mode = DBGMODE_Run;
-			fContinueExecution = true;
-			break;
-
-		case MUHDBG_CmdBreak:
-			m_dbg_mode = DBGMODE_StepInto;
-			break;
-
-		case MUHDBG_CmdGetStack:
-			fOk = dbg_read_int(&iLevel);
-			if( fOk==true )
-			{
-				dbg_get_stack(iLevel);
-			}
-			else
-			{
-				wxLogError(_("failed to receive int parameter for GetFrame command!"));
-			}
-			break;
-
-		case MUHDBG_CmdGetLocal:
-			fOk = dbg_read_int(&iLevel);
-			if( fOk==true )
-			{
-				dbg_get_locals(iLevel);
-			}
-			else
-			{
-				wxLogError(_("failed to receive int parameter for GetLocal command!"));
-			}
-			break;
-
-		case MUHDBG_CmdGetUpValue:
-			fOk = dbg_read_int(&iLevel);
-			if( fOk==true )
-			{
-				fOk = dbg_read_int(&iIndex);
-				if( fOk==true )
-				{
-					dbg_get_upvalue(iLevel, iIndex);
-				}
-			}
-			else
-			{
-				wxLogError(_("failed to receive int parameter for GetUpValue command!"));
-			}
-			break;
-
-		default:
-			wxLogError(_("received strange packet: 0x%02x"), ucPacketTyp);
-			break;
-		}
-	}
-
-	return fContinueExecution;
-}
-
-
-void serverkuh_mainFrame::dbg_get_stack(int iLevel)
-{
-	int iResult;
-	unsigned char ucStatus;
-	lua_Debug tDbg = {0};
-
-
-	if( m_ptDebugClientSocket->IsConnected()==true )
-	{
-		ucStatus = 1;
-		iResult = m_ptLuaState->lua_GetStack(iLevel, &tDbg);
-		if( iResult==1 )
-		{
-			iResult = m_ptLuaState->lua_GetInfo("Slnu", &tDbg);
-			if( iResult!=0 )
-			{
-				ucStatus = 0;
-
-				// write status
-				dbg_write_u08(ucStatus);
-
-				// write all debug info
-				dbg_write_str(wxString::FromAscii(tDbg.name));
-				dbg_write_str(wxString::FromAscii(tDbg.namewhat));
-				dbg_write_str(wxString::FromAscii(tDbg.what));
-				dbg_write_str(wxString::FromAscii(tDbg.source));
-				dbg_write_int(tDbg.currentline);
-				dbg_write_int(tDbg.nups);
-				dbg_write_int(tDbg.linedefined);
-				dbg_write_int(tDbg.lastlinedefined);
-			}
-		}
-
-		if( ucStatus!=0 )
-		{
-			// write status
-			dbg_write_u08(ucStatus);
-		}
-	}
-}
-
-
-void serverkuh_mainFrame::dbg_get_locals(int iLevel)
-{
-	int iResult;
-	wxString strValue;
-	lua_Debug tDbg = {0};
-	int iLuaType;
-	int iIndex;
-
-
-	if( m_ptDebugClientSocket->IsConnected()==true )
-	{
-		// TODO: create a temp state here to prevent stack modifications in the original
-//		L = wxlState.GetLuaState();
-		iResult = m_ptLuaState->lua_GetStack(iLevel, &tDbg);
-		if( iResult==1 )
-		{
-			iIndex = 1;
-			do
-			{
-				strValue = wxString::FromAscii(m_ptLuaState->lua_GetLocal(&tDbg, iIndex));
-				dbg_write_str(strValue);
-
-				if( strValue.IsEmpty()==false )
-				{
-					// get the value from the stack
-					iLuaType = m_ptLuaState->lua_Type(-1);
-					strValue = m_ptLuaState->lua_TypeName(iLuaType);
-					dbg_write_str(strValue);
-
-					// get the typ
-					strValue = dbg_getStackValue(-1);
-					dbg_write_str(strValue);
-
-					// remove the value from the stack
-					m_ptLuaState->lua_Pop(1);
-				}
-				else
-				{
-					break;
-				}
-				// next local
-				++iIndex;
-			} while( 1 );
-		}
-		else
-		{
-			dbg_write_str(wxEmptyString);
-		}
-	}
-}
-
-
-wxString serverkuh_mainFrame::dbg_getStackValue(int iIndex)
-{
-	int iTyp;
-	int iVal;
-	double dVal;
-	wxString strValue;
-	const void *pvVal;
-
-
-	iTyp = m_ptLuaState->lua_Type(iIndex);
-	switch( iTyp )
-	{
-	case LUA_TNONE:
-		strValue = wxEmptyString;
-		break;
-
-	case LUA_TNIL:
-		strValue = wxT("nil");
-		break;
-
-	case LUA_TBOOLEAN:
-		// NOTE: ToBoolean returns int
-		iVal = m_ptLuaState->lua_ToBoolean(iIndex);
-		if( iVal==0 )
-		{
-			strValue = wxT("false");
-		}
-		else
-		{
-			strValue = wxT("true");
-		}
-		break;
-
-	case LUA_TLIGHTUSERDATA:
-		pvVal = m_ptLuaState->lua_ToUserdata(iIndex);
-		strValue.Printf(wxT("%p"), pvVal);
-		break;
-
-	case LUA_TNUMBER:
-		dVal = m_ptLuaState->lua_ToNumber(iIndex);
-		strValue.Printf(wxT("%f"), dVal);
-		break;
-
-	case LUA_TSTRING:
-		strValue = m_ptLuaState->lua_TowxString(iIndex);
-		break;
-
-	case LUA_TTABLE:
-		// don't recurse here, just return a summary
-		strValue = dbg_dumpTable(iIndex);
-		//pvVal = m_ptLuaState->lua_ToPointer(iIndex);
-		//strValue.Printf("%p", pvVal);
-		break;
-
-	case LUA_TFUNCTION:
-		strValue = wxT("some function...");
-		break;
-
-	case LUA_TUSERDATA:
-		pvVal = m_ptLuaState->lua_ToUserdata(iIndex);
-		strValue.Printf(wxT("%p"), pvVal);
-		break;
-
-	case LUA_TTHREAD:
-		pvVal = m_ptLuaState->lua_ToPointer(iIndex);
-		strValue.Printf(wxT("%p"), pvVal);
-		break;
-
-	default:
-		strValue.Printf(wxT("unknown type: %d"), iTyp);
-		break;
-	}
-
-	return strValue;
-}
-
-
-wxString serverkuh_mainFrame::dbg_dumpTable(int iIndex)
-{
-	bool fResult;
-	wxString strKey;
-	wxString strValue;
-	wxString strDump;
-
-
-	// is the index really a table?
-	fResult = m_ptLuaState->lua_IsTable(iIndex);
-	if( fResult!=true )
-	{
-		// no table
-		strDump = wxT("not a table");
-		// TODO: return some errormsg
-	}
-	else
-	{
-		// ok, it's a table, dump it
-
-		// push a nil, this is the first value
-		m_ptLuaState->lua_PushNil();
-		// loop over all entries
-		while( m_ptLuaState->lua_Next(iIndex-1)!=0 )
-		{
-			// NOTE: key is now at stack -2, value at stack -1
-
-			strKey = dbg_getStackValue(-2);
-			strValue = dbg_getStackValue(-1);
-			strDump += strKey + wxT(" : ") + strValue + wxT("\n");
-
-			// remove the value from the stack
-			// NOTE: do not remove the key, it is necessary to get the next table line
-			m_ptLuaState->lua_Pop(1);
-		}
-	}
-
-	return strDump;
-}
-
-void serverkuh_mainFrame::dbg_get_upvalue(int iLevel, int iIndex)
-{
-
-}
-
-
-bool serverkuh_mainFrame::dbg_read_string(wxString &strData)
-{
-	wxUint32 u32LastRead;
-	size_t sizLen;
-	char *pcBuf;
-	bool fOk;
-
-
-	fOk = false;
-
-	strData.Empty();
-
-	m_ptDebugClientSocket->Read(&sizLen, sizeof(sizLen));
-	u32LastRead = m_ptDebugClientSocket->LastCount();
-	if( u32LastRead==sizeof(sizLen) )
-	{
-		if( sizLen==0 )
-		{
-			fOk = true;
-		}
-		else
-		{
-			pcBuf = new char[sizLen];
-			m_ptDebugClientSocket->Read(pcBuf, sizLen);
-			u32LastRead = m_ptDebugClientSocket->LastCount();
-			if( u32LastRead==sizLen )
-			{
-				strData = wxString::From8BitData(pcBuf, sizLen);
-				fOk = true;
-			}
-			delete[] pcBuf;
-		}
-	}
-
-	return fOk;
-}
-
-
-bool serverkuh_mainFrame::dbg_read_int(int *piData)
-{
-	wxUint32 u32LastRead;
-	bool fOk;
-
-
-	fOk = false;
-
-	m_ptDebugClientSocket->Read(piData, sizeof(int));
-	u32LastRead = m_ptDebugClientSocket->LastCount();
-	if( u32LastRead==sizeof(int) )
-	{
-		fOk = true;
-	}
-
-	return fOk;
-}
-
-
-void serverkuh_mainFrame::dbg_write_u08(unsigned char ucData)
-{
-	m_ptDebugClientSocket->Write(&ucData, 1);
-}
-
-
-void serverkuh_mainFrame::dbg_write_int(int iData)
-{
-	m_ptDebugClientSocket->Write(&iData, sizeof(int));
-}
-
-
-void serverkuh_mainFrame::dbg_write_str(wxString strData)
-{
-	size_t sizData;
-
-
-	sizData = strData.Len();
-	m_ptDebugClientSocket->Write(&sizData, sizeof(size_t));
-	if( sizData!=0 )
-	{
-		m_ptDebugClientSocket->Write(strData.c_str(), sizData);
-	}
-}
-
 void serverkuh_mainFrame::OnLuaPrint(wxLuaEvent &event)
 {
 	wxLogMessage( event.GetString() );
@@ -1407,28 +849,6 @@ void serverkuh_mainFrame::OnPaneClose(wxAuiManagerEvent &event)
 	if( ptWindow==m_textCtrl )
 	{
 		m_menuBar->Check(serverkuh_mainFrame_menuViewMessageLog, false);
-	}
-}
-
-
-void serverkuh_mainFrame::OnDebugSocket(wxSocketEvent &event)
-{
-	wxSocketNotify tEventTyp;
-
-
-	tEventTyp = event.GetSocketEvent();
-	switch( tEventTyp )
-	{
-	case wxSOCKET_INPUT:
-		wxLogMessage(wxT("wxSOCKET_INPUT"));
-		break;
-
-	case wxSOCKET_LOST:
-		wxLogMessage(wxT("wxSOCKET_LOST"));
-		break;
-
-	case wxSOCKET_CONNECTION:
-		wxLogMessage(wxT("wxSOCKET_CONNECTION"));
 	}
 }
 
