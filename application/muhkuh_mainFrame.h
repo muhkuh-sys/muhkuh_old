@@ -39,7 +39,6 @@
 #define __MUHKUH_MAINFRAME_H__
 
 #include "muhkuh_id.h"
-#include "muhkuh_debugger.h"
 #include "muhkuh_plugin_manager.h"
 #include "muhkuh_repository_manager.h"
 #include "muhkuh_testTreeItemData.h"
@@ -59,6 +58,17 @@ extern "C"
 {
 	#include <lualib.h>
 }
+
+//-------------------------------------
+
+class muhkuh_server_process : public wxProcess
+{
+public:
+	muhkuh_server_process(wxEvtHandler *parent, int id)
+	: wxProcess(parent, id)
+	{
+	}
+};
 
 //-------------------------------------
 // Define the main frame
@@ -201,12 +211,8 @@ private:
 
 	// the lua state
 	wxLuaState *m_ptLuaState;
-	// the debugger panel
-	muhkuh_debugger *m_debuggerPanel;
 	// the process id of the server task
 	long m_lServerPid;
-	// the debug server port
-	unsigned short m_usDebugServerPort;
 	// the server process notification
 	muhkuh_server_process *m_ptServerProcess;
 

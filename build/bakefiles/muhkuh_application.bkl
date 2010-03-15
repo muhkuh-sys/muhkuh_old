@@ -25,7 +25,6 @@
 			application/muhkuh_brokenPluginDialog.cpp
 			application/muhkuh_config_reposEntryDialog.cpp
 			application/muhkuh_configDialog.cpp
-			application/muhkuh_debugger.cpp
 			application/muhkuh_dirlistbox.cpp
 			application/muhkuh_htmltag_lua.cpp
 			application/muhkuh_icons.cpp
@@ -70,7 +69,6 @@
 
 		<wxlua-lib>wxluasocket</wxlua-lib>
 		<wxlua-lib>wxluadebug</wxlua-lib>
-		<wxlua-lib>wxbindstc</wxlua-lib>
 		<wxlua-lib>wxbindxrc</wxlua-lib>
 		<wxlua-lib>wxbindhtml</wxlua-lib>
 		<wxlua-lib>wxbindadv</wxlua-lib>
@@ -82,7 +80,6 @@
 		<wxlua-lib>wxlua</wxlua-lib>
 		<wxlua-lib>lua</wxlua-lib>
 
-		<wx-lib>stc</wx-lib>
 		<wx-lib>xrc</wx-lib>
 		<wx-lib>html</wx-lib>
 		<wx-lib>adv</wx-lib>

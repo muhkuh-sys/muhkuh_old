@@ -23,15 +23,10 @@
 #include <wx/url.h>
 
 
-// use the debugger
-//#define __ENABLE_DEBUGGER__
-
-
 #include "growbuffer.h"
 #include "muhkuh_version.h"
 #include "muhkuh_aboutDialog.h"
 #include "muhkuh_brokenPluginDialog.h"
-#include "muhkuh_debug_messages.h"
 #include "muhkuh_lua_interface.h"
 #include "muhkuh_mainFrame.h"
 #include "muhkuh_configDialog.h"
@@ -56,7 +51,6 @@ WXLUA_DECLARE_BIND_WXXML
 WXLUA_DECLARE_BIND_WXXRC
 WXLUA_DECLARE_BIND_WXHTML
 WXLUA_DECLARE_BIND_WXAUI
-WXLUA_DECLARE_BIND_WXSTC
 
 muhkuh_mainFrame *g_ptMainFrame;
 
@@ -118,8 +112,6 @@ muhkuh_mainFrame::muhkuh_mainFrame(void)
  , m_ptPluginManager(NULL)
  , m_ptRepositoryManager(NULL)
  , m_ptHelp(NULL)
-// , m_testPanel(NULL)
- , m_debuggerPanel(NULL)
  , m_lServerPid(0)
  , m_ptServerProcess(NULL)
  , m_tipProvider(NULL)
@@ -132,10 +124,6 @@ muhkuh_mainFrame::muhkuh_mainFrame(void)
 	wxFileConfig *ptConfig;
 	int iLanguage;
 
-
-	// TODO: get this fron the config file
-	// *** DEBUG ***
-	m_usDebugServerPort = 3000;
 
 	// get the application path
 	cfgName.Assign(wxStandardPaths::Get().GetExecutablePath());
@@ -1133,7 +1121,6 @@ bool muhkuh_mainFrame::initLuaState(void)
 		WXLUA_IMPLEMENT_BIND_WXXRC
 		WXLUA_IMPLEMENT_BIND_WXHTML
 		WXLUA_IMPLEMENT_BIND_WXAUI
-		WXLUA_IMPLEMENT_BIND_WXSTC
 
 		// init the muhkuh lua bindings
 		fResult = wxLuaBinding_muhkuh_lua_init();
@@ -1342,23 +1329,7 @@ void muhkuh_mainFrame::executeTest(muhkuh_wrap_xml *ptTestData, unsigned int uiI
 
 void muhkuh_mainFrame::finishTest(void)
 {
-	int iPanelIdx;
-
-
 	wxLogMessage(_("Test '%s' finished, cleaning up..."), m_strRunningTestName.c_str());
-
-	if( m_debuggerPanel!=NULL )
-	{
-		// does the pannel still exist?
-		iPanelIdx = m_notebook->GetPageIndex(m_debuggerPanel);
-		if( iPanelIdx!=wxNOT_FOUND )
-		{
-			m_notebook->RemovePage(iPanelIdx);
-		}
-		// delete the panel
-		delete m_debuggerPanel;
-		m_debuggerPanel = NULL;
-	}
 
 	// was this an autostart test?
 	if( m_fRunningTestIsAutostart==true )
@@ -2062,34 +2033,14 @@ void muhkuh_mainFrame::OnNotebookPageClose(wxAuiNotebookEvent &event)
 {
 	int iSelection;
 	wxWindow *ptWin;
-	int iResult;
 
 
 	// get the selected Page
 	iSelection = event.GetSelection();
 	ptWin = m_notebook->GetPage(iSelection);
 
-	// close the test panel?
-	if( ptWin==m_debuggerPanel )
-	{
-		// is the test still running?
-		if( m_state==muhkuh_mainFrame_state_testing )
-		{
-			iResult = wxMessageBox(_("Are you sure you want to cancel debugging this test?"), m_strRunningTestName, wxYES_NO, this);
-			if( iResult!=wxYES )
-			{
-				event.Veto();
-			}
-		}
-		// close the panel?
-		if( event.IsAllowed()==true )
-		{
-			// the panel will be deleted, forget the pointer
-			m_debuggerPanel = NULL;
-		}
-	}
 	// close the welcome page?
-	else if( ptWin==m_welcomeHtml )
+	if( ptWin==m_welcomeHtml )
 	{
 		m_menuBar->Check(muhkuh_mainFrame_menuViewWelcomePage, false);
 		// forget the pointer
