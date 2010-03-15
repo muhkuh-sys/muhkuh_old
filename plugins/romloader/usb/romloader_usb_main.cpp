@@ -46,7 +46,7 @@ static wxLuaState *m_ptLuaState;
 
 #if ROMLOADER_USB_LIBUSB_VERSION==0
 
-#ifdef _WINDOWS
+#ifdef WIN32
 #define LIBUSB_BUS_PATTERN "bus-%u"
 #define LIBUSB_DEV_PATTERN "\\\\.\\libusb0-%u"
 #else
