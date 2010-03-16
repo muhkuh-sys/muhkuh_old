@@ -130,7 +130,11 @@ int usb_bulk_pc_to_netx(libusb_device_handle *ptDevHandle, unsigned char ucEndPo
 		if( iError==0 )
 		{
 			iError = -1;
-		}
+		} 
+		else if (iError == -116)
+		{
+			iError = LIBUSB_ERROR_TIMEOUT;
+		} 
 		/* transfer failed */
 		if( piProcessed!=NULL )
 		{
@@ -163,7 +167,11 @@ int usb_bulk_netx_to_pc(libusb_device_handle *ptDevHandle, unsigned char ucEndPo
 		if( iError==0 )
 		{
 			iError = -1;
-		}
+		} 
+		else if (iError == -116)
+		{
+			iError = LIBUSB_ERROR_TIMEOUT;
+		} 
 		/* transfer failed */
 		if( piProcessed!=NULL )
 		{
