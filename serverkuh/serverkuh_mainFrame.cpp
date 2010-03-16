@@ -224,6 +224,11 @@ serverkuh_mainFrame::~serverkuh_mainFrame(void)
 	finishTest();
 	clearLuaState();
 
+	// delete test description 
+	if ( m_ptWrapXml != NULL)
+	{
+		delete m_ptWrapXml;
+	}
 	// delete the plugin manager
 	if( m_ptPluginManager!=NULL )
 	{

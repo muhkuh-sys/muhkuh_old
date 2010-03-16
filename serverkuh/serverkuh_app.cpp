@@ -79,9 +79,9 @@ void serverkuh_app::showHelp(wxCmdLineParser *ptParser)
 
 	wxLogMessage(
 		wxT("\n")
-		wxT("Examples:\n")
-		wxT("  regkuh -rp plugins/romloader_uart.xml\n")
-		wxT("        register the romloader_uart plugin in the plugins folder.\n")
+		wxT("Example:\n")
+		wxT("  serverkuh -c serverkuh.cfg -i 0\n")
+		wxT("      \"file://d%%3a/Muhkuh/bootwizard/test_description.xml\"\n")
 		wxT("\n")
 		wxT("Muhkuh home page: www.sf.net/projects/muhkuh\n")
 	);
