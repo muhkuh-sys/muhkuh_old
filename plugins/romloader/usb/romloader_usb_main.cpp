@@ -490,6 +490,7 @@ int fn_detect_interfaces(std::vector<muhkuh_plugin_instance*> *pvInterfaceList)
 	else
 	{
 		/* detect devices */
+		ptDeviceList = NULL;
 		ssizDevList = libusb_get_device_list(ptLibUsbContext, &ptDeviceList);
 		if( ssizDevList<0 )
 		{
@@ -580,7 +581,10 @@ int fn_detect_interfaces(std::vector<muhkuh_plugin_instance*> *pvInterfaceList)
 			}
 
 			/* free the device list */
-			libusb_free_device_list(ptDeviceList, 1);
+			if( ptDeviceList!=NULL )
+			{
+				libusb_free_device_list(ptDeviceList, 1);
+			}
 		}
 
 		/* free the libusb context */
