@@ -27,6 +27,26 @@ function tprint(...)
 	end
 end
 
+
+---------------------------------------
+-- tmpname
+--   Get a temp file name.
+--   If %TEMP% or %TMP% is defined, it is prepended to the temp. file name
+--
+-- Returns:
+--   the filename of the temporary file
+--
+
+function tmpname()
+	local tmpdirname = os.getenv("TEMP") or os.getenv("TMP")
+	local tmpfilename = os.tmpname()
+	if tmpdirname then
+		return tmpdirname .. "/" .. tmpfilename
+	else
+		return tmpfilename
+	end
+end
+
 ---------------------------------------
 -- getlocalfile
 --   Read a (possibly remote) file with muhkuh.load and write it to a temporary local file.
