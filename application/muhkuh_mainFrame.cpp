@@ -121,19 +121,45 @@ muhkuh_mainFrame::muhkuh_mainFrame(void)
 {
 	wxLog *pOldLogTarget;
 	wxFileName cfgName;
+	wxString strConfigFileName;
+	wxString strLocalConfigFileName;
+	wxString strGlobalConfigFileName;
 	wxFileConfig *ptConfig;
 	int iLanguage;
-
 
 	// get the application path
 	cfgName.Assign(wxStandardPaths::Get().GetExecutablePath());
 	m_strApplicationPath = cfgName.GetPath(wxPATH_GET_VOLUME|wxPATH_GET_SEPARATOR, wxPATH_NATIVE);
 
-	// get the config
+	// get the config file name
 	cfgName.SetFullName(wxTheApp->GetAppName()+wxT(".cfg"));
+	strConfigFileName = cfgName.GetFullPath();
+
+	// set global config file to application path/config file name
+	// and local config file to user local app data/Serverkuh/config file name
+	cfgName.Assign(wxStandardPaths::Get().GetExecutablePath());
+	cfgName.SetFullName(strConfigFileName);
+	strGlobalConfigFileName = cfgName.GetFullPath();
+
+	// XP: C:\Dokumente und Einstellungen\stephanl\Lokale Einstellungen\Anwendungsdaten\Serverkuh 
+	// Win7: C:\Users\StephanL\AppData\Local\Serverkuh
+	// remove the last element (AppName)
+	cfgName.AssignDir(wxStandardPaths::Get().GetUserLocalDataDir());
+	cfgName.RemoveLastDir();
+	cfgName.SetFullName(strConfigFileName);
+	strLocalConfigFileName = cfgName.GetFullPath();
+
+	// open config
+	//wxLogMessage(wxT("Global config: %s\nLocal config: %s"), strGlobalConfigFileName, strLocalConfigFileName);
+	ptConfig = new wxFileConfig(wxTheApp->GetAppName(), wxTheApp->GetVendorName(), strLocalConfigFileName, strGlobalConfigFileName, wxCONFIG_USE_LOCAL_FILE | wxCONFIG_USE_GLOBAL_FILE);
+	wxConfigBase::Set(ptConfig);
+	ptConfig->SetRecordDefaults();
+
+	/*
 	ptConfig = new wxFileConfig(wxTheApp->GetAppName(), wxTheApp->GetVendorName(), cfgName.GetFullPath(), cfgName.GetFullPath(), wxCONFIG_USE_LOCAL_FILE);
 	wxConfigBase::Set(ptConfig);
 	ptConfig->SetRecordDefaults();
+	*/
 
 	// TODO: init the locale to a value from the config file
 //	iLanguage = wxLANGUAGE_GERMAN;
@@ -239,7 +265,25 @@ muhkuh_mainFrame::muhkuh_mainFrame(void)
 
 muhkuh_mainFrame::~muhkuh_mainFrame(void)
 {
+	wxConfigBase *ptConfig;
+	bool fWriteOk;
+	wxMessageDialog *ptDialog;
+
 	write_config();
+	ptConfig = wxConfigBase::Set((wxConfigBase *) NULL);
+	if( ptConfig!=NULL ) {
+		fWriteOk = ptConfig->Flush();
+		if (!fWriteOk) {
+			ptDialog = new wxMessageDialog(
+				this,
+				wxT("The configuration file could not be written."),
+				wxT("Config write failed"),
+				wxOK);
+			ptDialog->ShowModal();
+			delete ptDialog;
+		}
+		delete ptConfig;
+	}
 
 	// delete the help controller
 	if( m_ptHelp!=NULL )

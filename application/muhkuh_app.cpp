@@ -95,6 +95,7 @@ bool muhkuh_app::OnInit()
 
 int muhkuh_app::OnExit()
 {
+	/*
 	wxConfigBase *pConfig;
 
 
@@ -102,6 +103,7 @@ int muhkuh_app::OnExit()
 	if( pConfig!=NULL ) {
 		delete pConfig;
 	}
+	*/
 
 	return 0;
 }
