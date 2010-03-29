@@ -81,6 +81,8 @@ serverkuh_mainFrame::serverkuh_mainFrame(wxCmdLineParser *ptParser)
  , m_argcLua(0)
 {
 	wxString strConfigFileName;
+	wxString strLocalConfigFileName;
+	wxString strGlobalConfigFileName;
 	wxFileName cfgName;
 	wxFileConfig *ptConfig;
 	int iLanguage;
@@ -99,12 +101,34 @@ serverkuh_mainFrame::serverkuh_mainFrame(wxCmdLineParser *ptParser)
 	{
 		strConfigFileName = wxTheApp->GetAppName()+wxT(".cfg");
 	}
+
+	// set global config file to application path/config file name
+	// and local config file to user local app data/Serverkuh/config file name
+	cfgName.Assign(wxStandardPaths::Get().GetExecutablePath());
+	cfgName.SetFullName(strConfigFileName);
+	strGlobalConfigFileName = cfgName.GetFullPath();
+
+	// XP: C:\Dokumente und Einstellungen\stephanl\Lokale Einstellungen\Anwendungsdaten\Serverkuh 
+	// Win7: C:\Users\StephanL\AppData\Local\Serverkuh
+	// remove the last element (AppName)
+	cfgName.AssignDir(wxStandardPaths::Get().GetUserLocalDataDir());
+	cfgName.RemoveLastDir();
+	cfgName.SetFullName(strConfigFileName);
+	strLocalConfigFileName = cfgName.GetFullPath();
+
+	// open config
+	//wxLogMessage(wxT("Global config: %s\nLocal config: %s"), strGlobalConfigFileName, strLocalConfigFileName);
+	ptConfig = new wxFileConfig(wxTheApp->GetAppName(), wxTheApp->GetVendorName(), strLocalConfigFileName, strGlobalConfigFileName, wxCONFIG_USE_LOCAL_FILE | wxCONFIG_USE_GLOBAL_FILE);
+	wxConfigBase::Set(ptConfig);
+	ptConfig->SetRecordDefaults();
+
+	/*
 	cfgName.SetFullName(strConfigFileName);
 	strConfigFileName = cfgName.GetFullPath();
 	ptConfig = new wxFileConfig(wxTheApp->GetAppName(), wxTheApp->GetVendorName(), strConfigFileName, strConfigFileName, wxCONFIG_USE_LOCAL_FILE);
 	wxConfigBase::Set(ptConfig);
 	ptConfig->SetRecordDefaults();
-
+	*/
 	// TODO: init the locale to a value from the config file
 //	iLanguage = wxLANGUAGE_GERMAN;
 //	iLanguage = wxLANGUAGE_ENGLISH_US;
@@ -219,7 +243,25 @@ serverkuh_mainFrame::serverkuh_mainFrame(wxCmdLineParser *ptParser)
 
 serverkuh_mainFrame::~serverkuh_mainFrame(void)
 {
+	wxConfigBase *ptConfig;
+	bool fWriteOk;
+	wxMessageDialog *ptDialog;
+
 	write_config();
+	ptConfig = wxConfigBase::Set((wxConfigBase *) NULL);
+	if( ptConfig!=NULL ) {
+		fWriteOk = ptConfig->Flush();
+		if (!fWriteOk) {
+			ptDialog = new wxMessageDialog(
+				this,
+				wxT("The configuration file could not be written."),
+				wxT("Config write failed"),
+				wxOK);
+			ptDialog->ShowModal();
+			delete ptDialog;
+		}
+		delete ptConfig;
+	}
 
 	finishTest();
 	clearLuaState();

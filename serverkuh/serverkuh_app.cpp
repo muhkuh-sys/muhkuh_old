@@ -199,14 +199,14 @@ bool serverkuh_app::OnInit()
 
 int serverkuh_app::OnExit()
 {
+	/*
 	wxConfigBase *ptConfig;
-
 
 	ptConfig = wxConfigBase::Set(NULL);
 	if( ptConfig!=NULL )
 	{
 		delete ptConfig;
 	}
-
+	*/
 	return 0;
 }
