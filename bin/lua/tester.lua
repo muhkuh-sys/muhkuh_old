@@ -384,11 +384,11 @@ function stdRead(parent, plugin, ulNetxAddress, ulLength)
 							wx.wxPD_AUTO_HIDE+wx.wxPD_CAN_ABORT+wx.wxPD_ESTIMATED_TIME+wx.wxPD_REMAINING_TIME+wx.wxPD_ELAPSED_TIME)
 	--strData = plugin:read_image(ulNetxAddress, ulLength, tester.stdReadCallback, 0)
 	local fOK, strData = pcall(plugin.read_image, plugin, ulNetxAddress, ulLength, tester.stdReadCallback, 0)
+	stdReadCloseProgress()
 	if not fOK then
 		print("plugin.read_image:" .. (strData or "unknown error"))
 		return nil, fOK, strData
 	end
-	stdReadCloseProgress()
 	return strData
 end
 
