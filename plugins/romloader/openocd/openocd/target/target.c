@@ -30,6 +30,20 @@
 #include "binarybuffer.h"
 #include "jtag.h"
 
+// types and magic values for free_arch_info 
+#include "arm7_9_common.h"
+#include "arm720t.h"
+#include "arm7tdmi.h"
+#include "arm920t.h"
+#include "arm926ejs.h"
+#include "arm966e.h"
+#include "arm9tdmi.h"
+#include "armv4_5.h"
+#include "armv7m.h"
+#include "cortex_m3.h"
+#include "xscale.h"
+
+
 #include <string.h>
 #include <stdlib.h>
 
@@ -2097,6 +2111,98 @@ int handle_rwp_command(struct command_context_s *cmd_ctx, char *cmd, char **args
 	return ERROR_OK;
 }
 
+void target_free_all_reg_caches(target_t *ptTarget)
+{
+	reg_cache_t *ptCache = ptTarget->reg_cache;
+	reg_cache_t *ptNextCache;
+	int i;
+
+	while (ptCache != NULL) 
+	{
+		// the value field of each reg_t were allocated as separate memory areas
+		for (i=0; i<ptCache->num_regs; ++i)
+		{
+			free(ptCache->reg_list[i].value);
+		}
+
+		// the arch_info fields were allocated as one memory area
+		if (ptCache->num_regs>0)
+		{
+			free(ptCache->reg_list[0].arch_info);
+		}
+
+		free(ptCache->reg_list);
+		ptNextCache = ptCache->next;
+		free(ptCache);
+		ptCache = ptNextCache;
+	}
+
+	ptTarget->reg_cache = NULL;
+}
+
+/* The arch_info pointer in the target structure points into the innermost
+   substructure of the arch_info structure, armv4_5_common_t.
+   From there, each arch_info pointer points to the parent structure. 
+   We follow these pointers until we reach a structure whose parent pointer
+   is NULL or which does not have a parent pointer. This structure is de-allocated.
+*/
+void target_free_arch_info(void* pvInfo)
+{
+	void *pvParent = NULL;
+	int iMagic = *((int*)pvInfo);
+	switch(iMagic)
+	{
+	case ARM926EJS_COMMON_MAGIC:
+	case ARM966E_COMMON_MAGIC:
+	case ARM920T_COMMON_MAGIC:
+	case ARM720T_COMMON_MAGIC:
+		break;
+
+	case ARM7_9_COMMON_MAGIC:
+		pvParent = ((arm7_9_common_t*)pvInfo)->arch_info;
+		break;
+
+	case ARM9TDMI_COMMON_MAGIC:
+		pvParent = ((arm9tdmi_common_t*)pvInfo)->arch_info;
+		free(((arm9tdmi_common_t*)pvInfo)->variant);
+		break;
+
+	case ARMV4_5_COMMON_MAGIC:
+		pvParent = ((armv4_5_common_t*)pvInfo)->arch_info;
+		break;
+
+	case ARM7TDMI_COMMON_MAGIC:
+		pvParent = ((arm7tdmi_common_t*)pvInfo)->arch_info;
+		free(((arm7tdmi_common_t*)pvInfo)->variant);
+		break;
+
+	case ARMV7M_COMMON_MAGIC:
+		pvParent = ((armv7m_common_t*)pvInfo)->arch_info;
+		break;
+
+	case CORTEX_M3_COMMON_MAGIC:
+		pvParent = ((cortex_m3_common_t*)pvInfo)->arch_info;
+		break;
+
+	case XSCALE_COMMON_MAGIC:
+		pvParent = ((xscale_common_t*)pvInfo)->arch_info;
+		break;
+
+	default:
+		// error, this point should not be reached
+		break;
+	}
+
+	if (pvParent)
+	{
+		target_free_arch_info(pvParent);
+	}
+	else
+	{
+		free(pvInfo);
+	}
+}
+
 int target_close(struct command_context_s *cmd_ctx)
 {
 	target_event_callback_t *ptEvent, *ptLastEvent;
@@ -2132,20 +2238,21 @@ int target_close(struct command_context_s *cmd_ctx)
 		ptTarget = ptTarget->next;
 
 		/* free all script filenames */
-		if (ptLastTarget->reset_script == NULL)
+		if (ptLastTarget->reset_script != NULL)
 		{
 			free(ptLastTarget->reset_script);
 		}
-		if (ptLastTarget->post_halt_script == NULL)
+		if (ptLastTarget->post_halt_script != NULL)
 		{
 			free(ptLastTarget->post_halt_script);
 		}
-		if (ptLastTarget->pre_resume_script == NULL)
+		if (ptLastTarget->pre_resume_script != NULL)
 		{
 			free(ptLastTarget->pre_resume_script);
 		}
 
 		target_free_all_working_areas(ptLastTarget);
+		target_free_all_reg_caches(ptLastTarget);
 		breakpoint_remove_all(ptLastTarget);
 		watchpoint_remove_all(ptLastTarget);
 
@@ -2172,6 +2279,9 @@ int target_close(struct command_context_s *cmd_ctx)
 			free(ptLastDbg);
 		}
 		ptLastTarget->dbgmsg = NULL;
+
+		/* free arch_info */
+		target_free_arch_info(ptLastTarget->arch_info);
 
 		free(ptLastTarget);
 	}

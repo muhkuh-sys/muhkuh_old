@@ -50,6 +50,8 @@ int target_asciimsg(target_t *target, u32 length)
 		c = c->next;
 	}
 	
+	free(msg);
+
 	return ERROR_OK;
 }
 

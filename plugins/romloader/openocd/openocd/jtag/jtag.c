@@ -1347,6 +1347,7 @@ int jtag_validate_chain()
 			char *cbuf = buf_to_str(ir_test, total_ir_length, 16);
 			ERROR("Error validating JTAG scan chain, IR mismatch, scan returned 0x%s", cbuf);
 			free(cbuf);
+			free(ir_test);
 			return ERROR_JTAG_INIT_FAILED;
 		}
 		chain_pos += device->ir_length;
@@ -1358,6 +1359,7 @@ int jtag_validate_chain()
 		char *cbuf = buf_to_str(ir_test, total_ir_length, 16);
 		ERROR("Error validating JTAG scan chain, IR mismatch, scan returned 0x%s", cbuf);
 		free(cbuf);
+		free(ir_test);
 		return ERROR_JTAG_INIT_FAILED;
 	}
 	
@@ -1947,7 +1949,7 @@ int jtag_close(struct command_context_s *cmd_ctx)
 	jtag_devices = NULL;
 
 	// init global vars
-	cmd_queue_pages = NULL;
+	cmd_queue_free();
 	end_state = TAP_TLR;
 	cur_state = TAP_TLR;
 	jtag_trst = 0;

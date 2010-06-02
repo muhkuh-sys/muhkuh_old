@@ -1344,6 +1344,7 @@ static int ft2232_init_ftd2xx(u16 vid, u16 pid, int more, int *try_more)
 	if (ft2232_device_desc && ft2232_serial)
 	{
 		WARNING("can't open by device description and serial number, giving precedence to serial");
+		free(ft2232_device_desc);
 		ft2232_device_desc = NULL;
 	}
 	
@@ -1580,7 +1581,8 @@ int ft2232_init(void)
 	}
 
 	ft2232_buffer_size = 0;
-	ft2232_buffer = malloc(FT2232_BUFFER_SIZE);
+	if (ft2232_buffer == NULL)
+		ft2232_buffer = malloc(FT2232_BUFFER_SIZE);
 
 	if (layout->init() != ERROR_OK)
 		return ERROR_JTAG_INIT_FAILED;
@@ -2055,6 +2057,16 @@ int ft2232_quit(void)
 #endif
 
 	free(ft2232_buffer);
+	ft2232_buffer = NULL;
+
+	free(ft2232_device_desc);
+	ft2232_device_desc = NULL;
+
+	free(ft2232_serial);
+	ft2232_serial = NULL;
+
+	free(ft2232_layout);
+	ft2232_layout = NULL;
 
 	return ERROR_OK;
 }
@@ -2063,6 +2075,7 @@ int ft2232_handle_device_desc_command(struct command_context_s *cmd_ctx, char *c
 {
 	if (argc == 1)
 	{
+		free(ft2232_device_desc);
 		ft2232_device_desc = strdup(args[0]);
 	}
 	else
@@ -2077,6 +2090,7 @@ int ft2232_handle_serial_command(struct command_context_s *cmd_ctx, char *cmd, c
 {
 	if (argc == 1)
 	{
+		free(ft2232_serial);
 		ft2232_serial = strdup(args[0]);
 	}
 	else
@@ -2092,6 +2106,7 @@ int ft2232_handle_layout_command(struct command_context_s *cmd_ctx, char *cmd, c
 	if (argc == 0)
 		return ERROR_OK;
 
+	free(ft2232_layout);
 	ft2232_layout = malloc(strlen(args[0]) + 1);
 	strcpy(ft2232_layout, args[0]);
 

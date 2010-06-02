@@ -309,15 +309,21 @@ void command_print(command_context_t *context, const char *format, ...)
 	while (!buffer || (n = vsnprintf(buffer, size, format, ap)) >= size)
 	{
 		/* increase buffer until it fits the whole string */
-		if (!(p = realloc(buffer, size += 4096)))
+		size += 4096;
+		p = realloc(buffer, size);
+		if (p==NULL) 
+		{
+			if (buffer) free(buffer);
 			return;
-
+		}
 		buffer = p;
 	}
 	
 	/* vsnprintf failed */
-	if (n < 0)
+	if (n < 0) {
+		if (buffer) free(buffer);
 		return;
+	}
 
 	p = buffer;
 	
