@@ -34,6 +34,7 @@
 
 command_t *target_request_cmd = NULL;
 
+
 int target_asciimsg(target_t *target, u32 length)
 {
 	char *msg = malloc(CEIL(length + 1, 4) * 4);
@@ -49,11 +50,30 @@ int target_asciimsg(target_t *target, u32 length)
 		command_print(c->cmd_ctx, "%s", msg);
 		c = c->next;
 	}
-	
-	free(msg);
+
+	free (msg);
 
 	return ERROR_OK;
 }
+
+
+int target_asciichar(target_t *target, char ch)
+{
+	char abMsg[2] = {ch, 0};
+	debug_msg_receiver_t *ptReceiver = target->dbgmsg;
+	command_context_t *ptContext;
+	DEBUG("char: %c", ch);
+
+	while (ptReceiver)
+	{
+		ptContext = ptReceiver->cmd_ctx;
+		if (ptContext->output_handler)
+			ptContext->output_handler(ptContext, abMsg);
+		ptReceiver = ptReceiver->next;
+	}
+	return ERROR_OK;
+}
+
 
 int target_hexmsg(target_t *target, int size, u32 length)
 {
@@ -121,6 +141,9 @@ int target_request(target_t *target, u32 request)
 			{
 				target_hexmsg(target, (request & 0xff00) >> 8, (request & 0xffff0000) >> 16);
 			}
+			break;
+		case TARGET_REQ_DEBUGCHAR:
+			target_asciichar(target, (char) ((request & 0x00ff0000) >> 16));
 			break;
 /*		case TARGET_REQ_SEMIHOSTING:
  *			break;
