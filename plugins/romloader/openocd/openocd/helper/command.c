@@ -301,6 +301,12 @@ void command_print(command_context_t *context, const char *format, ...)
 	char *buffer = NULL;
 	int n, size = 0;
 	char *p;
+	char *pline;
+	int crlen;
+
+	/* do nothing if there is no output handler */
+	if (context->output_handler == NULL)
+		return;
 
 	va_start(ap, format);
 	
@@ -325,21 +331,36 @@ void command_print(command_context_t *context, const char *format, ...)
 		return;
 	}
 
+	
+	/* 
+		If the string consists of multiple lines separated by
+		\n, \r\n or \n\r, split the string and send the separate
+		lines to the output handler. The line delimiters are skipped. 
+		uprintf replaces \n -> \r\n
+	*/
 	p = buffer;
-	
-	/* process lines in buffer */
-	do {
-		char *next = strchr(p, '\n');
-		
-		if (next)
-			*next++ = 0;
+	pline = p;
+	while (*p) {
+		if(*p=='\r' || *p=='\n') 
+		{
+			if (*p =='\r' && *(p+1)=='\n' || *p =='\n' && *(p+1)=='\r') crlen = 2;
+			else crlen = 1;
 
-		if (context->output_handler)
-			context->output_handler(context, p);
+			*p = 0;
+			p+=crlen;
+			context->output_handler(context, pline);
+			pline = p;
+		}
+		else
+		{
+			++p;
+		}
+	}
 
-		p = next;
-	} while (p);
-	
+	/* Print any remainder */
+	if (pline<p)
+		context->output_handler(context, pline);
+
 	if (buffer)
 		free(buffer);
 	
