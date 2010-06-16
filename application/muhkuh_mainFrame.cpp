@@ -2147,13 +2147,13 @@ void muhkuh_mainFrame::OnServerProcessTerminate(wxProcessEvent &event)
 
 void muhkuh_mainFrame::OnLuaPrint(wxLuaEvent &event)
 {
-	wxLogMessage( event.GetString() );
+	wxLogMessage(wxT("%s"), event.GetString() );
 }
 
 
 void muhkuh_mainFrame::OnLuaError(wxLuaEvent &event)
 {
-	wxLogError( event.GetString() );
+	wxLogError(wxT("%s"), event.GetString() );
 }
 
 

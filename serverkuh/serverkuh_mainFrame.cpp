@@ -851,13 +851,13 @@ void serverkuh_mainFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 
 void serverkuh_mainFrame::OnLuaPrint(wxLuaEvent &event)
 {
-	wxLogMessage( event.GetString() );
+	wxLogMessage(wxT("%s"), event.GetString() );
 }
 
 
 void serverkuh_mainFrame::OnLuaError(wxLuaEvent &event)
 {
-	wxLogError( event.GetString() );
+	wxLogError(wxT("%s"), event.GetString() );
 }
 
 
