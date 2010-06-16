@@ -39,6 +39,24 @@ extern "C"
 	WXEXPORT romloader *romloader_openocd_create(void *pvHandle);
 }
 
+class romloader_openocd : public romloader
+{
+public:
+	romloader_openocd(wxString strName, wxString strTyp, 
+									 const romloader_functioninterface *ptFn, 
+									 void *pvHandle, 
+									 muhkuh_plugin_fn_close_instance fn_close, 
+									 wxLuaState *ptLuaState);
+	~romloader_openocd(void);
+
+	void connect(void);
+
+private:
+	// formatted name for log message
+	wxString m_strMe;
+};
+
+
 /*-----------------------------------*/
 
 #endif	/* __ROMLOADER_OPENOCD_MAIN_H__ */

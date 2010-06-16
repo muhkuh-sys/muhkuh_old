@@ -18,9 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-
 #include "romloader_openocd_main.h"
 #include "_luaif/romloader_openocd_wxlua_bindings.h"
+#include <wx/dynarray.h>
 
 
 #ifdef _WIN32
@@ -87,22 +87,91 @@ const romloader_functioninterface tFunctionInterface =
 
 static wxLuaState *m_ptLuaState;
 
-static wxArrayString astrInitCfg;
-static wxArrayString astrRunCfg;
+// A single configuration
+class romloader_openocd_config
+{
+public:
+	wxString strCfgName;		// value of the "id" property of the Cfg tag
+	wxArrayString astrInitCfg;	// content between <Init>...</Init>
+	wxArrayString astrRunCfg;	// content between <Run>...</Run>
+};
+
+// All configurations read from the XML file
+WX_DECLARE_OBJARRAY(romloader_openocd_config, romloader_openocd_configs);
+#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+WX_DEFINE_OBJARRAY(romloader_openocd_configs);
+
+romloader_openocd_configs m_atCfgs;
+
+
+// configuration of the output handler.
+class output_handler_priv
+{
+public:
+	unsigned long iInstanceNo;	// Instance number to print in log messages. Not used yet
+	bool fDoLog;				// if true, print to log.
+	wxString strLogOutput;		// collect log output char by char (i.e. currently not used)
+	bool fAppendOutput;			// if true, the output handler appends output to strOutput
+	wxString strOutput;			// output to pass to callback
+};
 
 /*-------------------------------------*/
 
+/* This version ignores the char messages (not used by our put/flush 
+   routines on netx side */
+
 int romloader_openocd_default_output_handler(struct command_context_s *context, char* line)
 {
-	wxString strMsg;
-
-
-	strMsg.Printf(wxT("romloader_openocd(%p)") + wxString::FromAscii(line), context->output_handler_priv);
-	wxLogMessage(strMsg);
-
+	output_handler_priv *ptPriv = (output_handler_priv*) context->output_handler_priv;
+	if (ptPriv->fDoLog) 
+	{
+		unsigned long iInstanceNo = ptPriv->iInstanceNo;
+		wxLogMessage(wxT("romloader_openocd(%x) %s"), iInstanceNo, line);
+	}
+	if (ptPriv->fAppendOutput) 
+	{
+		ptPriv->strOutput.Append(line);
+		ptPriv->strOutput.Append(wxT("\n"));
+	}
 	return ERROR_OK;
 }
 
+/* There are two routes through which messages can arrive here:
+target.c:target_call_timer_callbacks()
+--> target_request.c:target_request()
+--> target_request.c:target_asciimsg()
+--> command.c:command_print()
+--> romloader_openocd_default_output_handler
+In this case, a string of arbitrary length without CR is passed.
+
+target.c:target_call_timer_callbacks()
+--> target_request.c:target_request()
+--> target_request.c:target_asciichar()
+--> romloader_openocd_default_output_handler
+In this case, the string contains exactly 1 char, a CR terminating a message passed to uprintf is passed through.
+
+- always append line to strLogOutput
+- if length != 1, add \n
+- if lenth != 1 or line = \n, pass on message
+*/
+#if 0
+int romloader_openocd_default_output_handler(struct command_context_s *context, char* line)
+{
+	output_handler_priv *ptPriv = (output_handler_priv*) context->output_handler_priv;
+	unsigned long iInstanceNo = ptPriv->iInstanceNo;
+	size_t len = strlen(line);
+	ptPriv->strLogOutput.Append(line);
+	if (len!=1) ptPriv->strLogOutput.Append(wxT("\n"));
+	if (len!=1 || strcmp(line, "\n")==0 /* || strcmp(line, "\r")==0 */)
+	{
+		wxLogMessage(wxT("romloader_openocd(%x) %s"), iInstanceNo, ptPriv->strLogOutput);
+		if (ptPriv->fAppendOutput) ptPriv->strOutput.Append(ptPriv->strLogOutput);
+		ptPriv->strLogOutput.Empty();
+	}
+
+	return ERROR_OK;
+}
+#endif
 
 void romloader_openocd_log_printf(enum log_levels level, const char *format, ...)
 {
@@ -286,8 +355,10 @@ int readXmlTextArray(wxXmlNode *ptCfgNode, wxString strNodeName, wxArrayString *
 
 int fn_init(wxLog *ptLogTarget, wxXmlNode *ptCfgNode, wxString &strPluginId)
 {
+	int iResult = 0;
+	bool fOk;
 	wxLog *pOldLogTarget;
-	int iResult;
+	romloader_openocd_config *ptCfg;
 
 
 	/* set main app's log target */
@@ -310,15 +381,39 @@ int fn_init(wxLog *ptLogTarget, wxXmlNode *ptCfgNode, wxString &strPluginId)
 	/* init the lua state */
 	m_ptLuaState = NULL;
 
-	/* clear the command arrays */
-	astrInitCfg.Empty();
-	astrRunCfg.Empty();
+	/* clear any stored configs */
+	m_atCfgs.Empty();
 
-	/* read the config file */
-	iResult = readXmlTextArray(ptCfgNode, wxT("Init"), &astrInitCfg);
-	if( iResult==0 )
+	while (ptCfgNode != NULL)
 	{
-		iResult = readXmlTextArray(ptCfgNode, wxT("Run"), &astrRunCfg);
+		ptCfg = new romloader_openocd_config();
+		fOk = ptCfgNode->GetPropVal(wxT("id"), &ptCfg->strCfgName);
+		if( fOk!=true || ptCfg->strCfgName.IsEmpty())
+		{
+			iResult = 1;
+		}
+
+		if( iResult==0 )
+		{
+			wxLogMessage(wxT("romloader_openocd(%s) : reading config '%s'"), plugin_desc.strPluginId, ptCfg->strCfgName);
+			iResult = readXmlTextArray(ptCfgNode, wxT("Init"), &ptCfg->astrInitCfg);
+		}
+		if( iResult==0 )
+		{
+			iResult = readXmlTextArray(ptCfgNode, wxT("Run"), &ptCfg->astrRunCfg);
+		}
+
+		if (iResult == 0)
+		{
+			m_atCfgs.Add(ptCfg);
+			ptCfgNode = ptCfgNode->GetNext();
+		}
+		else
+		{
+			delete ptCfg;
+			break;
+		}
+
 	}
 
 	return iResult;
@@ -352,7 +447,6 @@ int fn_init_lua(wxLuaState *ptLuaState)
 int fn_leave(void)
 {
 	wxLogMessage(wxT("bootloader openocd plugin leave"));
-
 	return 0;
 }
 
@@ -369,7 +463,7 @@ const muhkuh_plugin_desc *fn_get_desc(void)
 static void romloader_openocd_close_instance(void *pvHandle)
 {
 	command_context_t *cmd_ctx;
-	target_t *target;
+	output_handler_priv *ptPriv;
 	int iResult;
 	wxString strMsg;
 
@@ -379,6 +473,15 @@ static void romloader_openocd_close_instance(void *pvHandle)
 
 	strMsg.Printf(wxT("closing romloader openocd at %p"), cmd_ctx);
 	wxLogMessage(strMsg);
+
+	// close jtag after closing the target, as target_close may still
+	// access the target to restore working areas
+	iResult = target_close(cmd_ctx);
+	if( iResult!=ERROR_OK )
+	{
+		strMsg.Printf(wxT("failed to close target interface: %d"), iResult);
+		wxLogWarning(strMsg);
+	}
 
 	/* NOTE: this seems to work with ftd2xx, but not with libftdi */
 	if( jtag!=NULL && jtag->quit!=NULL )
@@ -394,25 +497,22 @@ static void romloader_openocd_close_instance(void *pvHandle)
 		wxLogWarning(strMsg);
 	}
 
-	iResult = target_close(cmd_ctx);
-	if( iResult!=ERROR_OK )
-	{
-		strMsg.Printf(wxT("failed to close target interface: %d"), iResult);
-		wxLogWarning(strMsg);
-	}
+	ptPriv = (output_handler_priv*) cmd_ctx->output_handler_priv;
+	if (ptPriv != NULL) delete ptPriv;
 
 	// free commandline interface
 	command_done(cmd_ctx);
+
 }
 
 
 /*-----------------------------------*/
 
-
-static int romloader_openocd_connect(command_context_t **pptCmdCtx)
+static int romloader_openocd_connect(romloader_openocd_config &tCfg, command_context_t **pptCmdCtx, bool fDetect)
 {
 	int iResult;
 	command_context_t *cmd_ctx;
+	output_handler_priv *ptPriv;
 	target_t *target;
 	wxString strCmd;
 	wxString strMsg;
@@ -439,16 +539,20 @@ static int romloader_openocd_connect(command_context_t **pptCmdCtx)
 	}
 	else
 	{
-		command_set_output_handler(cmd_ctx, romloader_openocd_default_output_handler, NULL);
+		ptPriv = new output_handler_priv();
+		ptPriv->iInstanceNo = 0;
+		ptPriv->fAppendOutput = false;
+		ptPriv->fDoLog = true;
+		command_set_output_handler(cmd_ctx, romloader_openocd_default_output_handler, ptPriv);
 		log_set_output_handler(romloader_openocd_log_printf, romloader_openocd_short_log_printf);
 		cmd_ctx->mode = COMMAND_CONFIG;
 
 		// set config
 		sizCfgCnt = 0;
-		sizCfgMax = astrInitCfg.GetCount();
+		sizCfgMax = tCfg.astrInitCfg.GetCount();
 		while( sizCfgCnt<sizCfgMax )
 		{
-			strCmd = astrInitCfg.Item(sizCfgCnt);
+			strCmd = tCfg.astrInitCfg.Item(sizCfgCnt);
 			wxLogMessage(wxT("command: ") + strCmd);
 			iResult = command_run_line(cmd_ctx, strCmd.ToAscii());
 			if( iResult!=ERROR_OK )
@@ -481,30 +585,29 @@ static int romloader_openocd_connect(command_context_t **pptCmdCtx)
 				}
 				else
 				{
-					wxMilliSleep(500);
-
 					/* wait for target reset */
-					iInitCnt = 10;
+					wxMilliSleep(500);
+					target = get_current_target(cmd_ctx);
+					iInitCnt = 15;
 					do
 					{
 						target_call_timer_callbacks();
 						wxMilliSleep(100);
-					} while( --iInitCnt>0 );
+					} while( --iInitCnt>0 && target->state!=TARGET_HALTED);
 
-					target = get_current_target(cmd_ctx);
 					if( target->state!=TARGET_HALTED )
 					{
 						wxLogError(wxT("failed to halt the target"));
 						iResult = ERROR_TARGET_NOT_HALTED;
 					}
-					else
+					else if (fDetect==false)
 					{
 						// set config
 						sizCfgCnt = 0;
-						sizCfgMax = astrRunCfg.GetCount();
+						sizCfgMax = tCfg.astrRunCfg.GetCount();
 						while( sizCfgCnt<sizCfgMax )
 						{
-							strCmd = astrRunCfg.Item(sizCfgCnt);
+							strCmd = tCfg.astrRunCfg.Item(sizCfgCnt);
 							wxLogMessage(wxT("command: ") + strCmd);
 							iResult = command_run_line(cmd_ctx, strCmd.ToAscii());
 							if( iResult!=ERROR_OK )
@@ -547,6 +650,9 @@ static int romloader_openocd_connect(command_context_t **pptCmdCtx)
 int fn_detect_interfaces(std::vector<muhkuh_plugin_instance*> *pvInterfaceList)
 {
 	int iInterfaces;
+	size_t iCfgCount;
+	size_t iCfgNo;
+	
 	int iResult;
 	muhkuh_plugin_instance *ptInst;
 	command_context_t *cmd_ctx;
@@ -558,22 +664,29 @@ int fn_detect_interfaces(std::vector<muhkuh_plugin_instance*> *pvInterfaceList)
 	strTyp = plugin_desc.strPluginId;
 	strLuaCreateFn = wxT("muhkuh.romloader_openocd_create");
 
+	iCfgCount = m_atCfgs.Count();
 	iInterfaces = 0;
 
-	// detect interface by trying to open it
-	iResult = romloader_openocd_connect(&cmd_ctx);
-	if( iResult==ERROR_OK )
+	for (iCfgNo = 0; iCfgNo<iCfgCount; ++iCfgNo)
 	{
-		// close the instance
-		romloader_openocd_close_instance(cmd_ctx);
+		romloader_openocd_config &ptCfg = m_atCfgs.Item(iCfgNo);
 
-		// construct the name
-		strName.Printf(wxT("romloader_openocd"));
-		ptInst = new muhkuh_plugin_instance(strName, strTyp, false, strLuaCreateFn, NULL);
-		++iInterfaces;
+		// detect interface by trying to open it
+		iResult = romloader_openocd_connect(ptCfg, &cmd_ctx, true);
+		if( iResult==ERROR_OK )
+		{
+			// close the instance
+			romloader_openocd_close_instance(cmd_ctx);
 
-		// add the new instance to the list
-		pvInterfaceList->push_back(ptInst);
+			// construct the name
+			//strName.Printf(wxT("romloader_openocd  %s (#%d)"), ptCfg.strCfgName, iCfgNo);
+			strName.Printf(wxT("romloader_openocd  %s"), ptCfg.strCfgName);
+			ptInst = new muhkuh_plugin_instance(strName, strTyp, false, strLuaCreateFn, (void*) iCfgNo);
+			++iInterfaces;
+
+			// add the new instance to the list
+			pvInterfaceList->push_back(ptInst);
+		}
 	}
 
 	return iInterfaces;
@@ -582,108 +695,76 @@ int fn_detect_interfaces(std::vector<muhkuh_plugin_instance*> *pvInterfaceList)
 
 /*-------------------------------------*/
 
-
 romloader *romloader_openocd_create(void *pvHandle)
 {
+	unsigned long iCfgNo;
+	size_t iCfgCount;
 	int iResult;
 	command_context_t *cmd_ctx;
 	wxString strTyp;
 	wxString strName;
 	romloader *ptInstance = NULL;
 
+	iCfgNo = (unsigned long) pvHandle;
+	iCfgCount = m_atCfgs.Count();
 
-	iResult = romloader_openocd_connect(&cmd_ctx);
-	if( iResult==ERROR_OK )
+	if (iCfgNo >= iCfgCount)
 	{
-		// create the new instance
-		strTyp = plugin_desc.strPluginId;
-		// TODO: add some info
-		strName.Printf(wxT("romloader_openocd"));
-		ptInstance = new romloader(strName, strTyp, &tFunctionInterface, cmd_ctx, romloader_openocd_close_instance, m_ptLuaState);
+		wxLogError(wxT("romloader_openocd_create: handle %d is no valid plugin handle (max: %d)"), iCfgNo, iCfgCount);
 	}
+	else
+	{
+		wxLogMessage(wxT("romloader_openocd_create: trying to connect with config %d of %d"), iCfgNo, iCfgCount);
+		romloader_openocd_config &ptCfg = m_atCfgs.Item(iCfgNo);
+
+		iResult = romloader_openocd_connect(ptCfg, &cmd_ctx, false);
+		if( iResult==ERROR_OK )
+		{
+			// create the new instance
+			strTyp = plugin_desc.strPluginId;
+			//strName.Printf(wxT("romloader_openocd  %s (#%d)"), ptCfg.strCfgName, iCfgNo);
+			strName.Printf(wxT("romloader_openocd  %s"), ptCfg.strCfgName);
+			ptInstance = new romloader_openocd(strName, strTyp, 
+				&tFunctionInterface, cmd_ctx, (muhkuh_plugin_fn_close_instance)romloader_openocd_close_instance, 
+				m_ptLuaState);
+		}
+		else
+		{
+			wxLogError(wxT("romloader_openocd_create: connection attempt failed"));
+		}
+
+	}
+
 
 	return ptInstance;
 }
 
+/*
+romloader(wxString strName, wxString strTyp, 
+	const romloader_functioninterface *ptFn, void *pvHandle, muhkuh_plugin_fn_close_instance fn_close, 
+	wxLuaState *ptLuaState);
+*/
 
-/*-------------------------------------*/
-
-
-static bool callback(lua_State *L, int iLuaCallbackTag, unsigned long ulProgressData, void *pvCallbackUserData)
+romloader_openocd::romloader_openocd(wxString strName, wxString strTyp, 
+									 const romloader_functioninterface *ptFn, 
+									 void *pvHandle, 
+									 muhkuh_plugin_fn_close_instance fn_close, 
+									 wxLuaState *ptLuaState)
+ : romloader(strName, strTyp, ptFn, pvHandle, fn_close,ptLuaState)
 {
-	bool fStillRunning;
-	int iOldTopOfStack;
-	int iResult;
-	int iLuaType;
-	wxString strMsg;
-
-
-	// check lua state and callback tag
-	if( L!=NULL && iLuaCallbackTag!=0 )
-	{
-		// get the current stack position
-		iOldTopOfStack = lua_gettop(L);
-		// push the function tag on the stack
-		lua_rawgeti(L, LUA_REGISTRYINDEX, iLuaCallbackTag);
-		// push the arguments on the stack
-		lua_pushnumber(L, ulProgressData);
-		lua_pushnumber(L, (long)pvCallbackUserData);
-		// call the function
-		iResult = lua_pcall(L, 2, 1, 0);
-		if( iResult!=0 )
-		{
-			switch( iResult )
-			{
-			case LUA_ERRRUN:
-				strMsg = wxT("runtime error");
-				break;
-			case LUA_ERRMEM:
-				strMsg = wxT("memory allocation error");
-				break;
-			default:
-				strMsg.Printf(wxT("unknown errorcode: %d"), iResult);
-				break;
-			}
-			wxLogError(wxT("callback function failed: ") + strMsg);
-			strMsg = wxString::FromAscii(wxlua_getstringtype(L, -1));
-			wxLogError(strMsg);
-			wxLogError(wxT("cancel operation"));
-			fStillRunning = false;
-		}
-		else
-		{
-			// get the function's return value
-			iLuaType = lua_type(L, -1);
-			if( wxlua_iswxluatype(iLuaType, WXLUA_TBOOLEAN)==false )
-			{
-				wxLogError(wxT("callback function returned a non-boolean type!"));
-				fStillRunning = false;
-			}
-			else
-			{
-				if( iLuaType==LUA_TNUMBER )
-				{
-					iResult = lua_tonumber(L, -1);
-				}
-				else
-				{
-					iResult = lua_toboolean(L, -1);
-				}
-				fStillRunning = (iResult!=0);
-			}
-		}
-		// return old stack top
-		lua_settop(L, iOldTopOfStack);
-	}
-	else
-	{
-		// no callback function -> keep running
-		fStillRunning = true;
-	}
-
-	return fStillRunning;
+	// unfortunately, this is inaccessible by the C routines
+	m_strMe.Printf(wxT("romloader_uart(%p): "), this);
+	wxLogMessage(wxT("%s constructor"), m_strMe);
 }
 
+romloader_openocd::~romloader_openocd(void){
+	wxLogMessage(wxT("%s destructor"), m_strMe);
+}
+
+void romloader_openocd::connect(void){
+	romloader::connect();
+	detect_chiptyp();
+}
 
 /*-------------------------------------*/
 
@@ -702,6 +783,7 @@ void fn_disconnect(void *pvHandle)
 
 
 /* returns the connection state of the device */
+// TODO: Why false?
 bool fn_is_connected(void *pvHandle)
 {
 	return false;
@@ -800,13 +882,20 @@ int fn_read_data32(void *pvHandle, unsigned long ulNetxAddress, unsigned long *p
 	return iResult;
 }
 
+#define OPENOCD_READ_IMAGE_CHUNKSIZE (8*1024)
+#define OPENOCD_WRITE_IMAGE_CHUNKSIZE (32*1024)
+#define OPENOCD_CALL_TIMESLICE_MS (10)
 
 /* read a byte array from the netx to the pc */
 int fn_read_image(void *pvHandle, unsigned long ulNetxAddress, char *pcData, unsigned long ulSize, lua_State *L, int iLuaCallbackTag, void *pvCallbackUserData)
 {
+	int iResult = 0;
+	unsigned long ulChunkSize;
+	unsigned long ulBytesLeft;
+	bool fIsRunning;
 	command_context_t *cmd_ctx;
 	target_t *target;
-	int iResult;
+	wxString strErrorMsg;
 
 
 	/* cast the handle to the command context */
@@ -815,22 +904,56 @@ int fn_read_image(void *pvHandle, unsigned long ulNetxAddress, char *pcData, uns
 	/* get the target from the command context */
 	target = get_current_target(cmd_ctx);
 
-	/* read the data from the netX */
-	iResult = target_read_buffer(target, ulNetxAddress, ulSize, (u8*)pcData);
-	if( iResult==ERROR_OK )
+
+	/* Set chunk size: if a callback is defined, transmit several small chunks,
+		if no callabck is defined, transmit all at once. */
+	if (iLuaCallbackTag!=0)
 	{
-		iResult = 0;
+		ulChunkSize = OPENOCD_READ_IMAGE_CHUNKSIZE;
 	}
 	else
 	{
-		iResult = 1;
+		ulChunkSize = ulSize;
 	}
 
-	wxMilliSleep(1);
+	/* read the data from the netX */
+	ulBytesLeft = ulSize;
+	while (ulBytesLeft > 0)
+	{
+		/* last chunk may be smaller */
+		if (ulChunkSize > ulBytesLeft)
+		{
+			ulChunkSize = ulBytesLeft;
+		}
+
+		/* callback */
+		fIsRunning = romloader::callback_long(L, iLuaCallbackTag, ulSize-ulBytesLeft, pvCallbackUserData);
+		if( fIsRunning!=true )
+		{
+			wxLogMessage(wxT("romloader_openocd: read_image canceled"));
+			iResult = -2;
+			break;
+		}
+
+		/* read a chunk */
+		wxLogDebug(wxT("target_read_buffer: ->%x size %x"), ulNetxAddress, ulChunkSize);
+		iResult = target_read_buffer(target, ulNetxAddress, ulChunkSize, (u8*)pcData);
+		if( iResult!=ERROR_OK )
+		{
+			wxLogError(wxT("romloader_openocd: Error reading memory: target_read_buffer returned %d"), iResult);
+			iResult = 1;
+			break;
+		}
+
+		ulNetxAddress += ulChunkSize;
+		pcData += ulChunkSize;
+		ulBytesLeft -= ulChunkSize;
+
+		wxMilliSleep(1);
+	}
 
 	return iResult;
 }
-
 
 /* write a byte (8bit) from the pc to the netx */
 int fn_write_data08(void *pvHandle, unsigned long ulNetxAddress, unsigned char ucData)
@@ -928,9 +1051,13 @@ int fn_write_data32(void *pvHandle, unsigned long ulNetxAddress, unsigned long u
 /* write a byte array from the pc to the netx */
 int fn_write_image(void *pvHandle, unsigned long ulNetxAddress, const char *pcData, unsigned long ulSize, lua_State *L, int iLuaCallbackTag, void *pvCallbackUserData)
 {
+	int iResult = 0;
+	unsigned long ulChunkSize;
+	unsigned long ulBytesLeft;
+	bool fIsRunning;
 	command_context_t *cmd_ctx;
 	target_t *target;
-	int iResult;
+	wxString strErrorMsg;
 
 
 	/* cast the handle to the command context */
@@ -939,18 +1066,53 @@ int fn_write_image(void *pvHandle, unsigned long ulNetxAddress, const char *pcDa
 	/* get the target from the command context */
 	target = get_current_target(cmd_ctx);
 
-	/* write the data to the netX */
-	iResult = target_write_buffer(target, ulNetxAddress, ulSize, (u8*)pcData);
-	if( iResult==ERROR_OK )
+
+	/* Set chunk size: if a callback is defined, transmit several small chunks,
+		if no callabck is defined, transmit all at once. */
+	if (iLuaCallbackTag!=0)
 	{
-		iResult = 0;
+		ulChunkSize = OPENOCD_WRITE_IMAGE_CHUNKSIZE;
 	}
 	else
 	{
-		iResult = 1;
+		ulChunkSize = ulSize;
 	}
 
-	wxMilliSleep(1);
+	/* read the data from the netX */
+	ulBytesLeft = ulSize;
+	while (ulBytesLeft > 0)
+	{
+		/* last chunk may be smaller */
+		if (ulChunkSize > ulBytesLeft)
+		{
+			ulChunkSize = ulBytesLeft;
+		}
+
+		/* callback */
+		fIsRunning = romloader::callback_long(L, iLuaCallbackTag, ulSize-ulBytesLeft, pvCallbackUserData);
+		if( fIsRunning!=true )
+		{
+			wxLogMessage(wxT("romloader_openocd: write_image canceled!"));
+			iResult = -2;
+			break;
+		}
+
+		/* read a chunk */
+		wxLogDebug(wxT("target_write_buffer: ->%x size %x"), ulNetxAddress, ulChunkSize);
+		iResult = target_write_buffer(target, ulNetxAddress, ulChunkSize, (u8*)pcData);
+		if( iResult!=ERROR_OK )
+		{
+			wxLogError(wxT("romloader_openocd: Error writing memory: target_write_buffer returned %d"), iResult);
+			iResult = 1;
+			break;
+		}
+
+		ulNetxAddress += ulChunkSize;
+		pcData += ulChunkSize;
+		ulBytesLeft -= ulChunkSize;
+
+		wxMilliSleep(1);
+	}
 
 	return iResult;
 }
@@ -992,14 +1154,21 @@ int fn_call(void *pvHandle, unsigned long ulNetxAddress, unsigned long ulParamet
 		}
 		else
 		{
-			// grab messages here
-			// TODO: redirect outputhandler, then grab messages, restore default output handler on halt
-
 			// wait for halt
 			target = get_current_target(cmd_ctx);
+			output_handler_priv *ptPriv = (output_handler_priv*) cmd_ctx->output_handler_priv;
+
+			// redirect output if a callback is given
+			if (iLuaCallbackTag!=0)
+			{
+				ptPriv->strOutput.Empty();
+				ptPriv->fAppendOutput = true;
+				ptPriv->fDoLog = false;
+			}
+
 			do
 			{
-				wxMilliSleep(100);
+				wxMilliSleep(OPENOCD_CALL_TIMESLICE_MS);
 
 				target->type->poll(target);
 				state = target->state;
@@ -1011,7 +1180,9 @@ int fn_call(void *pvHandle, unsigned long ulNetxAddress, unsigned long ulParamet
 				else
 				{
 					// execute callback
-					fIsRunning = callback(L, iLuaCallbackTag, 0, pvCallbackUserData);
+					fIsRunning = romloader::callback_string(L, iLuaCallbackTag, ptPriv->strOutput, pvCallbackUserData);
+					ptPriv->strOutput.Empty();
+
 					if( fIsRunning!=true )
 					{
 						// operation was canceled, halt the target
@@ -1031,6 +1202,13 @@ int fn_call(void *pvHandle, unsigned long ulNetxAddress, unsigned long ulParamet
 				}
 			} while( state!=TARGET_HALTED );
 
+			if (iLuaCallbackTag!=0)
+			{
+				ptPriv->fAppendOutput = false;
+				ptPriv->fDoLog = true;
+				ptPriv->strOutput.Empty();
+			}
+
 			// usb cmd delay
 			wxMilliSleep(1);
 		}
@@ -1038,6 +1216,8 @@ int fn_call(void *pvHandle, unsigned long ulNetxAddress, unsigned long ulParamet
 
 	return iResult;
 }
+
+
 
 
 /*-------------------------------------*/
