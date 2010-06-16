@@ -4,7 +4,9 @@ Name: muhkuh; Description: Muhkuh base application; Types: full compact custom; 
 
 [Files]
 Source: bin\muhkuh.exe; DestDir: {app}\application; Components: muhkuh
+;Source: bin\muhkuh.exe.manifest; DestDir: {app}\application; Components: muhkuh
 Source: bin\serverkuh.exe; DestDir: {app}\application; Components: muhkuh
+;Source: bin\serverkuh.exe.manifest; DestDir: {app}\application; Components: muhkuh
 Source: bin\muhkuh_tips.txt; DestDir: {app}\application; Components: muhkuh
 Source: icons\custom\muhkuh_uninstall.ico; DestDir: {app}\application; Components: muhkuh
 ; system dlls
@@ -46,7 +48,7 @@ Source: bin\wxlua_msw28_wxluadebug.dll; DestDir: {app}\application; Components: 
 Source: bin\wxlua_msw28_wxluasocket.dll; DestDir: {app}\application; Components: muhkuh
 ; mhash
 Source: bin\mhash.dll; DestDir: {app}\application; Components: muhkuh
+;Source: bin\mhash.dll.manifest; DestDir: {app}\application; Components: muhkuh
 ; the docs
-Source: docs\gpl-2.0.txt; DestDir: {app}\docs; Components: muhkuh
 Source: changelog.txt; DestDir: {app}\docs; Components: muhkuh
 

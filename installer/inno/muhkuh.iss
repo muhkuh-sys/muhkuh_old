@@ -21,10 +21,11 @@ AppPublisher=Muhkuh team
 AppPublisherURL=http://muhkuh.sourceforge.net/
 AppSupportURL=http://www.sourceforge.net/projects/muhkuh
 AppUpdatesURL=http://www.sourceforge.net/projects/muhkuh
-VersionInfoCopyright=Copyright (C) 2008, Muhkuh team
-AppCopyright=Copyright (C) 2008, Muhkuh team
+VersionInfoCopyright=Copyright (C) 2010, Muhkuh team
+AppCopyright=Copyright (C) 2010, Muhkuh team
 
 InfoBeforeFile=changelog.txt
+LicenseFile=docs\gpl-2.0.txt
 
 ; icon stuff
 SetupIconFile=icons\custom\muhkuh.ico
@@ -32,6 +33,8 @@ SetupIconFile=icons\custom\muhkuh.ico
 [Messages]
 BeveledLabel=Muhkuh
 
+[Files]
+Source: docs\gpl-2.0.txt; DestDir: {app}\docs; Components: muhkuh
 
 [Tasks]
 Name: associate; Description: &Associate .mtd files with the Muhkuh application; GroupDescription: File associations:
