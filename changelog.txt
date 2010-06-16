@@ -1,6 +1,15 @@
 
 Changelog for Muhkuh
 
+ * OpenOCD plugin
+   - Handles multiple configurations
+   - Config file includes configurations for NXHX 500-RE/ETM, NXHX 50-RE/ETM, Amontec JTAGKey
+   - Progress display during fn_read_image/fn_write_image
+   - Handles DCC messages. Messages are shown in the log window, or, 
+     while fn_call is running with a callback, re-directed to the callback.
+   - jtag_device commandhas been extended to check device ids
+   - script command has been changed to allow execution of scripts in config phase
+ * fixed: bug when Log output contains "%"
  * Added Menu to Serverkuh containing an entry to close/re-open the log window
 
 Muhkuh 1.0.445
