@@ -163,12 +163,13 @@ public:
 
 // *** lua interface end ***
 
+	static bool callback_long(lua_State *L, int iLuaCallbackTag, long lProgressData, void *pvCallbackUserData);
+	static bool callback_string(lua_State *L, int iLuaCallbackTag, wxString strProgressData, void *pvCallbackUserData);
+
+
 protected:
 	bool detect_chiptyp(void);
 	unsigned int crc16(unsigned int uCrc, unsigned int uData);
-	bool callback_long(lua_State *L, int iLuaCallbackTag, long lProgressData, void *pvCallbackUserData);
-	bool callback_string(lua_State *L, int iLuaCallbackTag, wxString strProgressData, void *pvCallbackUserData);
-
 	// the lua state
 	wxLuaState *m_ptLuaState;
 
@@ -176,7 +177,7 @@ protected:
 	ROMLOADER_ROMCODE m_tRomcode;
 
 private:
-	bool callback_common(lua_State *L, void *pvCallbackUserData, int iOldTopOfStack);
+	static bool callback_common(lua_State *L, void *pvCallbackUserData, int iOldTopOfStack);
 
 	wxString m_strName;
 	wxString m_strTyp;
