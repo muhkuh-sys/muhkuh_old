@@ -1,0 +1,18 @@
+Notes about the OpenOCD configuration
+
+OpenOCD can now read multiple configurations from a single XML file.
+Each configuration is in a separate <Cfg> tag. 
+Each tag which must have a unique "id" property, which is displayed in the select plugin dialogue, and two subtags: <Init> and <Run>.
+
+When detect_interfaces is called, the <Init> section of each configuration is executed. Each configuration which allows a successful initialisation of the JTAG interface is shown in the plugin selector, using the id attribute as the screen name.
+When a configuration is selected, both the <Init> and <Run> sections of this configuration are executed.
+
+Added progress display to fn_read_image/fn_write_image
+Added handling of DCC messages. Messages are shown in the log window, or, while fn_call is running with a callback, re-directed to the callback.
+
+The jtag_device configuration instruction has been extended to check device ids:
+jtag_device ir_length   expected_ircapture_value  expected_ircapture_mask [idcode_instr expected_idcode]
+(idcode_instr is ignored)
+
+The script command has been changed to allow execution of scripts in config phase.
+The paths in the script and load_image commands are relative to the location of muhkuh.exe or serverkuh.exe.
