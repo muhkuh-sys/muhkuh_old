@@ -1284,7 +1284,7 @@ int jtag_examine_chain()
 				device = device->next;
 			}
 			device_count++;
-			
+
 			manufacturer = (idcode & 0xffe) >> 1;
 			part = (idcode & 0xffff000) >> 12;
 			version = (idcode & 0xf0000000) >> 28;
@@ -1305,6 +1305,22 @@ int jtag_examine_chain()
 		return ERROR_JTAG_INIT_FAILED;
 	}
 	
+	return ERROR_OK;
+}
+
+int jtag_check_device_ids()
+{
+	jtag_device_t *device = jtag_devices;
+	while (device)
+	{
+		if (device->expected_idcode != 0 && device->expected_idcode != device->idcode)
+		{
+			ERROR("Incorrect device id: got 0x%08x, expected 0x%08x",
+				device->idcode, device->expected_idcode);
+			return ERROR_JTAG_INIT_FAILED;
+		}
+		device = device->next;
+	}
 	return ERROR_OK;
 }
 
@@ -1458,6 +1474,9 @@ int jtag_init(struct command_context_s *cmd_ctx)
 					usleep(10000);
 				}
 
+				if (jtag_check_device_ids() != ERROR_OK)
+						return ERROR_JTAG_INVALID_INTERFACE;
+
 				return ERROR_OK;
 			}
 		}
@@ -1507,6 +1526,8 @@ int handle_interface_command(struct command_context_s *cmd_ctx, char *cmd, char 
 	return ERROR_OK;
 }
 
+// jtag_device <ir length> <expected ir capture value> <mask> [<idcode instr> <expected idcode value>]
+// idcode instr is not evaluated or stored, seems to be hardcoded
 int handle_jtag_device_command(struct command_context_s *cmd_ctx, char *cmd, char **args, int argc)
 {
 	jtag_device_t **last_device_p = &jtag_devices;
@@ -1533,6 +1554,11 @@ int handle_jtag_device_command(struct command_context_s *cmd_ctx, char *cmd, cha
 	(*last_device_p)->bypass = 1;
 	buf_set_ones((*last_device_p)->cur_instr, (*last_device_p)->ir_length);
 	
+	if (argc >= 5)
+		(*last_device_p)->expected_idcode = strtoul(args[4], NULL, 0);
+	else
+		(*last_device_p)->expected_idcode = 0;
+
 	(*last_device_p)->next = NULL;
 	
 	jtag_register_event_callback(jtag_reset_callback, (*last_device_p));

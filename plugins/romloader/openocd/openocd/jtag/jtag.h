@@ -165,6 +165,7 @@ typedef struct jtag_device_s
 	u8 *expected;		/* Capture-IR expected value */
 	u8 *expected_mask;	/* Capture-IR expected mask */
 	u32 idcode;			/* device identification code */
+	u32 expected_idcode;/* expected device identification code */
 	u8 *cur_instr;		/* current instruction */
 	int bypass;			/* bypass register selected */
 	struct jtag_device_s *next;
