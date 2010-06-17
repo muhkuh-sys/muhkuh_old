@@ -680,7 +680,7 @@ int fn_detect_interfaces(std::vector<muhkuh_plugin_instance*> *pvInterfaceList)
 
 			// construct the name
 			//strName.Printf(wxT("romloader_openocd  %s (#%d)"), ptCfg.strCfgName, iCfgNo);
-			strName.Printf(wxT("romloader_openocd  %s"), ptCfg.strCfgName);
+			strName.Printf(wxT("romloader_openocd_%s"), ptCfg.strCfgName);
 			ptInst = new muhkuh_plugin_instance(strName, strTyp, false, strLuaCreateFn, (void*) iCfgNo);
 			++iInterfaces;
 
@@ -722,8 +722,8 @@ romloader *romloader_openocd_create(void *pvHandle)
 		{
 			// create the new instance
 			strTyp = plugin_desc.strPluginId;
-			//strName.Printf(wxT("romloader_openocd  %s (#%d)"), ptCfg.strCfgName, iCfgNo);
-			strName.Printf(wxT("romloader_openocd  %s"), ptCfg.strCfgName);
+			//strName.Printf(wxT("romloader_openocd %s (#%d)"), ptCfg.strCfgName, iCfgNo);
+			strName.Printf(wxT("romloader_openocd_%s"), ptCfg.strCfgName);
 			ptInstance = new romloader_openocd(strName, strTyp, 
 				&tFunctionInterface, cmd_ctx, (muhkuh_plugin_fn_close_instance)romloader_openocd_close_instance, 
 				m_ptLuaState);
