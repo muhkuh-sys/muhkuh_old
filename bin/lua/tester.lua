@@ -385,11 +385,11 @@ function stdRead(parent, plugin, ulNetxAddress, ulLength)
 							wx.wxPD_AUTO_HIDE+wx.wxPD_CAN_ABORT+wx.wxPD_ESTIMATED_TIME+wx.wxPD_REMAINING_TIME+wx.wxPD_ELAPSED_TIME)
 	--strData = plugin:read_image(ulNetxAddress, ulLength, tester.stdReadCallback, 0)
 	local fOK, strData = pcall(plugin.read_image, plugin, ulNetxAddress, ulLength, tester.stdReadCallback, 0)
+	stdReadCloseProgress()
 	if not fOK then
 		print("plugin.read_image:" .. (strData or "unknown error"))
 		return nil, fOK, strData
 	end
-	stdReadCloseProgress()
 	return strData
 end
 
@@ -1373,7 +1373,7 @@ function run()
 	updateTestReport(nil)
 
 	-- run a single test?
-	if __MUHKUH_TEST_INDEX>0 then
+	if __MUHKUH_TEST_INDEX~=nil and __MUHKUH_TEST_INDEX>0 then
 		moveToTest(1, __MUHKUH_TEST_INDEX)
 	end
 
