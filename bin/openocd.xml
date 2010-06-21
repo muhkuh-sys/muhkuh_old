@@ -48,7 +48,7 @@
 		</Run>
 	</Cfg>
 	
-	<Cfg id="netX500 JTAGkey">
+	<Cfg id="netX100/500 JTAGkey">
 		<Init>
 			interface ft2232
 			ft2232_device_desc "Amontec JTAGkey"
