@@ -1,16 +1,24 @@
 
 Changelog for Muhkuh
 
+Muhkuh 1.0.741
+
  * OpenOCD plugin
    - Handles multiple configurations
    - Config file includes configurations for NXHX 500-RE/ETM, NXHX 50-RE/ETM, Amontec JTAGKey
    - Progress display during fn_read_image/fn_write_image
    - Handles DCC messages. Messages are shown in the log window, or, 
      while fn_call is running with a callback, re-directed to the callback.
-   - jtag_device commandhas been extended to check device ids
+   - jtag_device command has been extended to check device ids
    - script command has been changed to allow execution of scripts in config phase
- * fixed: bug when Log output contains "%"
  * Added Menu to Serverkuh containing an entry to close/re-open the log window
+ * All config changes are written to a user-specific config file in the user's local app data directory
+ * utils.getLocalFile, loadBin, writeBin: File object is explicitly gc'ed after use
+ * fixed in tester.lua: progress window was not closed if stdRead was aborted
+ * fixed: crash when config file is not writeable (config is now written in main frame destructor)
+ * fixed: bug when Log output contains "%"
+ * msvc9 unicode fixes
+ * removed debugger and dependencies to stc
 
 Muhkuh 1.0.445
 
