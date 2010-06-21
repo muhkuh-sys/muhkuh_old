@@ -194,8 +194,12 @@ void muhkuh_regApp::showHelp(void)
 
 	printf(	"\n"
 		"Examples:\n"
+		/*
 		"  regkuh -rp plugins/romloader_uart.xml\n"
 		"        register the romloader_uart plugin in the plugins folder.\n"
+		*/
+		"  regkuh -c Bootwizard.cfg rp:plugins/openocd_win.xml:1\n"
+		"        register the openOCD plugin in the plugins folder and enable it.\n"
 		"\n"
 		"Muhkuh home page: www.sf.net/projects/muhkuh\n"
 	);
@@ -597,7 +601,7 @@ int muhkuh_regApp::register_plugin(wxArrayString &aParam)
 		// get the optional "enable" parameter
 		if( sizParamCount==3 )
 		{
-			strEnable = aParam[1];
+			strEnable = aParam[2];
 			if( strEnable.Cmp(wxT("1"))==0 )
 			{
 				// make this repository active
