@@ -10,5 +10,6 @@ Source: "bin\openocd.dll";                     DestDir: "{app}\application\plugi
 ;Source: "bin\openocd_netx50_jtagkey_win.xml";  DestDir: "{app}\application\plugins"; Components: plugin_romloader_openocd
 ;Source: "bin\openocd_netx500_jtagkey_win.xml"; DestDir: "{app}\application\plugins"; Components: plugin_romloader_openocd
 ;Source: "bin\openocd_nxhx50_win.xml";          DestDir: "{app}\application\plugins"; Components: plugin_romloader_openocd
+Source: "bin\ftd2xx.dll";                      DestDir: "{app}\application"; Components: plugin_romloader_openocd
 Source: "bin\openocd_win.xml";                 DestDir: "{app}\application\plugins"; Components: plugin_romloader_openocd
 Source: "bin\plugins\openocd\*";               DestDir: "{app}\application\plugins\openocd"; Components: plugin_romloader_openocd
