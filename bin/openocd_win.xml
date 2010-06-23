@@ -40,7 +40,7 @@
 			interface ft2232
 			ft2232_device_desc "NXHX 500-RE A"
 			ft2232_layout comstick
-			# ft2232_vid_pid 0x0640 0x0028
+			ft2232_vid_pid 0x0640 0x0028
 			script plugins/openocd/netx500_init_workarea0380.txt
 		</Init>
 		<Run>
@@ -53,7 +53,7 @@
 			interface ft2232
 			ft2232_device_desc "Amontec JTAGkey A"
 			ft2232_layout "jtagkey"
-			# ft2232_vid_pid 0x0403 0xcff8
+			ft2232_vid_pid 0x0403 0xcff8
 			script plugins/openocd/netx500_init_workarea0380.txt
 		</Init>
 		<Run>
