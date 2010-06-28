@@ -192,17 +192,38 @@ void muhkuh_regApp::showHelp(void)
 	// show general usage
 	ptParser->Usage();
 
-	printf(	"\n"
+	printf(
+		"Commands:\n"
+		" rp: add entry to [Plugins] (does not check for existence)\n"
+		" rp:plugin.xml[:enable]                            register plugin\n"
+		"     enable -> 0|1, default 1\n"
+		"\n"
+		" rr: add entry to [Repositories]\n"
+		" rr:repository name:d:location:extension[:active]  directory scan\n"
+		" rr:repository name:f:location[:active]            file list\n"
+		" rr:repository name:s:location[:active]            single XML\n"
+		"     active -> 0|1, default \n"
+		"\n"
+		" ct, ci, as: set customtitle, customicon, autostart, autoexit, startscript entries in [MainFrame]\n"
+		" ct:mytitle                                        set customtitle\n"
+		" ct                                                clear customtitle\n"
+		" ci:icon.ico                                       set customicon\n"
+		" ci                                                clear customicon\n"
+		" as:startscript[:autoexit]                         set autostart, autostarttest, autoexit\n"
+		"     autoexit -> 0|1, default 0(false)\n"
+		" as                                                disable autostart+autoexit\n"
+		"\n"
 		"Examples:\n"
-		/*
-		"  regkuh -rp plugins/romloader_uart.xml\n"
-		"        register the romloader_uart plugin in the plugins folder.\n"
-		*/
-		"  regkuh -c Bootwizard.cfg rp:plugins/openocd_win.xml:1\n"
+		" regkuh rp:plugins/openocd_win.xml:1\n"
 		"        register the openOCD plugin in the plugins folder and enable it.\n"
 		"\n"
-		"Muhkuh home page: www.sf.net/projects/muhkuh\n"
-	);
+		" regkuh ct:icon.ico \n"
+	    "        set customtitle=icon.ico\n"
+		"\n"
+		" regkuh -c Bootwizard.cfg ...\n"
+		"        Apply changes to the file Bootwizard.cfg\n"
+		"\n"
+		"Muhkuh home page: www.sf.net/projects/muhkuh\n"	);
 }
 
 
@@ -500,13 +521,13 @@ int muhkuh_regApp::custom_title(wxArrayString &aParam)
 		{
 			strTitle.Empty();
 		}
-		else if( sizParamCount!=2 )
+		else if( sizParamCount==2 )
 		{
 			strTitle = aParam[1];
 		}
 		else
 		{
-			wxLogError(wxT("not enough parameter for a plugin!"));
+			wxLogError(wxT("Too many parameters"));
 			iRes = EXIT_FAILURE;
 		}
 
@@ -549,13 +570,13 @@ int muhkuh_regApp::custom_icon(wxArrayString &aParam)
 		{
 			strIcon.Empty();
 		}
-		else if( sizParamCount!=2 )
+		else if( sizParamCount==2 )
 		{
 			strIcon = aParam[1];
 		}
 		else
 		{
-			wxLogError(wxT("not enough parameter for a custom icon!"));
+			wxLogError(wxT("Too many parameters"));
 			iRes = EXIT_FAILURE;
 		}
 
@@ -844,7 +865,6 @@ int muhkuh_regApp::autostart(wxArrayString &aParam)
 			strAutoexit = aParam[2];
 			if( strAutoexit.Cmp(wxT("1"))==0 )
 			{
-				// make this repository active
 				fAutoExit = true;
 			}
 			else if( strAutoexit.Cmp(wxT("0"))==0 )
