@@ -1,9 +1,10 @@
 <MuhkuhPluginConfig name="OpenOCD" so="openocd" id="romloader_openocd">
 	<!--
 	Memory usage:
-	                netx 500                  netx 50 
-	Intram     0380 -     03ff   ITCM      0380 -     03ff working area for DCC downloads
-	Intram     0400 -     04ff   ITCM      0400 -     04ff DCC output code
+	           netx 500                  netx 50 
+	Intram     0380 -     03ff   Intram    0380 -     03ff working area for DCC downloads
+	Intram     0400 -     04ff   Intram    0400 -     04ff DCC output code
+	TCM    10000000 - 10000200   Intram    0500 -     7ffc Stack
 	TCM    10001e00 - 10001eff   DTCM  04000e00 - 0e000eff DCC output buffer
 	TCM    10001fe0              DTCM  04000fe0            DCC output buffer pointer
 	TCM    10001ff0 - 10001fff   DTCM  04000ff0 - 04000fff serial vectors

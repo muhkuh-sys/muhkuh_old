@@ -14,14 +14,14 @@
 			
 			# set the ctrl register to ... 
 			# 15: 0 TBIT enable
-			# 12: 1 enable ITCM
+			# 12: 0 disable ITCM
 			# 7:  0 little endianess
 			# 3:  1 enable buffered writes in bufferable areas 
 			# 2:  1 enable DTCM 
 			# 1:  0 disable alignment check
 			
 			arm966e cp15 7 0
-			arm966e cp15 2 0x00001f7c
+			arm966e cp15 2 0x00000f7c
 			
 			# init regs
 			bp 0x200000 4 hw

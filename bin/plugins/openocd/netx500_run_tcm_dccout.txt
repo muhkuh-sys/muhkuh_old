@@ -1,11 +1,13 @@
 			#init regs 
 			
+			# no TCM, stack at 0x7ffc
 			#bp 0x200000 4 hw
 			#reg cpsr 0xd3
 			#reg spsr_svc 0xd3
 			#reg r13_svc 0x7ffc
 			#reg lr_svc 0x200000
 			
+			# TCM enabled, stack at 0x10000200
 			bp 0x200000 4 hw
 			reg cpsr 0xd3
 			reg r13_svc 0x10000200
