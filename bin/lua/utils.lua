@@ -17,6 +17,15 @@
 --   Free Software Foundation, Inc.,                                       --
 --   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             --
 -----------------------------------------------------------------------------
+--
+-- Description:
+--   utility routines for Muhkuh
+--
+--  Changes:
+--    Date        Author        Description
+--  Sept 24, 2010 SL            added runcommand_set_background
+-----------------------------------------------------------------------------
+
 module("utils", package.seeall)
 
 
@@ -146,9 +155,19 @@ end
 --   result : return code from the command
 --   text : output from the command
 
+-- When runcommand is called from a GUI application, all application windows are
+-- disabled until the command exits.
+-- If runcommand is used from the command line, i.e. may run in the background,
+-- we add the wx.wxEXEC_NODISABLE flag to prevent other apps from losing focus.
+
+runcommand_flags = wx.wxEXEC_SYNC
+function runcommand_set_background()
+	runcommand_flags = wx.wxEXEC_SYNC + wx.wxEXEC_NODISABLE
+end
+
 function runcommand(cmd)
 	vbs_print("Running command: ", cmd)
-	local lRet, astrOutput, astrErrors = wx.wxExecuteStdoutStderr(cmd, wx.wxEXEC_SYNC)
+	local lRet, astrOutput, astrErrors = wx.wxExecuteStdoutStderr(cmd, runcommand_flags)
 	local strOutput = astrOutput and table.concat(astrOutput, "\n") or ""
 	local strErrors = astrErrors and table.concat(astrErrors, "\n") or ""
 	local strOutput = strOutput .. strErrors
