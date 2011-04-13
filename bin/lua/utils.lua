@@ -23,6 +23,8 @@
 --
 --  Changes:
 --    Date        Author        Description
+--  Apr 11, 2011  SL            tmpname: returns path ending in .tmp 
+--                              and handles separators properly
 --  Sept 24, 2010 SL            added runcommand_set_background
 -----------------------------------------------------------------------------
 
@@ -95,12 +97,41 @@ end
 function tmpname()
 	local tmpdirname = os.getenv("TEMP") or os.getenv("TMP")
 	local tmpfilename = os.tmpname()
-	if tmpdirname then
-		return tmpdirname .. "/" .. tmpfilename
+	local tmppath
+	
+	-- make sure the file name has a "tmp" suffix
+	if tmpfilename:sub(-1) == "." then
+		tmpfilename = tmpfilename .. "tmp"
 	else
-		return tmpfilename
+		tmpfilename = tmpfilename .. ".tmp"
 	end
+	
+	if tmpdirname then
+		-- handle the separator if the file name is 
+		-- to be concatenated to a directory 
+		local separator = "/"
+		local ch
+		
+		ch = tmpfilename:sub(1, 1) 
+		if ch == "\\" or ch == "/" then
+			tmpfilename = tmpfilename:sub(2)
+			separator = ch
+		end
+		
+		ch = tmpdirname:sub(-1)
+		if ch == "\\" or ch == "/" then
+			tmpdirname = tmpdirname:sub(1, -2)
+			separator = ch
+		end
+		
+		tmppath = tmpdirname .. separator .. tmpfilename
+	else
+		tmppath = tmpfilename
+	end
+	
+	return tmppath
 end
+
 
 ---------------------------------------
 -- getlocalfile
