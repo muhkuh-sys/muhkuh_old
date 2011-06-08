@@ -1170,8 +1170,14 @@ int fn_call(void *pvHandle, unsigned long ulNetxAddress, unsigned long ulParamet
 			{
 				wxMilliSleep(OPENOCD_CALL_TIMESLICE_MS);
 
+				// execute callback
+				fIsRunning = romloader::callback_string(L, iLuaCallbackTag, ptPriv->strOutput, pvCallbackUserData);
+				ptPriv->strOutput.Empty();
+
+				// check if the target is still running
 				target->type->poll(target);
 				state = target->state;
+
 				if( state==TARGET_HALTED )
 				{
 					wxLogMessage(wxT("call finished!"));
@@ -1179,10 +1185,6 @@ int fn_call(void *pvHandle, unsigned long ulNetxAddress, unsigned long ulParamet
 				}
 				else
 				{
-					// execute callback
-					fIsRunning = romloader::callback_string(L, iLuaCallbackTag, ptPriv->strOutput, pvCallbackUserData);
-					ptPriv->strOutput.Empty();
-
 					if( fIsRunning!=true )
 					{
 						// operation was canceled, halt the target
@@ -1206,7 +1208,6 @@ int fn_call(void *pvHandle, unsigned long ulNetxAddress, unsigned long ulParamet
 			{
 				ptPriv->fAppendOutput = false;
 				ptPriv->fDoLog = true;
-				ptPriv->strOutput.Empty();
 			}
 
 			// usb cmd delay
