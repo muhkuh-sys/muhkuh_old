@@ -1,6 +1,10 @@
 
 Changelog for Muhkuh
 
+Muhkuh 1.0.1180
+
+ * fixed in openOCD plugin: The last line of debug output was not shown or passed to the callback.
+
 Muhkuh 1.0.741
 
  * OpenOCD plugin
