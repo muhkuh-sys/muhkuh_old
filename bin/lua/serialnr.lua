@@ -154,7 +154,7 @@ function run(iSerialNo, iBoardCount)
 
 
 	-- create the dialog
-	m_dialog = wx.wxDialog(wx.NULL, wx.wxID_ANY, "Select the plugin", wx.wxDefaultPosition, wx.wxDefaultSize, wx.wxDEFAULT_DIALOG_STYLE+wx.wxRESIZE_BORDER)
+	m_dialog = wx.wxDialog(wx.NULL, wx.wxID_ANY, "Settings for test run", wx.wxDefaultPosition, wx.wxDefaultSize, wx.wxDEFAULT_DIALOG_STYLE+wx.wxRESIZE_BORDER)
 
 	-- get datecode
 	dToday = wx.wxDateTime()
