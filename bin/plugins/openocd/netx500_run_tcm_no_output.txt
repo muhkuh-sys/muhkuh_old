@@ -1,0 +1,29 @@
+			#init regs 
+			
+			# no TCM, stack at 0x7ffc
+			#bp 0x200000 4 hw
+			#reg cpsr 0xd3
+			#reg spsr_svc 0xd3
+			#reg r13_svc 0x7ffc
+			#reg lr_svc 0x200000
+			
+			# TCM enabled, stack at 0x10000200
+			bp 0x200000 4 hw
+			reg cpsr 0xd3
+			reg r13_svc 0x10000200
+			reg lr_svc 0x200000
+			arm926ejs cp15 0 0 7 7 0
+			arm926ejs cp15 0 4 7 10 0
+			arm926ejs cp15 0 0 8 7 0
+			arm926ejs cp15 0 0 1 0 0x00050078
+			arm926ejs cp15 0 0 9 1 0x10000001
+			
+			# set serial vectors
+			mww 0x10001ff0 0 # Get
+			mww 0x10001ff4 0 # Put
+			mww 0x10001ff8 0 # Peek
+			mww 0x10001ffc 0 # Flush
+			
+			arm7_9 dcc_downloads enable
+			arm7_9 fast_memory_access enable
+			target_request debugmsgs enable
