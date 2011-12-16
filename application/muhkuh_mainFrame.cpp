@@ -2332,7 +2332,9 @@ void muhkuh_mainFrame::OnMove(wxMoveEvent &event)
 	if( IsIconized()==false && IsFullScreen()==false && IsMaximized()==false )
 	{
 		// frame is in normal state -> remember the position
-		m_framePosition = event.GetPosition();
+		/* hack: The position stored in the event seems to be incorrect */
+		// m_framePosition = event.GetPosition();
+		m_framePosition = this->GetPosition();
 	}
 }
 
