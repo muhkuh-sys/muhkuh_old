@@ -448,6 +448,15 @@ wxString romloader::get_chiptyp_name(ROMLOADER_CHIPTYP tChiptyp)
 	case ROMLOADER_CHIPTYP_NETX50:
 		strChiptyp = wxT("netX50");
 		break;
+	case ROMLOADER_CHIPTYP_NETX10:
+		strChiptyp = wxT("netX10");
+		break;
+	case ROMLOADER_CHIPTYP_NETX51:
+		strChiptyp = wxT("netX51");
+		break;
+	case ROMLOADER_CHIPTYP_NETX52:
+		strChiptyp = wxT("netX52");
+		break;
 	case ROMLOADER_CHIPTYP_UNKNOWN:
 		strChiptyp = _("unknown chip");
 		break;
@@ -469,6 +478,9 @@ wxString romloader::get_romcode_name(ROMLOADER_ROMCODE tRomcode)
 		break;
 	case ROMLOADER_ROMCODE_HBOOT:
 		strRomcode = wxT("HBoot");
+		break;
+	case ROMLOADER_ROMCODE_HBOOT2:
+		strRomcode = wxT("HBoot2");
 		break;
 	case ROMLOADER_ROMCODE_UNKNOWN:
 		strRomcode = _("unknown romcode");
@@ -496,7 +508,7 @@ bool romloader::detect_chiptyp(void)
 
 	// read the reset vector at 0x00000000
 	ulResetVector = read_data32(0);
-	wxLogMessage(wxT("romloader_uart(%p): reset vector: 0x%08X"), this, ulResetVector);
+	wxLogMessage(wxT("romloader(%p): reset vector: 0x%08X"), this, ulResetVector);
 
 	// match the reset vector to all known chipfamilies
 	ptRstCnt = atResIds;
@@ -509,7 +521,7 @@ bool romloader::detect_chiptyp(void)
 			ulVersionAddr = ptRstCnt->ulVersionAddress;
 			// read version address
 			ulVersion = read_data32(ulVersionAddr);
-			wxLogMessage(wxT("romloader_uart(%p): version value: 0x%08X"), this, ulVersion);
+			wxLogMessage(wxT("romloader(%p): version value: 0x%08X"), this, ulVersion);
 			if( ptRstCnt->ulVersionValue==ulVersion )
 			{
 				// found chip!
@@ -541,11 +553,14 @@ bool romloader::detect_chiptyp(void)
 }
 
 
-const tRomloader_ResetId romloader::atResIds[3] =
+const tRomloader_ResetId romloader::atResIds[6] =
 {
 	{ 0xea080001,	0x00200008,	0x00001000,	ROMLOADER_CHIPTYP_NETX500,  ROMLOADER_ROMCODE_ABOOT },  // aboot netx500
 	{ 0xea080002,	0x00200008,	0x00003002,	ROMLOADER_CHIPTYP_NETX100,  ROMLOADER_ROMCODE_ABOOT },  // aboot netx100
-	{ 0xeac83ffc,	0x08200008,	0x00002001,	ROMLOADER_CHIPTYP_NETX50,   ROMLOADER_ROMCODE_HBOOT }   // hboot netx50
+	{ 0xeac83ffc,	0x08200008,	0x00002001,	ROMLOADER_CHIPTYP_NETX50,   ROMLOADER_ROMCODE_HBOOT },  // hboot netx50
+	{ 0xeafdfffa,	0x08070008,	0x00005003,	ROMLOADER_CHIPTYP_NETX10,	ROMLOADER_ROMCODE_HBOOT },  // hboot netx10
+	{ 0xeafbfffa,	0x080f0008,	0x00006003,	ROMLOADER_CHIPTYP_NETX51,	ROMLOADER_ROMCODE_HBOOT2},  // hboot2 netx51
+	{ 0xeafbfffa,	0x080f0008,	0x00007003,	ROMLOADER_CHIPTYP_NETX52,	ROMLOADER_ROMCODE_HBOOT2}   // hboot2 netx52
 };
 
 
