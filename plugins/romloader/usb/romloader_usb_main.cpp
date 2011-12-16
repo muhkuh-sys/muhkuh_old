@@ -25,6 +25,13 @@
 #include <wx/wx.h>
 #include <wx/regex.h>
 
+/* used in read_image/write_image   test     old value */
+#define USB_EXCHANGE_WRITE_TIMEOUT   700  //  200
+#define USB_EXCHANGE_READ_TIMEOUT    700  //  200
+/* used in call */
+#define USB_CALL_WRITE_TIMEOUT       200  //  200
+#define USB_CALL_READ_TIMEOUT       1000  //  200
+
 /*-------------------------------------*/
 
 static muhkuh_plugin_desc plugin_desc =
@@ -37,6 +44,184 @@ static muhkuh_plugin_desc plugin_desc =
 static wxLuaState *m_ptLuaState;
 
 /*-------------------------------------*/
+/*
+Changes:
+replaced calls to usb_* with pfn_usb_*
+Each pfn_usb_* is either a valid function from libusb0.dll or a dummy.
+
+fn_detect_interfaces calls libusb_isloaded
+fn_init calls libusb_loa
+fn_leave calls libusb_unload
+
+*/
+
+#ifdef WIN32
+/* global pointers to the used libusb functions */
+
+usb_dev_handle *(* pfn_usb_open)(struct usb_device *dev);
+int             (* pfn_usb_close)(usb_dev_handle *dev);
+int             (* pfn_usb_bulk_write)(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout);
+int             (* pfn_usb_bulk_read)(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout);
+int             (* pfn_usb_set_configuration)(usb_dev_handle *dev, int configuration);
+int             (* pfn_usb_claim_interface)(usb_dev_handle *dev, int _interface);
+int             (* pfn_usb_release_interface)(usb_dev_handle *dev, int _interface);
+int             (* pfn_usb_reset)(usb_dev_handle *dev);
+void            (* pfn_usb_init)(void);
+struct usb_bus *(* pfn_usb_get_busses)(void);
+int             (* pfn_usb_find_busses)(void);
+int             (* pfn_usb_find_devices)(void);
+
+/* non-NULL if the dll has been loaded and the function pointers have been set */ 
+wxDllType tDllHandle;
+
+/* dummy functions */
+usb_dev_handle * no_usb_open(struct usb_device *dev) {return NULL;}
+int              no_usb_close(usb_dev_handle *dev) {return  LIBUSB_ERROR_NOT_SUPPORTED;}
+int              no_usb_bulk_write(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout) {return  LIBUSB_ERROR_NOT_SUPPORTED;}
+int              no_usb_bulk_read(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout) {return  LIBUSB_ERROR_NOT_SUPPORTED;}
+int              no_usb_set_configuration(usb_dev_handle *dev, int configuration) {return  LIBUSB_ERROR_NOT_SUPPORTED;}
+int              no_usb_claim_interface(usb_dev_handle *dev, int _interface) {return  LIBUSB_ERROR_NOT_SUPPORTED;}
+int              no_usb_release_interface(usb_dev_handle *dev, int _interface) {return  LIBUSB_ERROR_NOT_SUPPORTED;}
+int              no_usb_reset(usb_dev_handle *dev) {return  LIBUSB_ERROR_NOT_SUPPORTED;}
+void             no_usb_init(void){}
+struct usb_bus * no_usb_get_busses(void) {return NULL;}
+int              no_usb_find_busses(void) {return  LIBUSB_ERROR_NOT_SUPPORTED;}
+int              no_usb_find_devices(void) {return  LIBUSB_ERROR_NOT_SUPPORTED;}
+
+
+/* auxiliary structures for reading the symbols from the dll */
+typedef struct 
+{
+	const char *pstrFnName;
+	void** ppFnPtr;
+	void* pDefaultFnPtr;
+} T_DLL_SYMBOL_ENTRY;
+
+T_DLL_SYMBOL_ENTRY atLibusbSymbols[] = {
+	{wxT("usb_open")              , (void**) &pfn_usb_open,                 (void*) no_usb_open},             
+	{wxT("usb_close")             , (void**) &pfn_usb_close,                (void*) no_usb_close},            
+	{wxT("usb_bulk_write")        , (void**) &pfn_usb_bulk_write,           (void*) no_usb_bulk_write},       
+	{wxT("usb_bulk_read")         , (void**) &pfn_usb_bulk_read,            (void*) no_usb_bulk_read},        
+	{wxT("usb_set_configuration") , (void**) &pfn_usb_set_configuration,    (void*) no_usb_set_configuration},
+	{wxT("usb_claim_interface")   , (void**) &pfn_usb_claim_interface,      (void*) no_usb_claim_interface},  
+	{wxT("usb_release_interface") , (void**) &pfn_usb_release_interface,    (void*) no_usb_release_interface},
+	{wxT("usb_reset")             , (void**) &pfn_usb_reset,                (void*) no_usb_reset},            
+	{wxT("usb_init")              , (void**) &pfn_usb_init,                 (void*) no_usb_init},             
+	{wxT("usb_get_busses")        , (void**) &pfn_usb_get_busses,           (void*) no_usb_get_busses},       
+	{wxT("usb_find_busses")       , (void**) &pfn_usb_find_busses,          (void*) no_usb_find_busses},      
+	{wxT("usb_find_devices")      , (void**) &pfn_usb_find_devices,         (void*) no_usb_find_devices},     
+};
+
+#define ARRAY_ENDADDR(arrayname) arrayname + (sizeof(arrayname)/sizeof(arrayname[0]))
+
+void libusb_setDummyFunctions();
+
+bool libusb_load()
+{
+	wxDynamicLibrary dll;
+	bool fDllLoaded;
+	bool fLibusbPointersInitialized;
+
+	fDllLoaded = dll.Load(wxT("libusb0"), wxDL_DEFAULT);
+	if( fDllLoaded==false )
+	{
+		wxLogMessage(_("romloader_usb: Failed to load libusb."));
+	}
+	else
+	{
+		wxLogMessage(_("romloader_usb: libusb loaded."));
+		T_DLL_SYMBOL_ENTRY *ptPfnEntry = atLibusbSymbols;
+		T_DLL_SYMBOL_ENTRY *ptPfnTableEnd = ARRAY_ENDADDR(atLibusbSymbols);
+		void* pvFn;
+
+		fLibusbPointersInitialized = true;
+		while (ptPfnEntry < ptPfnTableEnd)
+		{
+			pvFn = dll.GetSymbol(ptPfnEntry->pstrFnName);
+			*(ptPfnEntry->ppFnPtr) = pvFn;
+
+			if (pvFn == NULL)
+			{
+				fLibusbPointersInitialized = false;
+				wxLogError(_("romloader_usb: Symbol %s not found in libusb"), ptPfnEntry->pstrFnName);
+				break;
+			}
+
+			ptPfnEntry++;
+		}
+	}
+
+	if( fDllLoaded && fLibusbPointersInitialized )
+	{
+		// get handle for the dll
+		tDllHandle = dll.Detach();
+		return true;
+	}
+	else
+	{
+		// unload the dll
+		if (fDllLoaded) 
+		{
+			dll.Unload();
+		}
+		tDllHandle = NULL;
+		libusb_setDummyFunctions();
+		wxLogMessage(_("romloader_usb: netX500/100 USB devices will not be available."));
+		return false;
+	}
+}
+
+
+void libusb_setDummyFunctions()
+{
+	T_DLL_SYMBOL_ENTRY *ptPfnEntry = atLibusbSymbols;
+	T_DLL_SYMBOL_ENTRY *ptPfnTableEnd = ARRAY_ENDADDR(atLibusbSymbols);
+	while (ptPfnEntry < ptPfnTableEnd)
+	{
+		*ptPfnEntry->ppFnPtr = ptPfnEntry->pDefaultFnPtr;
+		ptPfnEntry++;
+	}
+}
+
+void libusb_unload()
+{
+	if (tDllHandle!=NULL)
+	{
+		wxDynamicLibrary::Unload(tDllHandle);
+		tDllHandle = NULL;
+		wxLogMessage(_("romloader_usb: libusb unloaded."));
+	}
+	libusb_setDummyFunctions();
+}
+
+bool libusb_isloaded()
+{
+	return (tDllHandle!=NULL);
+}
+
+
+#else /* Linux */
+
+bool libusb_load() {return true;}
+bool libusb_isloaded() {return true;}
+void libusb_unload() {}
+
+#define  pfn_usb_init               usb_init
+#define  pfn_usb_open               usb_open
+#define  pfn_usb_close              usb_close
+#define  pfn_usb_reset              usb_reset
+#define  pfn_usb_get_busses         usb_get_busses
+#define  pfn_usb_find_busses        usb_find_busses
+#define  pfn_usb_find_devices       usb_find_devices
+#define  pfn_usb_get_descriptor     usb_get_descriptor
+#define  pfn_usb_claim_interface    usb_claim_interface
+#define  pfn_usb_release_interface  usb_release_interface
+#define  pfn_usb_set_configuration  usb_set_configuration
+#define  pfn_usb_bulk_write         usb_bulk_write
+#define  pfn_usb_bulk_read          usb_bulk_read
+
+#endif
+
 
 /*-------------------------------------*/
 
@@ -60,8 +245,8 @@ int libusb_open(libusb_device *ptDevice, libusb_device_handle **pptDevHandle)
 	libusb_device_handle *ptDevHandle;
 	int iError;
 
+	ptDevHandle = pfn_usb_open(ptDevice);
 
-	ptDevHandle = usb_open(ptDevice);
 	if( ptDevHandle!=NULL )
 	{
 		*pptDevHandle = ptDevHandle;
@@ -79,19 +264,21 @@ int libusb_open(libusb_device *ptDevice, libusb_device_handle **pptDevHandle)
 
 void libusb_close(libusb_device_handle *dev_handle)
 {
-	usb_close(dev_handle);
+	pfn_usb_close(dev_handle);
 }
 
 
 int libusb_init(libusb_context **pptContext)
 {
-	usb_init();
+	pfn_usb_init();
 
 	/* use something different from NULL */
 	*pptContext = (libusb_context*)1;
 
 	return LIBUSB_SUCCESS;
 }
+
+
 
 
 void libusb_exit(libusb_context *ptContext)
@@ -113,8 +300,8 @@ int usb_bulk_pc_to_netx(libusb_device_handle *ptDevHandle, unsigned char ucEndPo
 	const char *pcDataOut = (const char*)pucDataOut;
 #endif
 
+	iError = pfn_usb_bulk_write(ptDevHandle, ucEndPointOut, pcDataOut, iLength, uiTimeoutMs);
 
-	iError = usb_bulk_write(ptDevHandle, ucEndPointOut, pcDataOut, iLength, uiTimeoutMs);
 	if( iError==iLength )
 	{
 		/* transfer ok! */
@@ -150,8 +337,8 @@ int usb_bulk_netx_to_pc(libusb_device_handle *ptDevHandle, unsigned char ucEndPo
 {
 	int iError;
 
+	iError = pfn_usb_bulk_read(ptDevHandle, ucEndPointIn, (char*)pucDataIn, iLength, uiTimeoutMs);
 
-	iError = usb_bulk_read(ptDevHandle, ucEndPointIn, (char*)pucDataIn, iLength, uiTimeoutMs);
 	if( iError==iLength )
 	{
 		/* transfer ok! */
@@ -272,25 +459,25 @@ unsigned char libusb_get_device_address(libusb_device *dev)
 
 int libusb_reset_device(libusb_device_handle *dev)
 {
-	return usb_reset(dev);
+	return pfn_usb_reset(dev);
 }
 
 
 int libusb_set_configuration(libusb_device_handle *dev, int configuration)
 {
-	return usb_set_configuration(dev, configuration);
+	return pfn_usb_set_configuration(dev, configuration);
 }
 
 
 int libusb_claim_interface(libusb_device_handle *dev, int iface)
 {
-	return usb_claim_interface(dev, iface);
+	return pfn_usb_claim_interface(dev, iface);
 }
 
 
 int libusb_release_interface(libusb_device_handle *dev, int iface)
 {
-	return usb_release_interface(dev, iface);
+	return pfn_usb_release_interface(dev, iface);
 }
 
 
@@ -305,9 +492,9 @@ ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device ***list)
 
 
 	/* detect all busses */
-	usb_find_busses();
+	pfn_usb_find_busses();
 	/* detect all devices on each bus */
-	usb_find_devices();
+	pfn_usb_find_devices();
 
 	/* init the device list */
 	ptDeviceList = NULL;
@@ -316,7 +503,7 @@ ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device ***list)
 	ssizDeviceList = 0;
 
 	/* get the head of the bus list */
-	ptBusses = usb_get_busses();
+	ptBusses = pfn_usb_get_busses();
 
 	/* loop over all bus entries and count the devices */
 	ptBusCnt = ptBusses;
@@ -411,6 +598,9 @@ int fn_init(wxLog *ptLogTarget, wxXmlNode *ptCfgNode, wxString &strPluginId)
 	/* init the lua state */
 	m_ptLuaState = NULL;
 
+	/* ignore the result, fn_init will succeed even if libusb_load fails */
+	libusb_load();
+
 	return 0;
 }
 
@@ -442,7 +632,7 @@ int fn_init_lua(wxLuaState *ptLuaState)
 int fn_leave(void)
 {
 	wxLogMessage(wxT("bootloader usb plugin leave"));
-
+	libusb_unload();
 	return 0;
 }
 
@@ -487,6 +677,11 @@ int fn_detect_interfaces(std::vector<muhkuh_plugin_instance*> *pvInterfaceList)
 	strLuaCreateFn = wxT("muhkuh.romloader_usb_create");
 
 	iInterfaces = 0;
+
+	if (!libusb_isloaded())
+	{
+		return iInterfaces;
+	}
 
 	/* create a new libusb context */
 	iResult = libusb_init(&ptLibUsbContext);
@@ -1105,7 +1300,7 @@ bool romloader_usb::parseDumpLine(const char *pcLine, size_t sizLineLen, unsigne
 	// is enough input data left?
 	if( sizLineLen<(10+ulElements*3) )
 	{
-		strErrorMsg = wxT("strange response from netx!");
+		strErrorMsg = wxT("strange response from netx! (line too short)");
 		fResult = false;
 	}
 	else
@@ -1114,12 +1309,12 @@ bool romloader_usb::parseDumpLine(const char *pcLine, size_t sizLineLen, unsigne
 		iMatches = sscanf(pcLine, "%8lX: ", &ulResultAddress);
 		if( iMatches!=1 )
 		{
-			strErrorMsg = wxT("strange response from netx!");
+			strErrorMsg = wxT("strange response from netx! (failed to parse address)");
 			fResult = false;
 		}
 		else if( ulResultAddress!=ulAddress )
 		{
-			strErrorMsg = wxT("response does not match request!");
+			strErrorMsg = wxT("address in response does not match!");
 			fResult = false;
 		}
 		else
@@ -1134,7 +1329,7 @@ bool romloader_usb::parseDumpLine(const char *pcLine, size_t sizLineLen, unsigne
 				iMatches = sscanf(pcLine, "%2X ", &uiByte);
 				if( iMatches!=1 )
 				{
-					strErrorMsg = wxT("strange response from netx!");
+					strErrorMsg = wxT("strange response from netx! (could not parse byte)");
 					fResult = false;
 					break;
 				}
@@ -1670,7 +1865,7 @@ int romloader_usb::usb_load(const char *pcData, size_t sizDataLen, unsigned long
 			}
 			// copy data to the packet
 			memcpy(aucBufSend+1, pucDataCnt, sizChunkSize);
-			aucBufSend[0] = sizChunkSize+1;
+			aucBufSend[0] = (unsigned char) sizChunkSize+1;
 
 			fIsRunning = callback_long(L, iLuaCallbackTag, lBytesProcessed, pvCallbackUserData);
 			if( fIsRunning!=true )
@@ -1723,7 +1918,7 @@ int romloader_usb::usb_call(unsigned long ulNetxAddress, unsigned long ulParamet
 		{
 			// send handshake
 			aucSend[0] = 0x00;
-			iResult = libusb_writeBlock(aucSend, 64, 200);
+			iResult = libusb_writeBlock(aucSend, 64, USB_CALL_WRITE_TIMEOUT);
 			if( iResult==LIBUSB_SUCCESS )
 			{
 				do
@@ -1738,7 +1933,7 @@ int romloader_usb::usb_call(unsigned long ulNetxAddress, unsigned long ulParamet
 					else
 					{
 						// look for data from netx
-						iResult = libusb_readBlock(aucRec, 64, 200);
+						iResult = libusb_readBlock(aucRec, 64, USB_CALL_READ_TIMEOUT);
 						if( iResult==LIBUSB_SUCCESS )
 						{
 							iResult = LIBUSB_ERROR_TIMEOUT;
@@ -1801,7 +1996,7 @@ int romloader_usb::usb_sendCommand(wxString strCommand)
 
 		// construct the command
 		memcpy(abSend+1, strCommand.To8BitData(), sizCmdLen);
-		abSend[0] = sizCmdLen+2;
+		abSend[0] = (unsigned char) sizCmdLen+2;
 		abSend[sizCmdLen+1] = 0x0a;
 
 		// send the command
@@ -2033,13 +2228,14 @@ int romloader_usb::libusb_exchange(unsigned char *pucSendBuffer, unsigned char *
 	int iResult;
 
 
-	iResult = libusb_writeBlock(pucSendBuffer, 64, 200);
+	iResult = libusb_writeBlock(pucSendBuffer, 64, USB_EXCHANGE_WRITE_TIMEOUT);
 	if( iResult==LIBUSB_SUCCESS )
 	{
-		iResult = libusb_readBlock(pucReceiveBuffer, 64, 200);
+		iResult = libusb_readBlock(pucReceiveBuffer, 64, USB_EXCHANGE_READ_TIMEOUT);
 	}
 	return iResult;
 }
+
 
 
 const romloader_usb::LIBUSB_STRERROR_T romloader_usb::atStrError[] =

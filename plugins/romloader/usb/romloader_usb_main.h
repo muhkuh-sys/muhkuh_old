@@ -87,6 +87,10 @@ extern "C"
 	#error "The define ROMLOADER_USB_LIBUSB_VERSION specifies an unknown libusb version!"
 #endif
 
+bool libusb_load();
+bool libusb_isloaded();
+void libusb_unload();
+
 /*-----------------------------------*/
 
 typedef void (*romloader_usb_plugin_fn_close_instance)(wxString &strInterface);
