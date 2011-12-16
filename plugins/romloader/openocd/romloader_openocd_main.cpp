@@ -22,6 +22,9 @@
 #include "_luaif/romloader_openocd_wxlua_bindings.h"
 #include <wx/dynarray.h>
 
+#define OPENOCD_READ_IMAGE_CHUNKSIZE (8*1024)
+#define OPENOCD_WRITE_IMAGE_CHUNKSIZE (32*1024)
+#define OPENOCD_CALL_TIMESLICE_MS (10)           // sleep
 
 #ifdef _WIN32
 #define vsnprintf _vsnprintf
@@ -42,6 +45,12 @@ extern "C"
 	#include "target.h"
 	#include "command.h"
 	#include "replacements.h"
+
+	/* DLL loading functions in ft2232.c */
+	int ft2232_load();       /* called in fn_init */
+	void ft2232_unload();    /* called in fn_leave */
+	int ft2232_isloaded();   /* called in fn_detect_interfaces */
+
 }
 
 /*-------------------------------------*/
@@ -353,6 +362,7 @@ int readXmlTextArray(wxXmlNode *ptCfgNode, wxString strNodeName, wxArrayString *
 
 /*-------------------------------------*/
 
+
 int fn_init(wxLog *ptLogTarget, wxXmlNode *ptCfgNode, wxString &strPluginId)
 {
 	int iResult = 0;
@@ -384,38 +394,46 @@ int fn_init(wxLog *ptLogTarget, wxXmlNode *ptCfgNode, wxString &strPluginId)
 	/* clear any stored configs */
 	m_atCfgs.Empty();
 
-	while (ptCfgNode != NULL)
+	if (!ft2232_load())
 	{
-		ptCfg = new romloader_openocd_config();
-		fOk = ptCfgNode->GetPropVal(wxT("id"), &ptCfg->strCfgName);
-		if( fOk!=true || ptCfg->strCfgName.IsEmpty())
-		{
-			iResult = 1;
-		}
-
-		if( iResult==0 )
-		{
-			wxLogMessage(wxT("romloader_openocd(%s) : reading config '%s'"), plugin_desc.strPluginId, ptCfg->strCfgName);
-			iResult = readXmlTextArray(ptCfgNode, wxT("Init"), &ptCfg->astrInitCfg);
-		}
-		if( iResult==0 )
-		{
-			iResult = readXmlTextArray(ptCfgNode, wxT("Run"), &ptCfg->astrRunCfg);
-		}
-
-		if (iResult == 0)
-		{
-			m_atCfgs.Add(ptCfg);
-			ptCfgNode = ptCfgNode->GetNext();
-		}
-		else
-		{
-			delete ptCfg;
-			break;
-		}
-
+		wxLogMessage(wxT("romloader_openocd(%s) : ftd2xx.dll not loaded. JTAG will not be available."), plugin_desc.strPluginId);
 	}
+	else
+	{
+		wxLogMessage(wxT("romloader_openocd(%s) : ftd2xx.dll loaded"), plugin_desc.strPluginId);
 
+		while (ptCfgNode != NULL)
+		{
+			ptCfg = new romloader_openocd_config();
+			fOk = ptCfgNode->GetPropVal(wxT("id"), &ptCfg->strCfgName);
+			if( fOk!=true || ptCfg->strCfgName.IsEmpty())
+			{
+				iResult = 1;
+			}
+
+			if( iResult==0 )
+			{
+				wxLogMessage(wxT("romloader_openocd(%s) : reading config '%s'"), plugin_desc.strPluginId, ptCfg->strCfgName);
+				iResult = readXmlTextArray(ptCfgNode, wxT("Init"), &ptCfg->astrInitCfg);
+			}
+			if( iResult==0 )
+			{
+				iResult = readXmlTextArray(ptCfgNode, wxT("Run"), &ptCfg->astrRunCfg);
+			}
+
+			if (iResult == 0)
+			{
+				m_atCfgs.Add(ptCfg);
+				ptCfgNode = ptCfgNode->GetNext();
+			}
+			else
+			{
+				delete ptCfg;
+				break;
+			}
+
+		}
+	}
 	return iResult;
 }
 
@@ -447,6 +465,8 @@ int fn_init_lua(wxLuaState *ptLuaState)
 int fn_leave(void)
 {
 	wxLogMessage(wxT("bootloader openocd plugin leave"));
+	ft2232_unload();
+	wxLogMessage(wxT("bootloader openocd ftd2xx.dll unloaded."));
 	return 0;
 }
 
@@ -667,28 +687,30 @@ int fn_detect_interfaces(std::vector<muhkuh_plugin_instance*> *pvInterfaceList)
 	iCfgCount = m_atCfgs.Count();
 	iInterfaces = 0;
 
-	for (iCfgNo = 0; iCfgNo<iCfgCount; ++iCfgNo)
+	if (ft2232_isloaded())
 	{
-		romloader_openocd_config &ptCfg = m_atCfgs.Item(iCfgNo);
-
-		// detect interface by trying to open it
-		iResult = romloader_openocd_connect(ptCfg, &cmd_ctx, true);
-		if( iResult==ERROR_OK )
+		for (iCfgNo = 0; iCfgNo<iCfgCount; ++iCfgNo)
 		{
-			// close the instance
-			romloader_openocd_close_instance(cmd_ctx);
+			romloader_openocd_config &ptCfg = m_atCfgs.Item(iCfgNo);
 
-			// construct the name
-			//strName.Printf(wxT("romloader_openocd  %s (#%d)"), ptCfg.strCfgName, iCfgNo);
-			strName.Printf(wxT("romloader_openocd_%s"), ptCfg.strCfgName);
-			ptInst = new muhkuh_plugin_instance(strName, strTyp, false, strLuaCreateFn, (void*) iCfgNo);
-			++iInterfaces;
+			// detect interface by trying to open it
+			iResult = romloader_openocd_connect(ptCfg, &cmd_ctx, true);
+			if( iResult==ERROR_OK )
+			{
+				// close the instance
+				romloader_openocd_close_instance(cmd_ctx);
 
-			// add the new instance to the list
-			pvInterfaceList->push_back(ptInst);
+				// construct the name
+				//strName.Printf(wxT("romloader_openocd  %s (#%d)"), ptCfg.strCfgName, iCfgNo);
+				strName.Printf(wxT("romloader_openocd_%s"), ptCfg.strCfgName);
+				ptInst = new muhkuh_plugin_instance(strName, strTyp, false, strLuaCreateFn, (void*) iCfgNo);
+				++iInterfaces;
+
+				// add the new instance to the list
+				pvInterfaceList->push_back(ptInst);
+			}
 		}
 	}
-
 	return iInterfaces;
 }
 
@@ -714,7 +736,7 @@ romloader *romloader_openocd_create(void *pvHandle)
 	}
 	else
 	{
-		wxLogMessage(wxT("romloader_openocd_create: trying to connect with config %d of %d"), iCfgNo, iCfgCount);
+		wxLogMessage(wxT("romloader_openocd_create: trying to connect with config %d of %d"), iCfgNo+1, iCfgCount);
 		romloader_openocd_config &ptCfg = m_atCfgs.Item(iCfgNo);
 
 		iResult = romloader_openocd_connect(ptCfg, &cmd_ctx, false);
@@ -753,7 +775,7 @@ romloader_openocd::romloader_openocd(wxString strName, wxString strTyp,
  : romloader(strName, strTyp, ptFn, pvHandle, fn_close,ptLuaState)
 {
 	// unfortunately, this is inaccessible by the C routines
-	m_strMe.Printf(wxT("romloader_uart(%p): "), this);
+	m_strMe.Printf(wxT("romloader_openocd(%p): "), this);
 	wxLogMessage(wxT("%s constructor"), m_strMe);
 }
 
@@ -881,10 +903,6 @@ int fn_read_data32(void *pvHandle, unsigned long ulNetxAddress, unsigned long *p
 
 	return iResult;
 }
-
-#define OPENOCD_READ_IMAGE_CHUNKSIZE (8*1024)
-#define OPENOCD_WRITE_IMAGE_CHUNKSIZE (32*1024)
-#define OPENOCD_CALL_TIMESLICE_MS (10)
 
 /* read a byte array from the netx to the pc */
 int fn_read_image(void *pvHandle, unsigned long ulNetxAddress, char *pcData, unsigned long ulSize, lua_State *L, int iLuaCallbackTag, void *pvCallbackUserData)
@@ -1170,7 +1188,7 @@ int fn_call(void *pvHandle, unsigned long ulNetxAddress, unsigned long ulParamet
 			{
 				wxMilliSleep(OPENOCD_CALL_TIMESLICE_MS);
 
-				// execute callback
+				// execute callback in the Lua script
 				fIsRunning = romloader::callback_string(L, iLuaCallbackTag, ptPriv->strOutput, pvCallbackUserData);
 				ptPriv->strOutput.Empty();
 

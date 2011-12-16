@@ -46,6 +46,177 @@
 #include <ftdi.h>
 #endif
 
+/* load ftd2xx.dll */
+#if BUILD_FT2232_FTD2XX == 1
+int ft2232_load();
+void ft2232_unload();
+int ft2232_isloaded();
+
+#if 1
+/* global pointers to the used libusb functions */
+
+#define CALLSPEC WINAPI
+FT_STATUS (CALLSPEC * pfn_FT_OpenEx)(PVOID pArg1, DWORD Flags, FT_HANDLE *pHandle);
+FT_STATUS (CALLSPEC * pfn_FT_ListDevices)(PVOID pArg1, PVOID pArg2, DWORD Flags);
+FT_STATUS (CALLSPEC * pfn_FT_Close)(FT_HANDLE ftHandle);
+FT_STATUS (CALLSPEC * pfn_FT_Read)(FT_HANDLE ftHandle, LPVOID lpBuffer, DWORD nBufferSize, LPDWORD lpBytesReturned);
+FT_STATUS (CALLSPEC * pfn_FT_Write)(FT_HANDLE ftHandle, LPVOID lpBuffer, DWORD nBufferSize, LPDWORD lpBytesWritten);
+FT_STATUS (CALLSPEC * pfn_FT_Purge)(FT_HANDLE ftHandle, ULONG Mask);
+FT_STATUS (CALLSPEC * pfn_FT_SetTimeouts)(FT_HANDLE ftHandle, ULONG ReadTimeout, ULONG WriteTimeout);
+FT_STATUS (CALLSPEC * pfn_FT_SetLatencyTimer)(FT_HANDLE ftHandle, UCHAR ucLatency);
+FT_STATUS (CALLSPEC * pfn_FT_GetLatencyTimer)(FT_HANDLE ftHandle, PUCHAR pucLatency);
+FT_STATUS (CALLSPEC * pfn_FT_SetBitMode)(FT_HANDLE ftHandle, UCHAR ucMask, UCHAR ucEnable);
+FT_STATUS (CALLSPEC * pfn_FT_GetBitMode)(FT_HANDLE ftHandle, PUCHAR pucMode);
+
+/* non-NULL if the dll has been loaded and the function pointers have been set */ 
+HINSTANCE hFtd2xx;
+
+/* dummy functions */
+FT_STATUS CALLSPEC no_FT_OpenEx(PVOID pArg1, DWORD Flags, FT_HANDLE *pHandle)                                   {return FT_NOT_SUPPORTED;}
+FT_STATUS CALLSPEC no_FT_ListDevices(PVOID pArg1, PVOID pArg2, DWORD Flags)                                     {return FT_NOT_SUPPORTED;}
+FT_STATUS CALLSPEC no_FT_Close(FT_HANDLE ftHandle)                                                              {return FT_NOT_SUPPORTED;}
+FT_STATUS CALLSPEC no_FT_Read(FT_HANDLE ftHandle, LPVOID lpBuffer, DWORD nBufferSize, LPDWORD lpBytesReturned)  {return FT_NOT_SUPPORTED;}
+FT_STATUS CALLSPEC no_FT_Write(FT_HANDLE ftHandle, LPVOID lpBuffer, DWORD nBufferSize, LPDWORD lpBytesWritten)  {return FT_NOT_SUPPORTED;}
+FT_STATUS CALLSPEC no_FT_Purge(FT_HANDLE ftHandle, ULONG Mask)                                                  {return FT_NOT_SUPPORTED;}
+FT_STATUS CALLSPEC no_FT_SetTimeouts(FT_HANDLE ftHandle, ULONG ReadTimeout, ULONG WriteTimeout)                 {return FT_NOT_SUPPORTED;}
+FT_STATUS CALLSPEC no_FT_SetLatencyTimer(FT_HANDLE ftHandle, UCHAR ucLatency)                                   {return FT_NOT_SUPPORTED;}
+FT_STATUS CALLSPEC no_FT_GetLatencyTimer(FT_HANDLE ftHandle, PUCHAR pucLatency)                                 {return FT_NOT_SUPPORTED;}
+FT_STATUS CALLSPEC no_FT_SetBitMode(FT_HANDLE ftHandle, UCHAR ucMask, UCHAR ucEnable)                           {return FT_NOT_SUPPORTED;}
+FT_STATUS CALLSPEC no_FT_GetBitMode(FT_HANDLE ftHandle, PUCHAR pucMode)                                         {return FT_NOT_SUPPORTED;}
+
+
+/* auxiliary structures for reading the symbols from the dll */
+typedef struct 
+{
+	const char *pstrFnName;
+	void** ppFnPtr;
+	void* pDefaultFnPtr;
+} T_DLL_SYMBOL_ENTRY;
+
+T_DLL_SYMBOL_ENTRY atFtd2xxSymbols[] = {
+	{"FT_OpenEx"             , (void**) &pfn_FT_OpenEx               , (void*) no_FT_OpenEx         },
+	{"FT_ListDevices"        , (void**) &pfn_FT_ListDevices          , (void*) no_FT_ListDevices    },
+	{"FT_Close"              , (void**) &pfn_FT_Close                , (void*) no_FT_Close          },
+	{"FT_Read"               , (void**) &pfn_FT_Read                 , (void*) no_FT_Read           },
+	{"FT_Write"              , (void**) &pfn_FT_Write                , (void*) no_FT_Write          },
+	{"FT_Purge"              , (void**) &pfn_FT_Purge                , (void*) no_FT_Purge          },
+	{"FT_SetTimeouts"        , (void**) &pfn_FT_SetTimeouts          , (void*) no_FT_SetTimeouts    },
+	{"FT_SetLatencyTimer"    , (void**) &pfn_FT_SetLatencyTimer      , (void*) no_FT_SetLatencyTimer},
+	{"FT_GetLatencyTimer"    , (void**) &pfn_FT_GetLatencyTimer      , (void*) no_FT_GetLatencyTimer},
+	{"FT_SetBitMode"         , (void**) &pfn_FT_SetBitMode           , (void*) no_FT_SetBitMode     },
+};
+
+#define ARRAY_ENDADDR(arrayname) arrayname + (sizeof(arrayname)/sizeof(arrayname[0]))
+
+void ft2232_setDummyFunctions();
+
+int ft2232_load()
+{
+	hFtd2xx = LoadLibrary("ftd2xx");
+	if (hFtd2xx == NULL)
+	{
+		ft2232_setDummyFunctions();
+		//INFO("romloader_openocd: ftd2xx.dll not found. JTAG will not be available\n");
+	}
+	else
+	{
+		T_DLL_SYMBOL_ENTRY *ptPfnEntry = atFtd2xxSymbols;
+		T_DLL_SYMBOL_ENTRY *ptPfnTableEnd = ARRAY_ENDADDR(atFtd2xxSymbols);
+		void* pvFn = NULL;
+
+		//INFO("romloader_usb: ftd2xx.dll loaded.\n");
+
+		while (ptPfnEntry < ptPfnTableEnd)
+		{
+			pvFn = GetProcAddress(hFtd2xx, ptPfnEntry->pstrFnName);
+			*(ptPfnEntry->ppFnPtr) = pvFn;
+
+			if (pvFn == NULL)
+			{
+				//ERROR("romloader_openocd: Symbol %s not found in ftd2xx.dll.\n", ptPfnEntry->pstrFnName);
+				break;
+			}
+
+			ptPfnEntry++;
+		}
+
+		/* 
+			If pvFn is NULL, a symbol was not found. 
+			In this case, unload the library and set dummy functions 
+		*/
+		if (pvFn == NULL)
+		{
+			FreeLibrary(hFtd2xx);
+			hFtd2xx = NULL;
+			ft2232_setDummyFunctions();
+			//ERROR("romloader_openocd: JTAG not be available.\n");
+		}
+	}
+	
+	return ( hFtd2xx != NULL );
+}
+
+
+void ft2232_setDummyFunctions()
+{
+	T_DLL_SYMBOL_ENTRY *ptPfnEntry = atFtd2xxSymbols;
+	T_DLL_SYMBOL_ENTRY *ptPfnTableEnd = ARRAY_ENDADDR(atFtd2xxSymbols);
+	while (ptPfnEntry < ptPfnTableEnd)
+	{
+		*ptPfnEntry->ppFnPtr = ptPfnEntry->pDefaultFnPtr;
+		ptPfnEntry++;
+	}
+}
+
+void ft2232_unload()
+{
+	if (hFtd2xx != NULL) 
+	{
+		FreeLibrary(hFtd2xx);
+		hFtd2xx = NULL;
+		//INFO("romloader_openocd: ftd2xx-dll unloaded.\n");
+	}
+
+	ft2232_setDummyFunctions();
+}
+
+int ft2232_isloaded()
+{
+	return (hFtd2xx != NULL);
+}
+
+/*
+#define FT_OpenEx          pfn_FT_OpenEx            
+#define FT_ListDevices     pfn_FT_ListDevices       
+#define FT_Close           pfn_FT_Close             
+#define FT_Read            pfn_FT_Read              
+#define FT_Write           pfn_FT_Write             
+#define FT_Purge           pfn_FT_Purge             
+#define FT_SetTimeouts     pfn_FT_SetTimeouts       
+#define FT_SetLatencyTimer pfn_FT_SetLatencyTimer   
+#define FT_GetLatencyTimer pfn_FT_GetLatencyTimer   
+#define FT_SetBitMode      pfn_FT_SetBitMode        
+*/
+#else
+int ft2232_load() {return 1;}
+void ft2232_unload() {}
+int ft2232_isloaded() {return 1;}
+
+#define pfn_FT_OpenEx          FT_OpenEx             
+#define pfn_FT_ListDevices     FT_ListDevices        
+#define pfn_FT_Close           FT_Close              
+#define pfn_FT_Read            FT_Read               
+#define pfn_FT_Write           FT_Write              
+#define pfn_FT_Purge           FT_Purge              
+#define pfn_FT_SetTimeouts     FT_SetTimeouts        
+#define pfn_FT_SetLatencyTimer FT_SetLatencyTimer    
+#define pfn_FT_GetLatencyTimer FT_GetLatencyTimer    
+#define pfn_FT_SetBitMode      FT_SetBitMode      
+#endif
+
+#endif
+
+
 /* enable this to debug io latency
  */
 #if 0
@@ -169,7 +340,7 @@ int ft2232_write(u8 *buf, int size, u32* bytes_written)
 #if BUILD_FT2232_FTD2XX == 1
 	FT_STATUS status;
 	DWORD dw_bytes_written;
-	if ((status = FT_Write(ftdih, buf, size, &dw_bytes_written)) != FT_OK)
+	if ((status = pfn_FT_Write(ftdih, buf, size, &dw_bytes_written)) != FT_OK)
 	{
 		*bytes_written = dw_bytes_written;
 		ERROR("FT_Write returned: %lu", status);
@@ -206,7 +377,7 @@ int ft2232_read(u8* buf, int size, u32* bytes_read)
 
 	while ((*bytes_read < size) && timeout--)
 	{
-		if ((status = FT_Read(ftdih, buf + *bytes_read, size - 
+		if ((status = pfn_FT_Read(ftdih, buf + *bytes_read, size - 
 			*bytes_read, &dw_bytes_read)) != FT_OK)		
 		{
 			*bytes_read = 0; 
@@ -1366,7 +1537,7 @@ static int ft2232_init_ftd2xx(u16 vid, u16 pid, int more, int *try_more)
 		return ERROR_JTAG_INIT_FAILED;	
 	}
 
-	if ((status = FT_OpenEx(openex_string, openex_flags, &ftdih)) != FT_OK)
+	if ((status = pfn_FT_OpenEx(openex_string, openex_flags, &ftdih)) != FT_OK)
 	{
 		DWORD num_devices;
 		
@@ -1377,7 +1548,7 @@ static int ft2232_init_ftd2xx(u16 vid, u16 pid, int more, int *try_more)
 			return ERROR_JTAG_INIT_FAILED;
 		}
 		ERROR("unable to open ftdi device: %lu", status);
-		status = FT_ListDevices(&num_devices, NULL, FT_LIST_NUMBER_ONLY);
+		status = pfn_FT_ListDevices(&num_devices, NULL, FT_LIST_NUMBER_ONLY);
 		if (status == FT_OK)
 		{
 			char **desc_array = malloc(sizeof(char*) * (num_devices + 1));
@@ -1387,7 +1558,7 @@ static int ft2232_init_ftd2xx(u16 vid, u16 pid, int more, int *try_more)
 				desc_array[i] = malloc(64);
 			desc_array[num_devices] = NULL;
 
-			status = FT_ListDevices(desc_array, &num_devices, FT_LIST_ALL | openex_flags);
+			status = pfn_FT_ListDevices(desc_array, &num_devices, FT_LIST_ALL | openex_flags);
 
 			if (status == FT_OK)
 			{
@@ -1407,13 +1578,13 @@ static int ft2232_init_ftd2xx(u16 vid, u16 pid, int more, int *try_more)
 		return ERROR_JTAG_INIT_FAILED;
 	}
 
-	if ((status = FT_SetLatencyTimer(ftdih, ft2232_latency)) != FT_OK)
+	if ((status = pfn_FT_SetLatencyTimer(ftdih, ft2232_latency)) != FT_OK)
 	{
 		ERROR("unable to set latency timer: %lu", status);
 		return ERROR_JTAG_INIT_FAILED;
 	}
 	
-	if ((status = FT_GetLatencyTimer(ftdih, &latency_timer)) != FT_OK)
+	if ((status = pfn_FT_GetLatencyTimer(ftdih, &latency_timer)) != FT_OK)
 	{
 		ERROR("unable to get latency timer: %lu", status);
 		return ERROR_JTAG_INIT_FAILED;
@@ -1423,13 +1594,13 @@ static int ft2232_init_ftd2xx(u16 vid, u16 pid, int more, int *try_more)
 		DEBUG("current latency timer: %i", latency_timer);
 	}
 	
-	if ((status = FT_SetTimeouts(ftdih, 5000, 5000)) != FT_OK)
+	if ((status = pfn_FT_SetTimeouts(ftdih, 5000, 5000)) != FT_OK)
 	{
 		ERROR("unable to set timeouts: %lu", status);
 		return ERROR_JTAG_INIT_FAILED;
 	}
 
-	if ((status = FT_SetBitMode(ftdih, 0x0b, 2)) != FT_OK)
+	if ((status = pfn_FT_SetBitMode(ftdih, 0x0b, 2)) != FT_OK)
 	{
 		ERROR("unable to enable bit i/o mode: %lu", status);
 		return ERROR_JTAG_INIT_FAILED;
@@ -1442,7 +1613,7 @@ static int ft2232_purge_ftd2xx(void)
 {
 	FT_STATUS status;
 
-	if ((status = FT_Purge(ftdih, FT_PURGE_RX | FT_PURGE_TX)) != FT_OK)
+	if ((status = pfn_FT_Purge(ftdih, FT_PURGE_RX | FT_PURGE_TX)) != FT_OK)
 	{
 		ERROR("error purging ftd2xx device: %lu", status);
 		return ERROR_JTAG_INIT_FAILED;
@@ -2044,7 +2215,7 @@ int ft2232_quit(void)
 #if BUILD_FT2232_FTD2XX == 1
 	FT_STATUS status;
 
-	status = FT_Close(ftdih);
+	status = pfn_FT_Close(ftdih);
 #elif BUILD_FT2232_LIBFTDI == 1
 /* NOTE: don't use this, the jtagkey will not be accessible anymore! */
 /*
