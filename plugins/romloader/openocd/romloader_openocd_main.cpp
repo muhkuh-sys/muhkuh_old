@@ -404,34 +404,59 @@ int fn_init(wxLog *ptLogTarget, wxXmlNode *ptCfgNode, wxString &strPluginId)
 
 		while (ptCfgNode != NULL)
 		{
-			ptCfg = new romloader_openocd_config();
-			fOk = ptCfgNode->GetPropVal(wxT("id"), &ptCfg->strCfgName);
-			if( fOk!=true || ptCfg->strCfgName.IsEmpty())
+			/* read Cfg node */
+			if (ptCfgNode->GetType()==wxXML_ELEMENT_NODE && ptCfgNode->GetName()==wxT("Cfg"))
 			{
-				iResult = 1;
+				ptCfg = new romloader_openocd_config();
+				fOk = ptCfgNode->GetPropVal(wxT("id"), &ptCfg->strCfgName);
+				if( fOk!=true || ptCfg->strCfgName.IsEmpty())
+				{
+					iResult = 1;
+				}
+
+				if( iResult==0 )
+				{
+					wxLogMessage(wxT("romloader_openocd(%s) : reading config '%s'"), plugin_desc.strPluginId, ptCfg->strCfgName);
+					iResult = readXmlTextArray(ptCfgNode, wxT("Init"), &ptCfg->astrInitCfg);
+					if( iResult==0 )
+					{
+						iResult = readXmlTextArray(ptCfgNode, wxT("Run"), &ptCfg->astrRunCfg);
+					}
+				}
+
+				if (iResult == 0)
+				{
+					m_atCfgs.Add(ptCfg);
+					ptCfgNode = ptCfgNode->GetNext();
+				}
+				else
+				{
+					delete ptCfg;
+					break;
+				}
 			}
 
-			if( iResult==0 )
+			/* skip comments */
+			else if (ptCfgNode->GetType()==wxXML_COMMENT_NODE)
 			{
-				wxLogMessage(wxT("romloader_openocd(%s) : reading config '%s'"), plugin_desc.strPluginId, ptCfg->strCfgName);
-				iResult = readXmlTextArray(ptCfgNode, wxT("Init"), &ptCfg->astrInitCfg);
-			}
-			if( iResult==0 )
-			{
-				iResult = readXmlTextArray(ptCfgNode, wxT("Run"), &ptCfg->astrRunCfg);
+					ptCfgNode = ptCfgNode->GetNext();
 			}
 
-			if (iResult == 0)
+			/* error on unknown element nodes */
+			else if (ptCfgNode->GetType()==wxXML_ELEMENT_NODE)
 			{
-				m_atCfgs.Add(ptCfg);
-				ptCfgNode = ptCfgNode->GetNext();
-			}
-			else
-			{
-				delete ptCfg;
-				break;
+					wxLogError(wxT("romloader_openocd(%s) : unknown node <%s> in config!"), plugin_desc.strPluginId, ptCfgNode->GetName());
+					iResult = 1;
+					break;
 			}
 
+			/* error on other node types */
+			else 
+			{
+					wxLogError(wxT("romloader_openocd(%s) : invalid node type in config!"), plugin_desc.strPluginId);
+					iResult = 1;
+					break;
+			}
 		}
 	}
 	return iResult;
