@@ -1079,6 +1079,15 @@ void romloader_uart::call(double dNetxAddress, double dParameterR0, lua_State *L
 	// expect failure
 	fOk = false;
 
+	if ( (m_tChiptyp == ROMLOADER_CHIPTYP_NETX500 ||  m_tChiptyp == ROMLOADER_CHIPTYP_NETX100) &&  m_tRomcode == ROMLOADER_ROMCODE_ABOOT)
+	{
+		// aboot does not set the serial vectors
+		write_data32(0x10001ff0, 0);
+		write_data32(0x10001ff4, 0);
+		write_data32(0x10001ff8, 0);
+		write_data32(0x10001ffc, 0);
+	}
+
 	wxLogMessage(m_strMe + wxT("call %08x(%08x)"), ulNetxAddress, ulParameterR0);
 
 	// construct the "call" command
