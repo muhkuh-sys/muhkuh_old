@@ -51,7 +51,7 @@ include(muhkuh.version)
 `      VALUE "FileDescription",    "Muhkuh Script Server"'
 `      VALUE "FileVersion",        "'__VERSION_MAJ__`, '__VERSION_MIN__`, '__VERSION_SUB__`, 0"'
 `      VALUE "InternalName",       "serverkuh"'
-`      VALUE "LegalCopyright",     "Copyright (C) 2008, Muhkuh team"'
+`      VALUE "LegalCopyright",     "Copyright (C) 2012, Muhkuh team"'
 `      VALUE "OriginalFilename",   "serverkuh.exe"'
 `      VALUE "ProductName",        "Serverkuh"'
 `      VALUE "ProductVersion",     "'__VERSION_MAJ__`, '__VERSION_MIN__`, '__VERSION_SUB__`, 0"'
