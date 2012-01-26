@@ -51,7 +51,7 @@ include(muhkuh.version)
 `      VALUE "FileDescription",    "Muhkuh Project Manager"'
 `      VALUE "FileVersion",        "'__VERSION_MAJ__`, '__VERSION_MIN__`, '__VERSION_SUB__`, 0"'
 `      VALUE "InternalName",       "muhkuh"'
-`      VALUE "LegalCopyright",     "Copyright (C) 2008, Muhkuh team"'
+`      VALUE "LegalCopyright",     "Copyright (C) 2012, Muhkuh team"'
 `      VALUE "OriginalFilename",   "muhkuh.exe"'
 `      VALUE "ProductName",        "Muhkuh"'
 `      VALUE "ProductVersion",     "'__VERSION_MAJ__`, '__VERSION_MIN__`, '__VERSION_SUB__`, 0"'
