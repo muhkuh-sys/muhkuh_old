@@ -1,27 +1,31 @@
 <MuhkuhPluginConfig name="OpenOCD" so="openocd" id="romloader_openocd">
-	<!--
-	Memory usage:
-	           netx 500                  netx 50 
-	Intram     0380 -     03ff   Intram    0380 -     03ff working area for DCC downloads
-	Intram     0400 -     04ff   Intram    0400 -     04ff DCC output code
-	TCM    10000000 - 10000200   Intram    0500 -     7ffc Stack
-	TCM    10001e00 - 10001eff   DTCM  04000e00 - 0e000eff DCC output buffer
-	TCM    10001fe0              DTCM  04000fe0            DCC output buffer pointer
-	TCM    10001ff0 - 10001fff   DTCM  04000ff0 - 04000fff serial vectors
+
+<!--
+Memory layout:
+           netx 500         !          netx 50             !          netx 10                   !
+============================+==============================+====================================+================================
+Intram     0380 -     03ff  !  Intram     0380 -     03ff  !  intram_ITCM      0380 -     03ff  ! working area for DCC downloads
+Intram     0400 -     04ff  !  Intram     0400 -     04ff  !  intram_ITCM      0400 -     04ff  ! DCC output code
+TCM    10000000 - 10000200  !  Intram     0500 -     7ffc  !  intram_ITCM      0500 -     7ffc  ! Stack
+TCM    10001e00 - 10001eff  !  DTCM   04000e00 - 04000eff  !  intram_DTCM  04000e00 - 04000eff  ! DCC output buffer
+TCM    10001fe0             !  DTCM   04000fe0             !  intram_DTCM  04000fe0             ! DCC output buffer pointer
+TCM    10001ff0 - 10001fff  !  DTCM   04000ff0 - 04000fff  !  intram       08000100 - 0800010f  ! serial vectors
+	
 	
 	The jtag_device command has been extended to allow checking of device ids.
 	This is necessary for the JTAGkey configurations to distinguish between netX 50 and 500.
 	jtag_device ir_length   expected_ircapture_value  expected_ircapture_mask [idcode_instr expected_idcode]
 	netx 500: 0x07926021 (Manufacturer: 0x010, Part: 0x7926, Version: 0x0) dec: 127033377
-	netx 50:  0x25966021 (Manufacturer: 0x010, Part: 0x5966, Version: 0x2) dec: 630612001
+	netx 50/netx 10:  0x25966021 (Manufacturer: 0x010, Part: 0x5966, Version: 0x2) dec: 630612001
 	
 	                     USB vid/pid
 	NXHX 500/FTDI JTAG  0x0640 0x0028 "NXHX 500-ETM A"  "NXHX 500-RE A"
 	JTAGKey             0x0403 0xcff8 "Amontec JTAGkey A"
 	FTDI Dual RS232     0x0403 0x6001 "Dual RS232 A"
 	Windows/FTD2xx driver uses only the name string and ignores vid/pid
+-->
 	
-	-->
+	<!-- Configurations for netX500 and netX100 -->
 	
 	<Cfg id = "NXHX 500-ETM">
 		<Init>
@@ -62,6 +66,10 @@
 		</Run>
 	</Cfg>
 	
+	
+	
+	<!-- Configurations for netX50 -->
+	
 	<Cfg id = "NXHX 50-ETM">
 		<Init>
 			interface ft2232
@@ -101,4 +109,121 @@
 		</Run>
 	</Cfg>
 	
+	
+	
+	<!-- Configurations for netX10 -->
+	
+	<Cfg id = "NXHX 10-ETM">
+		<Init>
+			interface ft2232
+			ft2232_device_desc "NXHX 10-ETM A"
+			ft2232_layout comstick
+			ft2232_vid_pid 0x0640 0x0028
+			script plugins/openocd/netx50_init_workarea0380.txt
+		</Init>
+		<Run>
+			script plugins/openocd/netx10_run_tcm_dccout.txt
+		</Run>
+	</Cfg>
+
+	<Cfg id = "NXHX 10-IOL">
+		<Init>
+			interface ft2232
+			ft2232_device_desc "NXHX 10-IOL A"
+			ft2232_layout comstick
+			ft2232_vid_pid 0x0640 0x0028
+			script plugins/openocd/netx50_init_workarea0380.txt
+		</Init>
+		<Run>
+			script plugins/openocd/netx10_run_tcm_dccout.txt
+		</Run>
+	</Cfg>
+
+	<Cfg id="netX10 JTAGkey">
+		<Init>
+			interface ft2232
+			ft2232_device_desc "Amontec JTAGkey A"
+			ft2232_layout "jtagkey"
+			ft2232_vid_pid 0x0403 0xcff8
+			script plugins/openocd/netx50_init_workarea0380.txt
+		</Init>
+		<Run>
+			script plugins/openocd/netx10_run_tcm_dccout.txt
+		</Run>
+	</Cfg>
+	
+	
+	<!-- Configs for NXHX with empty FTDI eeprom -->
+	<!--
+	<Cfg id = "NXHX 100/500 blank FTDI">
+		<Init>
+			interface ft2232
+			ft2232_device_desc "Dual RS232 A"
+			ft2232_layout "comstick"
+			ft2232_vid_pid 0x0403 0x6001
+			script plugins/openocd/netx500_init_workarea0380.txt
+		</Init>
+		<Run>
+			script plugins/openocd/netx500_run_tcm_dccout.txt
+		</Run>
+	</Cfg>
+	
+	<Cfg id = "NXHX 50 blank FTDI">
+		<Init>
+			interface ft2232
+			ft2232_device_desc "Dual RS232 A"
+			ft2232_layout "comstick"
+			ft2232_vid_pid 0x0403 0x6001
+			script plugins/openocd/netx50_init_workarea0380.txt
+		</Init>
+		<Run>
+			script plugins/openocd/netx50_run_tcm_dccout.txt
+		</Run>
+	</Cfg>
+	
+	<Cfg id = "NXHX 10 blank FTDI">
+		<Init>
+			interface ft2232
+			ft2232_device_desc "Dual RS232 A"
+			ft2232_layout "comstick"
+			ft2232_vid_pid 0x0403 0x6001
+			script plugins/openocd/netx50_init_workarea0380.txt
+		</Init>
+		<Run>
+			script plugins/openocd/netx10_run_tcm_dccout.txt
+		</Run>
+	</Cfg>
+	-->
+	
+	<!-- for and double JTAG via PCIE adapter -->
+	<!--
+	<Cfg id="netX100/500 Dual JTAG JTAGkey DCC Output">
+		<Init>
+			interface ft2232
+			ft2232_device_desc "Amontec JTAGkey A"
+			ft2232_layout "jtagkey"
+			ft2232_vid_pid 0x0403 0xcff8
+			script plugins/openocd/netx500_init_workarea0380.txt
+			jtag_device 5 0x1 0x1f 0x1
+		</Init>
+		<Run>
+			script plugins/openocd/netx500_run_tcm_dccout.txt
+		</Run>
+	</Cfg>
+	
+	<Cfg id="netX100/500 Dual JTAG JTAGkey No Output">
+		<Init>
+			interface ft2232
+			ft2232_device_desc "Amontec JTAGkey A"
+			ft2232_layout "jtagkey"
+			ft2232_vid_pid 0x0403 0xcff8
+			script plugins/openocd/netx500_init_workarea0380.txt
+			jtag_device 5 0x1 0x1f 0x1
+		</Init>
+		<Run>
+			script plugins/openocd/netx500_run_tcm_no_output.txt
+		</Run>
+	</Cfg>
+	-->
+
 </MuhkuhPluginConfig>
