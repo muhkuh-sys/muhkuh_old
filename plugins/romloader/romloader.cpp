@@ -451,11 +451,8 @@ wxString romloader::get_chiptyp_name(ROMLOADER_CHIPTYP tChiptyp)
 	case ROMLOADER_CHIPTYP_NETX10:
 		strChiptyp = wxT("netX10");
 		break;
-	case ROMLOADER_CHIPTYP_NETX51:
-		strChiptyp = wxT("netX51");
-		break;
-	case ROMLOADER_CHIPTYP_NETX52:
-		strChiptyp = wxT("netX52");
+	case ROMLOADER_CHIPTYP_NETX56:
+		strChiptyp = wxT("netX51/52");
 		break;
 	case ROMLOADER_CHIPTYP_UNKNOWN:
 		strChiptyp = _("unknown chip");
@@ -559,8 +556,7 @@ const tRomloader_ResetId romloader::atResIds[6] =
 	{ 0xea080002,	0x00200008,	0x00003002,	ROMLOADER_CHIPTYP_NETX100,  ROMLOADER_ROMCODE_ABOOT },  // aboot netx100
 	{ 0xeac83ffc,	0x08200008,	0x00002001,	ROMLOADER_CHIPTYP_NETX50,   ROMLOADER_ROMCODE_HBOOT },  // hboot netx50
 	{ 0xeafdfffa,	0x08070008,	0x00005003,	ROMLOADER_CHIPTYP_NETX10,	ROMLOADER_ROMCODE_HBOOT },  // hboot netx10
-	{ 0xeafbfffa,	0x080f0008,	0x00006003,	ROMLOADER_CHIPTYP_NETX51,	ROMLOADER_ROMCODE_HBOOT2},  // hboot2 netx51
-	{ 0xeafbfffa,	0x080f0008,	0x00007003,	ROMLOADER_CHIPTYP_NETX52,	ROMLOADER_ROMCODE_HBOOT2}   // hboot2 netx52
+	{ 0xeafbfffa,	0x080f0008,	0x00006003,	ROMLOADER_CHIPTYP_NETX56,	ROMLOADER_ROMCODE_HBOOT2},  // hboot2 netx51/52
 };
 
 
