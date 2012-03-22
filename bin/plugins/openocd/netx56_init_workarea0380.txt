@@ -1,0 +1,9 @@
+			jtag_speed 1
+			reset_config trst_and_srst
+			jtag_device 4 0x1 0xf 0xe 0x25966021
+			jtag_nsrst_delay 100
+			jtag_ntrst_delay 100
+			daemon_startup reset
+			target arm966e little run_and_halt 0 arm966e
+			run_and_halt_time 0 500
+			working_area 0 0x0380 0x0080 backup

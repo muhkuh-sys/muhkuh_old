@@ -1,0 +1,33 @@
+			# flush write buffer
+			arm966e cp15 7 0 
+			
+			# ldr     r0,     =0x0f7c  
+			# MCR    <co-pro>, <op>, <ARM reg>, <co-pro reg>, <co-pro reg2>, <op2>
+			# mcr     p15,       0,        r0,            c1,            c0,  0
+			
+			# set the ctrl register to ... 
+			# f7c = 1111 0111 1100
+			# 15: 0 TBIT enable
+			# 12: 0 disable ITCM
+			# 7:  0 little endianess
+			# 3:  1 enable buffered writes in bufferable areas 
+			# 2:  1 enable DTCM 
+			# 1:  0 disable alignment check			
+			arm966e cp15 2 0x00000f7c
+			
+			# init regs
+			bp 0x70000 4 hw
+			reg cpsr 0xd3
+			reg spsr_svc 0xd3
+			reg r13_svc 0x7ffc
+			reg lr_svc 0x70000
+			
+			# set serial vectors (netx 10)
+			mww 0x08000100 0      # Get
+			mww 0x08000104 0      # Put
+			mww 0x08000108 0      # Peek
+			mww 0x0800010c 0      # Flush
+			
+			arm7_9 dcc_downloads enable
+			arm7_9 fast_memory_access enable
+			target_request debugmsgs disable
