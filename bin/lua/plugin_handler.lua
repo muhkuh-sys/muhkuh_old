@@ -301,6 +301,8 @@ end
 -- ================================================================
 -- Return plugin instance with the given name.
 -- Used by command line scripts, e.g. bootwizard command line flasher
+-- Note: there is no guarantee that the same port will always
+-- get the same plugin name.
 -- ================================================================
 function getPluginByName(strName)
 	local atPluginRefs = ScanPlugins(".*")
@@ -334,7 +336,9 @@ function open_plugin(plugin_instance)
 		print("connected")
 		m_commonPlugin = plugin_instance
 	else
-		plugin_instance:delete()
+		if plugin_instance.delete then
+			plugin_instance:delete()
+		end
 		print(strError)
 		print("could not connect")
 	end
@@ -347,10 +351,8 @@ function closeCommonPlugin()
 	if m_commonPlugin then
 		m_commonPlugin:disconnect()
 		if m_commonPlugin.delete then
-			m_commonPlugin.delete()
+			m_commonPlugin:delete()
 		end
-		--m_commonPlugin:delete()
-		--deletePlugin(m_commonPlugin)
 		m_commonPlugin = nil
 	end
 end
