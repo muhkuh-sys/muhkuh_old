@@ -1,8 +1,15 @@
 <MuhkuhPluginConfig name="OpenOCD" so="openocd" id="romloader_openocd">
 
 <!--
+Description:
+  openocd_win.xml: JTAG configs
+
+Changes:
+  Date        Author   Description
+23 mar 2012   SL       renamed netx56 to netx51/52   
+
 Memory layout:
-                               !            netx 500         !          netx 50             !          netx 10                   !          netx 56                 
+                               !            netx 500         !          netx 50             !          netx 10                   !          netx 51/52             
 ===============================+=============================+==============================+====================================+==================================
 working area for DCC downloads ! Intram     0380 -     03ff  !  Intram     0380 -     03ff  !  intram_ITCM      0380 -     03ff  ! intram_ITCM      0380 -     03ff 
 DCC output code                ! Intram     0400 -     04ff  !  Intram     0400 -     04ff  !  intram_ITCM      0400 -     04ff  ! intram_ITCM      0400 -     04ff 
@@ -15,8 +22,8 @@ serial vectors                 ! TCM    10001ff0 - 10001fff  !  DTCM   04000ff0 
 	The jtag_device command has been extended to allow checking of device ids.
 	This is necessary for the JTAGkey configurations to distinguish between netX 50 and 500.
 	jtag_device ir_length   expected_ircapture_value  expected_ircapture_mask [idcode_instr expected_idcode]
-	netx 500/100:   0x07926021 (Manufacturer: 0x010, Part: 0x7926, Version: 0x0) dec: 127033377
-	netx 50/10/56:  0x25966021 (Manufacturer: 0x010, Part: 0x5966, Version: 0x2) dec: 630612001
+	netx 500/100:      0x07926021 (Manufacturer: 0x010, Part: 0x7926, Version: 0x0) dec: 127033377
+	netx 50/10/51/52:  0x25966021 (Manufacturer: 0x010, Part: 0x5966, Version: 0x2) dec: 630612001
 	
 	USB VID/PID:
 	NXHX 500/FTDI JTAG  0x0640 0x0028 "NXHX 500-ETM A"  "NXHX 500-RE A"
@@ -163,9 +170,9 @@ serial vectors                 ! TCM    10001ff0 - 10001fff  !  DTCM   04000ff0 
 		</Run>
 	</Cfg -->
 	
-	<!-- Configurations for netX56 -->
+	<!-- Configurations for netX51/52 -->
 	
-	<Cfg id="netX56 JTAGkey">
+	<Cfg id="netX51/52 JTAGkey">
 		<Init>
 			interface ft2232
 			ft2232_device_desc "Amontec JTAGkey A"
