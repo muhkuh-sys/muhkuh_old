@@ -18,7 +18,20 @@
 --   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             --
 -----------------------------------------------------------------------------
 
+---------------------------------------------------------------------------
+-- Description:
+--   select_plugin.lua: select plugin window for Muhkuh
+--
+--  Changes:
+--    Date        Author        Description
+--  21 feb 12     SL            keep reference to imagelist in the package
+--  9 sept 11     SL            moved the actual plugin handling to 
+--                              plugin_handler. This module contains only
+--                              the select window.
+---------------------------------------------------------------------------
+
 module("select_plugin", package.seeall)
+require("plugin_handler", package.seeall)
 
 local m_dialog = nil
 local m_list_devices = nil
@@ -26,21 +39,26 @@ local m_button_ok = nil
 local m_devices = {}
 local m_selected_device = nil
 local m_strPattern = nil
+local m_imageList = nil
+
 
 -- IDs of the controls in the dialog
 local ID_BUTTON_RESCAN   = 1
 local ID_LIST_DEVICES    = 2
 
 
+
 local function create_controls(size, iCol0Width, iCol1Width, iCol2Width)
-	-- size for images
-	local size_images = wx.wxSize(16, 16)
-
 	-- cross and tick images
-	local imageList = wx.wxImageList(size_images:GetWidth(), size_images:GetHeight())
-	imageList:Add(wx.wxArtProvider.GetBitmap(wx.wxART_CROSS_MARK, wx.wxART_TOOLBAR, size_images))
-	imageList:Add(wx.wxArtProvider.GetBitmap(wx.wxART_TICK_MARK, wx.wxART_TOOLBAR, size_images))
-
+	-- keep the reference to the imagelist, otherwise it may be GCed
+	if m_imageList == nil then
+		-- size for images
+		local size_images = wx.wxSize(16, 16)
+		m_imageList = wx.wxImageList(size_images:GetWidth(), size_images:GetHeight())
+		m_imageList:Add(wx.wxArtProvider.GetBitmap(wx.wxART_CROSS_MARK, wx.wxART_TOOLBAR, size_images))
+		m_imageList:Add(wx.wxArtProvider.GetBitmap(wx.wxART_TICK_MARK, wx.wxART_TOOLBAR, size_images))
+	end
+	
 	-- the main sizer contains the listctrl and the button sizer
 	local sizer_main = wx.wxBoxSizer(wx.wxVERTICAL)
 	local sizer_buttons = wx.wxBoxSizer(wx.wxHORIZONTAL)
@@ -48,7 +66,7 @@ local function create_controls(size, iCol0Width, iCol1Width, iCol2Width)
 	-- create the quick action list
 	local list_devices_style = wx.wxLC_REPORT+wx.wxLC_SINGLE_SEL+wx.wxLC_HRULES+wx.wxSUNKEN_BORDER+wx.wxLC_EDIT_LABELS
 	m_list_devices = wx.wxListCtrl(m_dialog, ID_LIST_DEVICES, wx.wxDefaultPosition, wx.wxDefaultSize, list_devices_style)
-	m_list_devices:SetImageList(imageList, wx.wxIMAGE_LIST_SMALL)
+	m_list_devices:SetImageList(m_imageList, wx.wxIMAGE_LIST_SMALL)
 	m_list_devices:InsertColumn(0, "Name")
 	m_list_devices:InsertColumn(1, "Typ")
 	m_list_devices:InsertColumn(2, "Comment")
@@ -110,6 +128,39 @@ local function create_controls(size, iCol0Width, iCol1Width, iCol2Width)
 end
 
 
+
+local function update_plugin_list()
+	local list_item = wx.wxListItem()
+	local item_id
+	local comment
+	
+	-- clear all entries in the list
+	m_list_devices:DeleteAllItems()
+
+	for iPlugin, plugin in ipairs(m_devices) do
+		-- append new item at the end of the list
+		item_id = m_list_devices:GetItemCount()
+		-- create the new list item
+		list_item:Clear()
+		list_item:SetMask(wx.wxLIST_MASK_TEXT+wx.wxLIST_MASK_IMAGE+wx.wxLIST_MASK_DATA)
+		list_item:SetId(item_id)  -- index in m_list_devices
+		list_item:SetData(iPlugin)-- index in m_devices
+		list_item:SetText(plugin:GetName())
+		
+		if plugin:IsUsed()==false then
+			list_item:SetImage(1)
+			comment = "free"
+		else
+			list_item:SetImage(0)
+			comment = "in use"
+		end
+		
+		item_id = m_list_devices:InsertItem(list_item)
+		m_list_devices:SetItem(item_id, 1, plugin:GetTyp())
+		m_list_devices:SetItem(item_id, 2, comment)
+	end
+end
+
 local function get_device_from_idx(index)
 	local tableindex = nil
 	local device = nil
@@ -128,95 +179,28 @@ end
 
 
 local function is_device_ok(device)
-	local fIsOk = false
-
-
-	if device~=nil and device:IsValid()==true and device:IsUsed()==false then
-		fIsOk = true
-	end
-
-	return fIsOk
+	return device~=nil and device:IsValid()==true and device:IsUsed()==false
 end
 
 
 local function device_selected(index)
-	local device
-
-
-	device = get_device_from_idx(index)
+	local device = get_device_from_idx(index)
 	m_button_ok:Enable(is_device_ok(device))
 end
 
 
-local function on_ok()
-	local lIdx
-	local device
 
-
-	-- is a device selected?
-	lIdx = m_list_devices:GetNextItem(-1, wx.wxLIST_NEXT_ALL, wx.wxLIST_STATE_FOCUSED)
-	device = get_device_from_idx(lIdx)
-	if is_device_ok(device)==true then
-		m_selected_device = device
-		m_dialog:EndModal(wx.wxID_OK)
-	end
-end
-
+-- event handlers
 
 local function on_rescan()
-	local plugin
-	local list_item = wx.wxListItem()
-	local item_id
-	local comment
-
-
-	-- clear all entries in the list
-	m_list_devices:DeleteAllItems()
-	-- clear all entries in the table
-	m_devices = {}
-
-	-- scan for the pattern
-	muhkuh.ScanPlugins(m_strPattern)
-
-	-- enter all devices into the list
-	while true do
-		plugin = muhkuh.GetNextPlugin()
-		if plugin==nil then
-			break
-		elseif plugin:IsValid()==false then
-			break
-		else
-			-- append the item to the table
-			table.insert(m_devices, plugin)
-			-- append new item at the end of the list
-			item_id = m_list_devices:GetItemCount()
-			-- create the new list item
-			list_item:Clear()
-			list_item:SetMask(wx.wxLIST_MASK_TEXT+wx.wxLIST_MASK_IMAGE+wx.wxLIST_MASK_DATA)
-			list_item:SetId(item_id)
-			list_item:SetData(#m_devices)
-			list_item:SetText(plugin:GetName())
-			if plugin:IsUsed()==false then
-				list_item:SetImage(1)
-				comment = "free"
-			else
-				list_item:SetImage(0)
-				comment = "in use"
-			end
-			item_id = m_list_devices:InsertItem(list_item)
-			m_list_devices:SetItem(item_id, 1, plugin:GetTyp())
-			m_list_devices:SetItem(item_id, 2, comment)
-		end
-	end
+	m_devices = plugin_handler.ScanPlugins(m_strPattern)
+	update_plugin_list()
 end
 
 
 local function on_item_selected(event)
-	local lIdx;
-
-
 	-- get the selected element
-	lIdx = event:GetIndex()
+	local lIdx = event:GetIndex()
 	device_selected(lIdx);
 end
 
@@ -225,15 +209,10 @@ local function on_item_deselected(event)
 	device_selected(-1)
 end
 
-
-local function on_item_activated(event)
-	local lIdx
-	local device
-
-
-	-- get the selected element
-	lIdx = event:GetIndex()
-	device = get_device_from_idx(lIdx)
+local function on_ok()
+	-- is a device selected?
+	local lIdx = m_list_devices:GetNextItem(-1, wx.wxLIST_NEXT_ALL, wx.wxLIST_STATE_FOCUSED)
+	local device = get_device_from_idx(lIdx)
 	if is_device_ok(device)==true then
 		m_selected_device = device
 		m_dialog:EndModal(wx.wxID_OK)
@@ -241,9 +220,20 @@ local function on_item_activated(event)
 end
 
 
+local function on_item_activated(event)
+	-- get the selected element
+	local lIdx = event:GetIndex()
+	local device = get_device_from_idx(lIdx)
+	if is_device_ok(device)==true then
+		m_selected_device = device
+		m_dialog:EndModal(wx.wxID_OK)
+	end
+end
+
+
+
 function SelectPlugin(pattern, dialog_size, dialog_iCol0Width, dialog_iCol1Width, dialog_iCol2Width)
 	local plugin_instance = nil
-
 
 	-- set default arguments
 	m_strPattern		= pattern or ".*"
@@ -252,9 +242,9 @@ function SelectPlugin(pattern, dialog_size, dialog_iCol0Width, dialog_iCol1Width
 	dialog_iCol1Width	= dialog_iCol1Width or wx.wxLIST_AUTOSIZE
 	dialog_iCol2Width	= dialog_iCol2Width or wx.wxLIST_AUTOSIZE
 
-
 	-- create the dialog
 	m_dialog = wx.wxDialog(wx.NULL, wx.wxID_ANY, "Select the plugin", wx.wxDefaultPosition, wx.wxDefaultSize, wx.wxDEFAULT_DIALOG_STYLE+wx.wxRESIZE_BORDER)
+	
 	-- create dialog controls
 	create_controls(dialog_size, dialog_iCol0Width, dialog_iCol1Width, dialog_iCol2Width)
 
@@ -264,6 +254,7 @@ function SelectPlugin(pattern, dialog_size, dialog_iCol0Width, dialog_iCol1Width
 	m_dialog:Connect(ID_LIST_DEVICES,	wx.wxEVT_COMMAND_LIST_ITEM_DESELECTED,	on_item_deselected)
 	m_dialog:Connect(ID_LIST_DEVICES,	wx.wxEVT_COMMAND_LIST_ITEM_ACTIVATED,	on_item_activated)
 
+
 	-- initial scan
 	on_rescan()
 
@@ -272,22 +263,15 @@ function SelectPlugin(pattern, dialog_size, dialog_iCol0Width, dialog_iCol1Width
 
 	-- Show the dialog
 	if m_dialog:ShowModal(true)==wx.wxID_OK then
-		local env = _G
-		local fullname = m_selected_device:GetLuaCreateFn()
-		for w in string.gmatch(fullname, "[^\.]+") do
-			env = env[w]
-			if env==nil then
-				break
-			end
-		end
-
-		if env~=nil and type(env)=="function" then
-			plugin_instance = env(m_selected_device:GetHandle())
+		local plugin_instance, strError = plugin_handler.getPluginInstance(m_selected_device)
+		if plugin_instance then
+			return plugin_instance
 		else
-			error("plugin '"..m_selected_device:GetName().."' specified an invalid contructor: '"..fullname.."'")
+			strError = strError or "unknown error while opening plugin"
+			error (strError)
 		end
 	end
-
-	return plugin_instance
+	
+	return 
 end
 
