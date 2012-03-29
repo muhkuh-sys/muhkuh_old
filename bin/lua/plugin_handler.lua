@@ -1,21 +1,14 @@
-module("plugin_handler", package.seeall)
-
-require("romloader_usb")
-require("romloader_uart")
-require("romloader_eth")
-
 ---------------------------------------------------------------------------
 -- Copyright (C) 2012 Hilscher Gesellschaft für Systemautomation mbH
 --
 -- Description:
---   plugin_handler.lua: low-level plugin handling 
--- 
 -- - Scan for V1 and V2 plugins
 -- - Remove some unwanted plugin references from the list
 -- - Instantiate plugin references, add V2 function name aliases to V1 plugins
 --
 --  Changes:
 --    Date        Author  Description
+--  29 mar  12    SL      rewrote OpenOCD filtering, including blank FTDI
 --  27 mar  12    SL      skip V1 UART references if romloader_uart v2 is loaded
 --                        added ethernet
 --  23 mar  12    SL      renamed netx56->51/52 in JTAGkey filter list
@@ -26,6 +19,17 @@ require("romloader_eth")
 --   3 nov  11    SL      added wrap_v1_plugin_instance, cleanup
 --  13 sept 11    SL      Created
 ---------------------------------------------------------------------------
+
+module("plugin_handler", package.seeall)
+
+---------------------------------------------------------------------------
+-- SVN Keywords
+--
+SVN_DATE   ="$Date: $"
+SVN_VERSION="$Revision: $"
+-- $Author: $
+---------------------------------------------------------------------------
+
 
 -- ================================================================
 --                     enumerate plugins/interfaces
@@ -60,6 +64,7 @@ require("romloader_eth")
 -- ** This assumes that only one netX is connected via a JTAGkey or
 -- ** blank FTDI chip.
 
+
 function ScanPlugins(strPattern)
 	local atPluginRefs = {}
 	local atPluginRefsV1OpenOCD = {}
@@ -76,6 +81,7 @@ function ScanPlugins(strPattern)
 		-- collect OpenOCD configs in separate list for filtering
 		if pr:GetTyp()=="romloader_openocd" then
 			table.insert(atPluginRefsV1OpenOCD, pr)
+			
 		-- skip V1 UART references if romloader_uart v2 is loaded
 		elseif pr:GetTyp()=="romloader_uart" then
 			if romloader_uart == nil then
@@ -83,38 +89,41 @@ function ScanPlugins(strPattern)
 			else
 				-- print("Skipping old-style COM plugin")
 			end
+			
 		else
 			table.insert(atPluginRefs, pr)
 		end
 	end
 	
-	-- If more than one JTAG plugin has been found, filter them.
-	local iChiptype = nil
-	local strChiptypeName = nil
-
-	if #atPluginRefsV1OpenOCD == 1 then
-		table.insert(atPluginRefs, atPluginRefsV1OpenOCD[1])
-	elseif #atPluginRefsV1OpenOCD > 1 then
-		for i, pr in ipairs(atPluginRefsV1OpenOCD) do
-				if iChiptype == nil then
-					local plugin = getOldPluginInstance(pr)
-					plugin:connect()
-					iChiptype = plugin:get_chiptyp()
-					strChiptypeName = plugin:get_chiptyp_name(iChiptype)
-					plugin:disconnect()
-					plugin:delete()
-					plugin = nil
-				end
-				
-				if iChiptype and openocd_is_plugin_compatible(pr, iChiptype, strChiptypeName) then
-					table.insert(atPluginRefs, pr)
-				else
-					print("skipped: ", pr:GetName(), "(openOCD config does not match detected chiptype)")   
-				end
+	-- Look at the names of the JTAG plugin references.
+	-- Gather those containing "JTAGkey" or "blank FTDI" in separate lists.
+	-- Any others (NXHX 500 RE etc.) are accepted into the result list without checking.
+	
+	local atJTAGKeyRefs = {}
+	local atBlankFtdiRefs = {}
+	local strPluginName
+	
+	local atPluginRefsToFilter = {}
+	for i, pr in ipairs(atPluginRefsV1OpenOCD) do
+		local strPluginName = pr:GetName()
+		strPluginName = strPluginName:lower()
+		if strPluginName:find("jtagkey") then
+			table.insert(atJTAGKeyRefs, pr)
+		elseif strPluginName:find("blank ftdi") then
+			table.insert(atBlankFtdiRefs, pr)
+		else
+			table.insert(atPluginRefs, pr)
 		end
 	end
-
 	
+	checkJtagRefs(atJTAGKeyRefs, atPluginRefs)
+	checkJtagRefs(atBlankFtdiRefs, atPluginRefs)
+	
+	
+	-- Scan for V2 plugins
+	-- skip plugin references whose name does not match the pattern 
+	-- AND devices already recognized by "old" USB plugin
+		
 	if __MUHKUH_PLUGINS then
 		print("Scanning for V2 plugins")
 		local atPluginRefsV2 = {}
@@ -123,9 +132,7 @@ function ScanPlugins(strPattern)
 			print(string.format("Found %d interfaces with plugin_provider %s", iDetected, pp:GetID()))
 		end
 		
-		-- filter out plugins whose name does not match the pattern 
-		-- AND devices already recognized by "old" USB plugin
-		
+		-- collect a list of V1 plugin names
 		local afV1PluginNames = {}
 		for i, pr in ipairs(atPluginRefs) do
 			afV1PluginNames[pr:GetName()] = true
@@ -149,53 +156,70 @@ function ScanPlugins(strPattern)
 	return atPluginRefs
 end
 
+-- Check plugin references in atJTAGRefs for the correct chip type and
+-- Insert the accepted plugin refs into atPluginRefs.
+-- Filtering is only done if there are more than one config
+-- to choose from AND exactly one matching config is found.
 
--- from Muhkuh V1 romloader.cpp SVN >=1444
-ROMLOADER_CHIPTYP_UNKNOWN			= 0
-ROMLOADER_CHIPTYP_NETX500			= 1
-ROMLOADER_CHIPTYP_NETX100			= 2
-ROMLOADER_CHIPTYP_NETX50			= 3
-ROMLOADER_CHIPTYP_NETX5				= 4
-ROMLOADER_CHIPTYP_NETX10			= 5
-ROMLOADER_CHIPTYP_NETX56			= 6
-
-
-openocd_filter_patterns = {
-{strPattern = "netx100/500.*jtagkey.*",      aiChiptypes = {ROMLOADER_CHIPTYP_NETX500, ROMLOADER_CHIPTYP_NETX100}},
-{strPattern = "netx50.+jtagkey.*",           aiChiptypes = {ROMLOADER_CHIPTYP_NETX50}},
-{strPattern = "netx10.+jtagkey.*",           aiChiptypes = {ROMLOADER_CHIPTYP_NETX10}},
-{strPattern = "netx51/52.+jtagkey.*",        aiChiptypes = {ROMLOADER_CHIPTYP_NETX56}},
-
-{strPattern = "NXHX 100/500 blank FTDI",      aiChiptypes = {ROMLOADER_CHIPTYP_NETX500, ROMLOADER_CHIPTYP_NETX100}},
-{strPattern = "NXHX 50 blank FTDI",           aiChiptypes = {ROMLOADER_CHIPTYP_NETX50}},
-{strPattern = "NXHX 10 blank FTDI",           aiChiptypes = {ROMLOADER_CHIPTYP_NETX10}},
-}
-
--- Checks if an openOCD plugin reference matches iChipType.
--- pr: V1 plugin reference
--- iChiptype, strChiptypeName: detected chip type
--- 
--- Limitation: This will not work correctly when more than one OpenOCD devices
--- are connected to the PC.
-
-function openocd_is_plugin_compatible(pr, iChiptype, strChiptypeName)
-	local strName = pr:GetName()
-	strName = strName:lower()
-	print("openocd_is_plugin_compatible", strName, iChiptype, strChiptypeName)
-	local fNameFound = false
-	for _, tEntry in ipairs(openocd_filter_patterns) do
-		if strName:match(tEntry.strPattern) then
-			print(strName, tEntry.strPattern)
-			for _, iType in ipairs(tEntry.aiChiptypes) do
-				if iType == iChiptype then
-					return true
+function checkJtagRefs(atJTAGRefs, atPluginRefs)
+	local fFiltered = false
+	local tSelectedPluginRefs = {}
+	
+	if #atJTAGRefs > 1 then
+		
+		local iChiptype = nil
+		local strChiptypeName = nil
+		local aChipTypeFlags = {}
+		local pr = atJTAGRefs[1]
+		local plugin = getOldPluginInstance(pr)
+		
+		plugin:connect()
+		iChiptype = plugin:get_chiptyp()
+		strChiptypeName = plugin:get_chiptyp_name(iChiptype)
+		plugin:disconnect()
+		plugin:delete()
+		plugin = nil
+		
+		if iChiptype ~= 0 and strChiptypeName then
+			print("detected chip type: ", strChiptypeName)
+			for strChiptype in strChiptypeName:gmatch("%d+") do
+				if strChiptype == "51" or strChiptype == "52" then
+					strChiptype = "56"
+				end
+				aChipTypeFlags[strChiptype] = true
+			end
+			
+			for i, pr in ipairs(atJTAGRefs) do
+				local strPluginName = pr:GetName()
+				for strPluginChiptype in strPluginName:gmatch("%d+") do
+					--print("strPluginChiptype:", strPluginChiptype)
+					if strPluginChiptype == "51" or strPluginChiptype == "52" then
+						strPluginChiptype = "56"
+					end
+					
+					if aChipTypeFlags[strPluginChiptype] then
+						print("accepted: ", strPluginName)
+						table.insert(tSelectedPluginRefs, pr)
+						break
+					end
 				end
 			end
-			return false
+			
+			if #tSelectedPluginRefs == 1 then 
+				fFiltered = true
+			end
 		end
-	
 	end
-	return true
+	
+	if fFiltered then
+		for i, pr in ipairs(tSelectedPluginRefs) do
+			table.insert(atPluginRefs, pr)
+		end
+	else
+		for i, pr in ipairs(atJTAGRefs) do
+			table.insert(atPluginRefs, pr)
+		end
+	end
 end
 
 
