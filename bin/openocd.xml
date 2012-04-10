@@ -6,6 +6,7 @@ Description:
 
 Changes:
   Date        Author   Description
+10 apr 2012   SL       added NXHX 51/52 blank FTDI
 23 mar 2012   SL       renamed netx56 to netx51/52   
 
 
@@ -224,6 +225,19 @@ serial vectors                 ! TCM    10001ff0 - 10001fff  !  DTCM   04000ff0 
 		</Init>
 		<Run>
 			script plugins/openocd/netx10_run_tcm_dccout.txt
+		</Run>
+	</Cfg>
+	
+	<Cfg id = "NXHX 51/52 blank FTDI">
+		<Init>
+			interface ft2232
+			ft2232_device_desc "Dual RS232"
+			ft2232_layout "comstick"
+			ft2232_vid_pid 0x0403 0x6001
+			script plugins/openocd/netx56_init_workarea0380.txt
+		</Init>
+		<Run>
+			script plugins/openocd/netx56_run_tcm_dccout.txt
 		</Run>
 	</Cfg>
 	-->
