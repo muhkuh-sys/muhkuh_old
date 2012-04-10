@@ -17,14 +17,28 @@
 --   Free Software Foundation, Inc.,                                       --
 --   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             --
 -----------------------------------------------------------------------------
-
+-- 
+-- Description:
+--   tester.lua Muhkuh V1 production test framework
+--
+--  Changes:
+--    Date      Author   Description
+--  7  mar 12   SL       getCommonPlugin/closeCommonPlugin: delete plugin only
+--                       if delete method exists (V2 plugins don't have it)
+-----------------------------------------------------------------------------
 -- This version of tester.lua is meant for testing large numbers of boards.
 -- It stores the log texts for each board and each test in a temp file, and
 -- generates separate HTML files for each board. 
 -- Note that the full logs are still kept in the Muhkuh text log area.
 
-
 module("tester", package.seeall)
+-----------------------------------------------------------------------------
+-- SVN Keywords
+SVN_DATE   ="$Date$"
+SVN_VERSION="$Revision$"
+SVN_AUTHOR ="$Author$"
+-----------------------------------------------------------------------------
+
 require("utils")  -- for temp file handling
 require("select_plugin")
 
@@ -284,7 +298,9 @@ function getCommonPlugin(pattern)
 				print("connected")
 				m_commonPlugin = plugin
 			else
-				plugin:delete()
+				if plugin.delete then
+					plugin:delete()
+				end
 				print(strError)
 				print("could not connect")
 				print(debug.traceback())
@@ -297,7 +313,9 @@ end
 function closeCommonPlugin()
 	if m_commonPlugin then
 		m_commonPlugin:disconnect()
-		m_commonPlugin:delete()
+		if m_commonPlugin.delete then
+			m_commonPlugin:delete()
+		end
 		m_commonPlugin = nil
 	end
 end
