@@ -30,6 +30,10 @@ SVN_VERSION="$Revision$"
 -- $Author$
 ---------------------------------------------------------------------------
 
+print(pcall(require, "romloader_uart"))
+print(pcall(require, "romloader_usb"))
+print(pcall(require, "romloader_eth"))
+
 -- ================================================================
 --                     enumerate plugins/interfaces
 -- ================================================================
