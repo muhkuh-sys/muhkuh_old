@@ -25,11 +25,10 @@ module("plugin_handler", package.seeall)
 ---------------------------------------------------------------------------
 -- SVN Keywords
 --
-SVN_DATE   ="$Date: $"
-SVN_VERSION="$Revision: $"
--- $Author: $
+SVN_DATE   ="$Date$"
+SVN_VERSION="$Revision$"
+-- $Author$
 ---------------------------------------------------------------------------
-
 
 -- ================================================================
 --                     enumerate plugins/interfaces
